@@ -1,0 +1,15 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+<h1>Home</h1>
+
+  <p>Welcome to <em>My Articles</em>, the site, which contains my writings about traveling.</p>
+
+<h2>Lets see what I have here for reading...</h2>
+
+  <p>The article's library has the following record counts:</p>
+  <ul>
+    <li><strong>Articles:</strong> {{ num_published_articles }}</li>
+  </ul>
+
+{% endblock %}
