@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.views import generic
 
-from .models import Article
+from .models import Article #, Image
 
 
 def index(request):
@@ -23,3 +23,5 @@ class ArticleListView(generic.ListView):
 
 class ArticleDetailView(generic.DetailView):
     model = Article
+    # summary_image_url = Image.objects.all().count()
+    # print(summary_image_url)

@@ -15,17 +15,19 @@ class Article(models.Model):
     )
     author = models.ForeignKey(
         User,
-        on_delete=models.CASCADE,
-        null=True,
-        help_text="Article author (choose username)."
+        on_delete=models.SET_NULL,
+        help_text="Article author (choose username).",
+        null=True
     )
     summary = models.TextField(
         max_length=1000,
         help_text="Enter a brief description of the article."
     )
-    pict_url = models.TextField(
-        max_length=1000,
-        help_text="Add URL of the summary image."
+    pict_url = models.ForeignKey(
+        'Image',
+        null=True,
+        on_delete=models.SET_NULL,
+        help_text="Add here image code to be used it article summary"
     )
     body = models.TextField(
         help_text="Add an article here. Use html tags."
@@ -48,3 +50,40 @@ class Article(models.Model):
 
     class Meta:
         ordering = ('-publish',)
+
+
+class Image(models.Model):
+    image_code = models.CharField(
+        max_length=10,
+        help_text="Add here code to use in articles"
+    )
+    image_small_url = models.URLField(
+        help_text="Add here image small size url"
+    )
+    image_middle_url = models.URLField(
+        help_text="Add here image middle size url"
+    )
+    image_original_url = models.URLField(
+        help_text="Add here image original size url"
+    )
+
+    def __str__(self):
+        return self
+
+    def get_image_small_size_url_code(self):
+        return self.image_code+'_s'
+
+    def get_image_middle_size_url_code(self):
+        return self.image_code+'_m'
+
+    def get_image_original_size_url_code(self):
+        return self.image_code+'_o'
+
+    def get_image_small_size_url(self):
+        return self.image_small_url
+
+    def get_image_middle_size_url(self):
+        return self.image_middle_url
+
+    def get_image_original_size_url(self):
+        return self.image_original_url
