@@ -23,12 +23,6 @@ class Article(models.Model):
         max_length=1000,
         help_text="Enter a brief description of the article."
     )
-    pict_url = models.ForeignKey(
-        'Image',
-        null=True,
-        on_delete=models.SET_NULL,
-        help_text="Add here image code to be used it article summary"
-    )
     body = models.TextField(
         help_text="Add an article here. Use html tags."
     )
@@ -48,6 +42,9 @@ class Article(models.Model):
     def get_absolute_url(self):
         return reverse('article-detail', args=[str(self.id)])
 
+    def get_head_image_url(self):
+        return Image.objects.get(article=self.id).image_small_url
+
     class Meta:
         ordering = ('-publish',)
 
@@ -55,7 +52,7 @@ class Article(models.Model):
 class Image(models.Model):
     image_code = models.CharField(
         max_length=10,
-        help_text="Add here code to use in articles"
+        help_text="Add here code to use in the articles"
     )
     image_small_url = models.URLField(
         help_text="Add here image small size url"
@@ -66,24 +63,22 @@ class Image(models.Model):
     image_original_url = models.URLField(
         help_text="Add here image original size url"
     )
+    image_text = models.TextField(
+        max_length=1000,
+        help_text="Enter a brief description of the image."
+    )
+    article_head = models.BooleanField(
+        help_text="Check this, if image is article's main image."
+    )
+    slideshow = models.BooleanField(
+        help_text="Check this, if image is included in slideshow"
+    )
+    article = models.ForeignKey(
+        "Article",
+        on_delete=models.SET_NULL,
+        help_text="Choose article for the image",
+        null=True
+    )
 
     def __str__(self):
-        return self
-
-    def get_image_small_size_url_code(self):
-        return self.image_code+'_s'
-
-    def get_image_middle_size_url_code(self):
-        return self.image_code+'_m'
-
-    def get_image_original_size_url_code(self):
-        return self.image_code+'_o'
-
-    def get_image_small_size_url(self):
-        return self.image_small_url
-
-    def get_image_middle_size_url(self):
-        return self.image_middle_url
-
-    def get_image_original_size_url(self):
-        return self.image_original_url
+        return self.image_code

@@ -7,9 +7,20 @@
     <ul>
 
       {% for article in article_list %}
-      <li>
-        <a href="{{ article.get_absolute_url }}">{{ article.title }}</a> ({{article.author}})
-      </li>
+        <hr/>
+        <table>
+              <tr>
+                  <td><img src="{{ article.get_head_image_url }}" width="240"/></td>
+                  <td>
+                      <p>
+                          <a href="{{ article.get_absolute_url }}">
+                             {{ article.title }}</a> ({{article.author.last_name}}, {{ article.author.first_name }})
+                          <br/>
+                          {{ article.summary }}
+                      </p>
+                  </td>
+              </tr>
+        </table>
       {% endfor %}
 
     </ul>
