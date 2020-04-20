@@ -1,3 +1,4 @@
+# -*- coding:utf-8 -*-
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
@@ -45,6 +46,12 @@ class Article(models.Model):
     def get_head_image_url(self):
         return Image.objects.get(article=self.id).image_small_url
 
+    def display_author(self):
+        return User.objects.get(username=self.author).first_name \
+               + ', ' + User.objects.get(username=self.author).last_name
+
+    display_author.short_description = 'Author'
+
     class Meta:
         ordering = ('-publish',)
 
@@ -82,3 +89,36 @@ class Image(models.Model):
 
     def __str__(self):
         return self.image_code
+
+
+class Comment(models.Model):
+    comment_article = models.ForeignKey(
+        Article,
+        on_delete=models.CASCADE,
+        related_name='articles',
+        help_text='Comment on article',
+        null=True
+    )
+    comment_user = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        related_name='users',
+        help_text='User who posted this comment',
+        null=True
+        )
+    comment_text = models.TextField(help_text='Add your comment here')
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_updated = models.DateTimeField(auto_now=True)
+    is_active = models.BooleanField(
+        default=True,
+        help_text='Uncheck to deactivate comment'
+    )
+
+    class Meta:
+        ordering = ('date_created',)
+
+    def __str__(self):
+        return 'Comment by {} on {}'.format(
+            self.comment_user,
+            self.comment_article
+        )

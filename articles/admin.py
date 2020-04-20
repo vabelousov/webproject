@@ -1,5 +1,7 @@
+# -*- coding:utf-8 -*-
 from django.contrib import admin
-from .models import Article, Image
+from django.contrib.auth.models import User
+from .models import Article, Image, Comment
 
 
 class ImageInline(admin.StackedInline):
@@ -16,7 +18,7 @@ class ImageInline(admin.StackedInline):
 
 @admin.register(Article)
 class ArticleAdmin(admin.ModelAdmin):
-    list_display = ('title', 'author', 'status')
+    list_display = ('title', 'display_author', 'status')
     list_filter = ('status', 'publish')
     fieldsets = (
         (None, {
@@ -44,3 +46,27 @@ class ImageAdmin(admin.ModelAdmin):
             'fields': (('image_small_url', 'image_middle_url', 'image_original_url',),)
         }),
     )
+
+
+admin.site.unregister(User)
+
+
+@admin.register(User)
+class MyUserAdmin(admin.ModelAdmin):
+    list_display = (
+        'username',
+        'first_name',
+        'last_name',
+        'email',
+        'is_staff',
+        'is_superuser',
+        'is_active'
+    )
+
+
+@admin.register(Comment)
+class CommentAdmin(admin.ModelAdmin):
+    list_display = ('comment_user', 'comment_article', 'date_created', 'is_active')
+    list_filter = ('comment_user', 'comment_article', 'is_active', 'date_created')
+    search_fields = ('comment_user', 'comment_text')
+

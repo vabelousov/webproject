@@ -1,3 +1,4 @@
+# -*- coding:utf-8 -*-
 from django.conf.urls import url
 
 from . import views
@@ -8,4 +9,12 @@ urlpatterns = [
         name='articles'),
     url(r'^article/(?P<pk>\d+)$', views.ArticleDetailView.as_view(),
         name='article-detail'),
+]
+
+urlpatterns += [
+    url(r'^myarticles/$', views.ArticlesByAuthorListView.as_view(), name='my-articles'),
+]
+
+urlpatterns += [
+    url(r'^signup/$', views.signup, name='signup'),
 ]

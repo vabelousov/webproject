@@ -1,13 +1,22 @@
+# -*- coding:utf-8 -*-
 from django.shortcuts import render
+from django.urls import reverse
 from django.views import generic
+from django.views.generic.edit import FormMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth import login, authenticate
+from django.contrib.auth.forms import UserCreationForm
+from django.shortcuts import render   #, redirect
+from django.http import HttpResponseRedirect
 
-from .models import Article, Image
+from .models import Article, Image, Comment
+from .forms import CommentForm
 
 
 def index(request):
-    num_published_articles = Article.objects. \
-        filter(status__exact='published').count()
-
+    num_published_articles = Article.objects.filter(
+        status__exact='published'
+    ).count()
     return render(
         request,
         'index.html',
@@ -25,11 +34,15 @@ class ArticleListView(generic.ListView):
         return Article.objects.filter(status__exact='published')
 
 
-class ArticleDetailView(generic.DetailView):
+class ArticleDetailView(FormMixin, generic.DetailView):
     model = Article
+    form_class = CommentForm
+
+    def get_success_url(self):
+        return reverse('article-detail', kwargs={'pk': self.object.pk})
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+        context = super(ArticleDetailView, self).get_context_data(**kwargs)
         '''
         ниже в цикле я заменяю все вхождения 
         условных кодов картинок на их пути
@@ -43,4 +56,55 @@ class ArticleDetailView(generic.DetailView):
                 '[' + img.image_code + '_o]',
                 img.image_original_url
             )
+        context['comments'] = Comment.objects.filter(
+            comment_article__exact=context['article'].id
+        ).filter(is_active=True)
+        comment_form = CommentForm(
+            initial={
+                'comment_user': self.request.user,
+                'comment_article': context['article'].id
+            }
+        )
+        context['comment_form'] = comment_form
         return context
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        form = self.get_form()
+
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
+    def form_valid(self, form):
+        form.save()
+        return super(ArticleDetailView, self).form_valid(form)
+
+
+class ArticlesByAuthorListView(LoginRequiredMixin, generic.ListView):
+    model = Article
+    template_name = 'articles/author_articles.html'
+    paginate_by = 3
+
+    def get_queryset(self):
+        return Article.objects.filter(
+            author=self.request.user
+        ).filter(status__exact='published').order_by('-publish')
+
+
+def signup(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data.get('username')
+            raw_password = form.cleaned_data.get('password1')
+            user = authenticate(username=username, password=raw_password)
+            login(request, user)
+            return HttpResponseRedirect(reverse('index'))
+        else:
+            print('form is not valid!!!!')
+    else:
+        form = UserCreationForm()
+    return render(request, 'signup.html', {'form': form})

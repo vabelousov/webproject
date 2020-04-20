@@ -1,0 +1,19 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+    <h1>My articles</h1>
+
+    {% if article_list %}
+    <ul>
+
+      {% for article in article_list %} 
+      <li>
+        <a href="{% url 'article-detail' article.pk %}">{{article.title}}</a> ({{ article.publish }})        
+      </li>
+      {% endfor %}
+    </ul>
+
+    {% else %}
+      <p>You do not have any articles yet.</p>
+    {% endif %}       
+{% endblock %}

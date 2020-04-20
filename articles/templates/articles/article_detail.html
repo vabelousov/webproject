@@ -1,12 +1,37 @@
 {% extends "base_generic.html" %}
-
+{% load humanize %}
 {% block content %}
   <h1>{{ article.title }}</h1>
   <small>{{ article.summary }}</small>
   <hr/>
   {% autoescape off %}
-    {{ article.body }}
+    {{ article.body|safe }}
   {% endautoescape %}
   <hr/>
-  {{ article.author.last_name }}, {{ article.author.first_name }}
+<b>{{ article.author.last_name }}, {{ article.author.first_name }}</b>
+  <hr/>
+  <h3>Comments:</h3>
+    {% for comment in comments.all %}
+        <div class="comment">
+            <p><b>{{ comment.comment_user.username }}</b>
+                <i>{{ comment.date_created|naturaltime }}</i></p>
+            <div>{{ comment.comment_text|safe }}</div>
+        </div>
+    {% empty %}
+      <p>No comments here yet :(</p>
+    {% endfor %}
+    {% if user.is_authenticated %}
+    <hr/>
+    <form method="post" action="">
+        {% csrf_token %}
+        <h3>Add a comment as {{ user.username }}</h3>
+        {{ comment_form.as_p|safe }}
+        <p><input type="submit"></p>
+    </form>
+    {% else %}
+    <br/>
+    To comment you need to
+    <a href="{% url 'login' %}?next={{ request.path }}"> Login</a></li>
+    {% endif %}
+    <hr/>
 {% endblock %}
