@@ -31,7 +31,8 @@
     {% else %}
     <br/>
     To comment you need to
-    <a href="{% url 'login' %}?next={{ request.path }}"> Login</a></li>
+    <a href="{% url 'login' %}?next={{ request.path }}"> Login</a> --OR--
+    <a href="{% url 'social:begin' 'facebook' %}">Login with Facebook</a>
     {% endif %}
     <hr/>
 {% endblock %}

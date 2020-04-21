@@ -34,6 +34,7 @@
             {% if request.user|has_group:"Publishers"%}
               <li><a href="{% url 'my-articles' %}">My Articles</a></li>
             {% endif %}
+            <li><a href="{% url 'settings' %}">Settings</a></li>
             <li><a href="{% url 'logout' %}?next={{ request.path }}">Logout</a></li>
           {% else %}
             <li><a href="{% url 'login' %}?next={{ request.path }}">Login</a></li>

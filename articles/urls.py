@@ -1,4 +1,5 @@
 # -*- coding:utf-8 -*-
+
 from django.conf.urls import url
 
 from . import views
@@ -12,6 +13,9 @@ urlpatterns = [
 ]
 
 urlpatterns += [
-    url(r'^myarticles/$', views.ArticlesByAuthorListView.as_view(), name='my-articles'),
+    url(
+        r'^myarticles/$',
+        views.ArticlesByAuthorListView.as_view(),
+        name='my-articles'
+    ),
 ]
-

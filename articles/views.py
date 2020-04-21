@@ -1,9 +1,11 @@
 # -*- coding:utf-8 -*-
+
 from django.urls import reverse
 from django.views import generic
 from django.views.generic.edit import FormMixin
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login  # authenticate
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 from django.http import HttpResponseRedirect
@@ -12,6 +14,11 @@ from django.utils.encoding import force_bytes, force_text
 from django.utils.http import urlsafe_base64_encode
 from django.utils.http import urlsafe_base64_decode
 from django.template.loader import render_to_string
+from django.contrib.auth.forms import AdminPasswordChangeForm,\
+    PasswordChangeForm
+from django.contrib.auth import update_session_auth_hash
+from django.contrib import messages
+from social_django.models import UserSocialAuth
 
 from .models import Article, Image, Comment
 from .forms import CommentForm, SignUpForm
@@ -49,7 +56,7 @@ class ArticleDetailView(FormMixin, generic.DetailView):
     def get_context_data(self, **kwargs):
         context = super(ArticleDetailView, self).get_context_data(**kwargs)
         '''
-        ниже в цикле я заменяю все вхождения 
+        ниже в цикле я заменяю все вхождения
         условных кодов картинок на их пути
         '''
         for img in Image.objects.filter(article__exact=context['article'].id):
@@ -103,7 +110,6 @@ def signup(request):
     Вьюшка регистрации на сайте (с использованием профайла)
     используется Signal
     '''
-    template_name = '/templates/registration/signup.html'
     if request.method == 'POST':
         form = SignUpForm(request.POST)
         if form.is_valid():
@@ -119,7 +125,7 @@ def signup(request):
                 'token': account_activation_token.make_token(user),
             })
             user.email_user(subject, message)
-            #return redirect('account_activation_sent')
+            # return redirect('account_activation_sent')
             return HttpResponseRedirect(reverse('account_activation_sent'))
         else:
             print('form is not valid!!!!')
@@ -147,3 +153,47 @@ def activate(request, uidb64, token):
         return HttpResponseRedirect(reverse('index'))
     else:
         return render(request, 'account_activation_invalid.html')
+
+
+@login_required
+def settings(request):
+    user = request.user
+
+    try:
+        facebook_login = user.social_auth.get(provider='facebook')
+    except UserSocialAuth.DoesNotExist:
+        facebook_login = None
+
+    can_disconnect = (
+            user.social_auth.count() > 1
+            or user.has_usable_password()
+    )
+
+    return render(request, 'settings.html', {
+        'facebook_login': facebook_login,
+        'can_disconnect': can_disconnect
+    })
+
+
+@login_required
+def password(request):
+    if request.user.has_usable_password():
+        PasswordForm = PasswordChangeForm
+    else:
+        PasswordForm = AdminPasswordChangeForm
+
+    if request.method == 'POST':
+        form = PasswordForm(request.user, request.POST)
+        if form.is_valid():
+            form.save()
+            update_session_auth_hash(request, form.user)
+            messages.success(
+                request,
+                'Your password was successfully updated!'
+            )
+            return redirect('settings')
+        else:
+            messages.error(request, 'Please correct the error below.')
+    else:
+        form = PasswordForm(request.user)
+    return render(request, 'password.html', {'form': form})

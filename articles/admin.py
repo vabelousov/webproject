@@ -1,4 +1,5 @@
 # -*- coding:utf-8 -*-
+
 from django.contrib import admin
 from django.contrib.auth.models import User
 from .models import Article, Image, Comment, Profile
@@ -14,6 +15,13 @@ class ImageInline(admin.StackedInline):
         ),
     ]
     extra = 0
+
+
+class ProfileInline(admin.StackedInline):
+    model = Profile
+    can_delete = False
+    verbose_name_plural = 'Profile'
+    fk_name = 'user'
 
 
 @admin.register(Article)
@@ -43,16 +51,17 @@ class ImageAdmin(admin.ModelAdmin):
             'fields': ('image_text', 'article_head', 'slideshow',)
         }),
         ('URLs', {
-            'fields': (('image_small_url', 'image_middle_url', 'image_original_url',),)
+            'fields': ((
+                           'image_small_url',
+                           'image_middle_url',
+                           'image_original_url',
+                       ),)
         }),
     )
 
 
-admin.site.unregister(User)
-
-
-@admin.register(User)
 class MyUserAdmin(admin.ModelAdmin):
+    inlines = [ProfileInline]
     list_display = (
         'username',
         'first_name',
@@ -60,19 +69,36 @@ class MyUserAdmin(admin.ModelAdmin):
         'email',
         'is_staff',
         'is_superuser',
-        'is_active'
+        'is_active',
+        'get_location'
     )
+
+    def get_location(self, instance):
+        return instance.profile.location
+    get_location.short_description = 'Location'
+
+    def get_inline_instances(self, request, obj=None):
+        if not obj:
+            return list()
+        return super(MyUserAdmin, self).get_inline_instances(request, obj)
 
 
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):
-    list_display = ('comment_user', 'comment_article', 'date_created', 'is_active')
-    list_filter = ('comment_user', 'comment_article', 'is_active', 'date_created')
+    list_display = (
+        'comment_user',
+        'comment_article',
+        'date_created',
+        'is_active'
+    )
+    list_filter = (
+        'comment_user',
+        'comment_article',
+        'is_active',
+        'date_created'
+    )
     search_fields = ('comment_user', 'comment_text')
 
 
-@admin.register(Profile)
-class ProfileAdmin(admin.ModelAdmin):
-    list_display = ('user', 'location', 'birth_date')
-    list_filter = ('location',)
-    search_fields = ('location',)
+admin.site.unregister(User)
+admin.site.register(User, MyUserAdmin)

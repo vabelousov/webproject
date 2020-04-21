@@ -1,4 +1,5 @@
 # -*- coding:utf-8 -*-
+
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
@@ -144,6 +145,9 @@ class Profile(models.Model):
         blank=True,
         help_text='Add your birthday here'
     )
+
+    def __str__(self):
+        return self.user.username
 
 
 @receiver(post_save, sender=User)
