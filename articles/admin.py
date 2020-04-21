@@ -22,6 +22,15 @@ class ProfileInline(admin.StackedInline):
     can_delete = False
     verbose_name_plural = 'Profile'
     fk_name = 'user'
+    fields = (
+        'avatar_tag',
+        'avatar',
+        'bio',
+        'location',
+        'birth_date',
+        'email_confirmed'
+    )
+    readonly_fields = ['avatar_tag']  # Specify that this read only field
 
 
 @admin.register(Article)
@@ -63,6 +72,7 @@ class ImageAdmin(admin.ModelAdmin):
 class MyUserAdmin(admin.ModelAdmin):
     inlines = [ProfileInline]
     list_display = (
+        'avatar_tag',
         'username',
         'first_name',
         'last_name',
@@ -81,6 +91,9 @@ class MyUserAdmin(admin.ModelAdmin):
         if not obj:
             return list()
         return super(MyUserAdmin, self).get_inline_instances(request, obj)
+
+    def avatar_tag(self, obj):
+        return obj.profile.avatar_tag()
 
 
 @admin.register(Comment)

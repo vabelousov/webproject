@@ -6,6 +6,7 @@ from django.utils import timezone
 from django.urls import reverse
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.utils.safestring import mark_safe
 
 
 class Article(models.Model):
@@ -104,7 +105,7 @@ class Comment(models.Model):
     )
     comment_user = models.ForeignKey(
         User,
-        on_delete=models.SET_NULL,
+        on_delete=models.CASCADE,
         related_name='users',
         help_text='User who posted this comment',
         null=True
@@ -145,9 +146,28 @@ class Profile(models.Model):
         blank=True,
         help_text='Add your birthday here'
     )
+    avatar = models.ImageField(
+        upload_to='media/images/users',
+        verbose_name='Avatar image',
+        blank=True
+    )
 
     def __str__(self):
         return self.user.username
+
+    def get_avatar(self):
+        if not self.avatar:
+            return '/static/images/owl-gray.svg'
+        return self.avatar.url
+
+    def avatar_tag(self):
+        return mark_safe('<img src="%s" width="50" height="50" />' % self.get_avatar())
+
+    avatar_tag.short_description = 'Avatar'
+
+    class Meta:
+        verbose_name = 'Profile'
+        verbose_name_plural = 'Profiles'
 
 
 @receiver(post_save, sender=User)

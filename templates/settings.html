@@ -2,7 +2,7 @@
 
 {% block content %}
   <h2>Settings</h2>
-
+  <hr/>
   <h3>Facebook</h3>
   {% if facebook_login %}
     <p>Connected as <a href="https://facebook.com/{{ facebook_login.extra_data.id }}/" target="_blank">{{ facebook_login.extra_data.id }}</a></p>
@@ -18,5 +18,6 @@
   {% else %}
     <a href="{% url 'social:begin' 'facebook' %}">Connect to Facebook</a>
   {% endif %}
-
+  <hr/>
+  <a href="{% url 'edit_profile' %}">Edit your profile</a>
 {% endblock %}

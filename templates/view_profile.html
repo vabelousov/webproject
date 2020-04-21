@@ -1,0 +1,20 @@
+{% extends 'base_generic.html' %}
+{% block content %}
+<H1>View Profile</H1>
+<hr/>
+{% if person.avatar.url %}
+<img src="{{ person.avatar.url }}" width="240"/>
+<hr/>
+{% endif %}
+<strong>Username:</strong> {{ person_user.username }} <br/>
+<strong>First name:</strong> {{ person_user.first_name }} <br/>
+<strong>Last name:</strong> {{ person_user.last_name }} <br/>
+<strong>Email:</strong> {{ person_user.email }} <br/>
+<strong>Bio:</strong> {{ person.bio }} <br/>
+<strong>Location:</strong> {{ person.location }} </br>
+<hr/>
+{% if user.username == person_user.username %}
+<a href="{% url 'edit_profile' %}">Edit your profile</a>
+<br/>
+{% endif %}
+{% endblock %}

@@ -20,8 +20,8 @@ from django.contrib.auth import update_session_auth_hash
 from django.contrib import messages
 from social_django.models import UserSocialAuth
 
-from .models import Article, Image, Comment
-from .forms import CommentForm, SignUpForm
+from .models import Article, Image, Comment, Profile
+from .forms import CommentForm, SignUpForm, EditProfileForm, ProfileForm
 from .tokens import account_activation_token
 
 
@@ -197,3 +197,38 @@ def password(request):
     else:
         form = PasswordForm(request.user)
     return render(request, 'password.html', {'form': form})
+
+
+@login_required
+def edit_profile(request):
+    if request.method == 'POST':
+        form = EditProfileForm(request.POST, instance=request.user)
+        profile_form = ProfileForm(
+            request.POST,
+            request.FILES,
+            instance=request.user.profile
+        )
+
+        if form.is_valid() and profile_form.is_valid():
+            user_form = form.save()
+            custom_form = profile_form.save(False)
+            custom_form.user = user_form
+            custom_form.save()
+            return redirect('view_profile', username=request.user.username)
+    else:
+        form = EditProfileForm(instance=request.user)
+        profile_form = ProfileForm(instance=request.user.profile)
+        args = {}
+        args['form'] = form
+        args['profile_form'] = profile_form
+        return render(request, 'edit_profile.html', args)
+
+
+def view_profile(request, username):
+    person_user = User.objects.get(username=username)
+    person = Profile.objects.get(user=person_user)
+    args = {}
+    args['person'] = person
+    args['person_user'] = person_user
+    print(request)
+    return render(request, 'view_profile.html', args)

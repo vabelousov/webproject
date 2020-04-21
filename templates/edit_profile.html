@@ -1,0 +1,18 @@
+{% extends 'base_generic.html' %}
+{% block content %}
+
+<H1>Edit Profile</H1>
+<hr/>
+<div class="container">
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <table>
+        {{ form.as_table }}
+        {{ profile_form.as_p }}
+        </table>
+        <button type="submit">Submit</button>
+    </form>
+    <br>
+</div>
+
+{% endblock %}
