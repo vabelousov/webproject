@@ -15,6 +15,3 @@ urlpatterns += [
     url(r'^myarticles/$', views.ArticlesByAuthorListView.as_view(), name='my-articles'),
 ]
 
-urlpatterns += [
-    url(r'^signup/$', views.signup, name='signup'),
-]
