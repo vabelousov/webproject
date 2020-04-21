@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 from django.contrib import admin
 from django.contrib.auth.models import User
-from .models import Article, Image, Comment
+from .models import Article, Image, Comment, Profile
 
 
 class ImageInline(admin.StackedInline):
@@ -70,3 +70,9 @@ class CommentAdmin(admin.ModelAdmin):
     list_filter = ('comment_user', 'comment_article', 'is_active', 'date_created')
     search_fields = ('comment_user', 'comment_text')
 
+
+@admin.register(Profile)
+class ProfileAdmin(admin.ModelAdmin):
+    list_display = ('user', 'location', 'birth_date')
+    list_filter = ('location',)
+    search_fields = ('location',)

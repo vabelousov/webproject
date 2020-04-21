@@ -1,16 +1,14 @@
 # -*- coding:utf-8 -*-
-from django.shortcuts import render
 from django.urls import reverse
 from django.views import generic
 from django.views.generic.edit import FormMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import login, authenticate
-from django.contrib.auth.forms import UserCreationForm
-from django.shortcuts import render   #, redirect
+from django.shortcuts import render
 from django.http import HttpResponseRedirect
 
 from .models import Article, Image, Comment
-from .forms import CommentForm
+from .forms import CommentForm, SignUpForm
 
 
 def index(request):
@@ -94,17 +92,26 @@ class ArticlesByAuthorListView(LoginRequiredMixin, generic.ListView):
 
 
 def signup(request):
+    '''
+    Вьюшка регистрации на сайте (с использованием профайла)
+    используется Signal
+    '''
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = SignUpForm(request.POST)
         if form.is_valid():
-            form.save()
-            username = form.cleaned_data.get('username')
+            user = form.save()
+            # load the profile instance created by the signal
+            user.refresh_from_db()
+            user.profile.birth_date = form.cleaned_data.get('birth_date')
+            #  user.is_superuser = True
+            #  user.is_staff = True
+            user.save()
             raw_password = form.cleaned_data.get('password1')
-            user = authenticate(username=username, password=raw_password)
+            user = authenticate(username=user.username, password=raw_password)
             login(request, user)
             return HttpResponseRedirect(reverse('index'))
         else:
             print('form is not valid!!!!')
     else:
-        form = UserCreationForm()
+        form = SignUpForm()
     return render(request, 'signup.html', {'form': form})
