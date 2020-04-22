@@ -59,7 +59,13 @@ urlpatterns += [
         name='account_activation_sent'
     ),
     url(
-        r'^activate/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
+        # r'^activate/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
+        (
+            r'^activate/'
+            r'(?P<uidb64>[0-9A-Za-z_\-]+)/'
+            r'(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/'
+            r'$'
+        ),
         views.activate,
         name='activate'
     ),
@@ -70,6 +76,10 @@ urlpatterns += [
         views.password,
         name='password'
     ),
-    url(r'^view_profile/(?P<username>\w+)/$', views.view_profile, name='view_profile'),
+    url(
+        r'^view_profile/(?P<username>\w+)/$',
+        views.view_profile,
+        name='view_profile'
+    ),
     url(r'^edit_profile/$', views.edit_profile, name='edit_profile'),
 ]

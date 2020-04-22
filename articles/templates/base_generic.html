@@ -25,6 +25,9 @@
           {% load group_tags %}
           <li><a href="{% url 'index' %}">Home</a></li>
           <li><a href="{% url 'articles' %}">All articles</a></li>
+          <li><a href="{% url 'topos' %}">All topos</a></li>
+          <li><a href="{% url 'tips' %}">All tips</a></li>
+          <li><a href="{% url 'tours' %}">All tours</a></li>
           <hr/>
           {% if user.is_authenticated %}
             <li>User: {{ user.get_username }}</li>
@@ -33,6 +36,7 @@
             {% endif %}
             {% if request.user|has_group:"Publishers"%}
               <li><a href="{% url 'my-articles' %}">My Articles</a></li>
+              <li><a href="{% url 'article_create' %}">New article</a></li>
             {% endif %}
             <li><a href="{% url 'settings' %}">Settings</a></li>
             <li><a href="{% url 'view_profile' request.user.username %}">Profile</a></li>

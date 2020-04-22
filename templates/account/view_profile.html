@@ -2,10 +2,8 @@
 {% block content %}
 <H1>View Profile</H1>
 <hr/>
-{% if person.avatar.url %}
-<img src="{{ person.avatar.url }}" width="240"/>
+<img src="{{ person.get_avatar }}" width="80"/>
 <hr/>
-{% endif %}
 <strong>Username:</strong> {{ person_user.username }} <br/>
 <strong>First name:</strong> {{ person_user.first_name }} <br/>
 <strong>Last name:</strong> {{ person_user.last_name }} <br/>

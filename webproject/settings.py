@@ -28,6 +28,7 @@ SECRET_KEY = 'q@#74(tosp_y3y72_o#sn8=-&g9=k62b2$v$lfz82%nl&@0n)k'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+MENU_CACHE_TIME = -1
 
 ALLOWED_HOSTS = []
 
@@ -43,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
     'django.contrib.staticfiles',
     'social_django',
+    'crispy_forms',
     'articles.apps.ArticlesConfig',
 ]
 
@@ -134,7 +136,6 @@ MEDIA_URL = '/media/'
 LOGIN_REDIRECT_URL = 'index'
 
 LOGIN_URL = '/'
-# LOGIN_URL = 'login'
 
 LOGOUT_URL = 'logout'
 
@@ -148,5 +149,5 @@ AUTHENTICATION_BACKENDS = (
 SOCIAL_AUTH_FACEBOOK_KEY = '550881829191580'  # App ID
 SOCIAL_AUTH_FACEBOOK_SECRET = '5531d4b547845dc1b07d947677f24a8f'
 SOCIAL_AUTH_LOGIN_ERROR_URL = '/settings/'
-# SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/settings/'
+SOCIAL_AUTH_LOGIN_REDIRECT_URL = 'index'
 SOCIAL_AUTH_RAISE_EXCEPTIONS = False

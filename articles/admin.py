@@ -10,8 +10,8 @@ class ImageInline(admin.StackedInline):
     fields = [
         (
             'image_code', 'image_text',
-            'image_small_url', 'image_middle_url',
-            'image_original_url', 'article_head', 'slideshow'
+            'image_small', 'image_middle',
+            'image_orig', 'article_head', 'slideshow'
         ),
     ]
     extra = 0
@@ -35,14 +35,14 @@ class ProfileInline(admin.StackedInline):
 
 @admin.register(Article)
 class ArticleAdmin(admin.ModelAdmin):
-    list_display = ('title', 'display_author', 'status')
-    list_filter = ('status', 'publish')
+    list_display = ('title', 'display_author', 'type', 'status')
+    list_filter = ('type', 'status', 'publish')
     fieldsets = (
         (None, {
             'fields': ('title', 'summary', 'body', 'author',)
         }),
         ('Publishing', {
-            'fields': (('status', 'publish',),)
+            'fields': (('type', 'status', 'publish',),)
         }),
     )
     inlines = [ImageInline]
@@ -59,11 +59,11 @@ class ImageAdmin(admin.ModelAdmin):
         ('Summary', {
             'fields': ('image_text', 'article_head', 'slideshow',)
         }),
-        ('URLs', {
+        ('Images', {
             'fields': ((
-                           'image_small_url',
-                           'image_middle_url',
-                           'image_original_url',
+                           'image_small',
+                           'image_middle',
+                           'image_orig',
                        ),)
         }),
     )

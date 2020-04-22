@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
-
-from django.urls import reverse
+from django.db import transaction
+from django.urls import reverse, reverse_lazy
 from django.views import generic
 from django.views.generic.edit import FormMixin
 from django.contrib.auth.decorators import login_required
@@ -19,9 +19,11 @@ from django.contrib.auth.forms import AdminPasswordChangeForm,\
 from django.contrib.auth import update_session_auth_hash
 from django.contrib import messages
 from social_django.models import UserSocialAuth
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
 
 from .models import Article, Image, Comment, Profile
-from .forms import CommentForm, SignUpForm, EditProfileForm, ProfileForm
+from .forms import CommentForm, SignUpForm, EditProfileForm,\
+    ProfileForm, ArticleForm, ImagesFormSet
 from .tokens import account_activation_token
 
 
@@ -43,7 +45,41 @@ class ArticleListView(generic.ListView):
     paginate_by = 3
 
     def get_queryset(self):
-        return Article.objects.filter(status__exact='published')
+        return Article.objects.filter(type__exact='article').\
+            filter(status__exact='published')
+
+
+class TopoListView(generic.ListView):
+    model = Article
+    context_object_name = 'article_list'
+    template_name = 'articles/article_list.html'
+    paginate_by = 3
+
+    def get_queryset(self):
+        return Article.objects.filter(type__exact='topo').\
+            filter(status__exact='published')
+
+
+class TipListView(generic.ListView):
+    model = Article
+    context_object_name = 'article_list'
+    template_name = 'articles/article_list.html'
+    paginate_by = 3
+
+    def get_queryset(self):
+        return Article.objects.filter(type__exact='tip').\
+            filter(status__exact='published')
+
+
+class TourListView(generic.ListView):
+    model = Article
+    context_object_name = 'article_list'
+    template_name = 'articles/article_list.html'
+    paginate_by = 3
+
+    def get_queryset(self):
+        return Article.objects.filter(type__exact='tour').\
+            filter(status__exact='published')
 
 
 class ArticleDetailView(FormMixin, generic.DetailView):
@@ -62,11 +98,11 @@ class ArticleDetailView(FormMixin, generic.DetailView):
         for img in Image.objects.filter(article__exact=context['article'].id):
             context['article'].body = context['article'].body.replace(
                 '[' + img.image_code + '_m]',
-                img.image_middle_url
+                str(img.get_middle_image())
             )
             context['article'].body = context['article'].body.replace(
                 '[' + img.image_code + '_o]',
-                img.image_original_url
+                str(img.get_orig_image())
             )
         context['comments'] = Comment.objects.filter(
             comment_article__exact=context['article'].id
@@ -97,19 +133,15 @@ class ArticleDetailView(FormMixin, generic.DetailView):
 class ArticlesByAuthorListView(LoginRequiredMixin, generic.ListView):
     model = Article
     template_name = 'articles/author_articles.html'
-    paginate_by = 3
+    paginate_by = 10
 
     def get_queryset(self):
         return Article.objects.filter(
             author=self.request.user
-        ).filter(status__exact='published').order_by('-publish')
+        ).order_by('type').order_by('-publish')
 
 
 def signup(request):
-    '''
-    Вьюшка регистрации на сайте (с использованием профайла)
-    используется Signal
-    '''
     if request.method == 'POST':
         form = SignUpForm(request.POST)
         if form.is_valid():
@@ -118,27 +150,33 @@ def signup(request):
             user.save()
             current_site = get_current_site(request)
             subject = 'Activate Your MySite Account'
-            message = render_to_string('account_activation_email.html', {
-                'user': user,
-                'domain': current_site.domain,
-                'uid': urlsafe_base64_encode(force_bytes(user.pk)),
-                'token': account_activation_token.make_token(user),
-            })
+            message = render_to_string(
+                'account/account_activation_email.html', {
+                    'user': user,
+                    'domain': current_site.domain,
+                    'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+                    'token': account_activation_token.make_token(user),
+                }
+            )
             user.email_user(subject, message)
-            # return redirect('account_activation_sent')
             return HttpResponseRedirect(reverse('account_activation_sent'))
         else:
             print('form is not valid!!!!')
     else:
         form = SignUpForm()
-    return render(request, 'signup.html', {'form': form})
+    return render(request, 'account/signup.html', {'form': form})
 
 
 def account_activation_sent(request):
-    return render(request, 'account_activation_sent.html')
+    return render(request, 'account/account_activation_sent.html')
 
 
-def activate(request, uidb64, token):
+def activate(
+        request,
+        uidb64,
+        token,
+        backend='django.contrib.auth.backends.ModelBackend'
+):
     try:
         uid = force_text(urlsafe_base64_decode(uidb64))
         user = User.objects.get(pk=uid)
@@ -149,10 +187,14 @@ def activate(request, uidb64, token):
         user.is_active = True
         user.profile.email_confirmed = True
         user.save()
-        login(request, user)
+        login(
+            request,
+            user,
+            backend='django.contrib.auth.backends.ModelBackend'
+        )
         return HttpResponseRedirect(reverse('index'))
     else:
-        return render(request, 'account_activation_invalid.html')
+        return render(request, 'account/account_activation_invalid.html')
 
 
 @login_required
@@ -169,7 +211,7 @@ def settings(request):
             or user.has_usable_password()
     )
 
-    return render(request, 'settings.html', {
+    return render(request, 'account/settings.html', {
         'facebook_login': facebook_login,
         'can_disconnect': can_disconnect
     })
@@ -196,7 +238,7 @@ def password(request):
             messages.error(request, 'Please correct the error below.')
     else:
         form = PasswordForm(request.user)
-    return render(request, 'password.html', {'form': form})
+    return render(request, 'account/password.html', {'form': form})
 
 
 @login_required
@@ -221,7 +263,7 @@ def edit_profile(request):
         args = {}
         args['form'] = form
         args['profile_form'] = profile_form
-        return render(request, 'edit_profile.html', args)
+        return render(request, 'account/edit_profile.html', args)
 
 
 def view_profile(request, username):
@@ -230,5 +272,79 @@ def view_profile(request, username):
     args = {}
     args['person'] = person
     args['person_user'] = person_user
-    print(request)
-    return render(request, 'view_profile.html', args)
+    return render(request, 'account/view_profile.html', args)
+
+
+class ArticleCreate(LoginRequiredMixin, CreateView):
+    model = Article
+    form_class = ArticleForm
+    success_url = None
+
+    def get_context_data(self, **kwargs):
+        data = super(ArticleCreate, self).get_context_data(**kwargs)
+        if self.request.POST:
+            data['article_images'] = ImagesFormSet(self.request.POST)
+        else:
+            data['article_images'] = ImagesFormSet()
+        return data
+
+    def get_initial(self, *args, **kwargs):
+        initial = super(ArticleCreate, self).get_initial()
+        initial.update(
+            {
+                'type': 'article',
+                'status': 'draft',
+                'author': self.request.user.id
+            }
+        )
+        return initial
+
+    def form_valid(self, form):
+        context = self.get_context_data()
+        article_images = context['article_images']
+        with transaction.atomic():
+            form.instance.user = self.request.user
+            self.object = form.save()
+            if article_images.is_valid():
+                article_images.instance = self.object
+                article_images.save()
+        return super(CreateView, self).form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy('my-articles')
+
+
+class ArticleUpdate(LoginRequiredMixin, UpdateView):
+    model = Article
+    form_class = ArticleForm
+    success_url = None
+
+    def get_context_data(self, **kwargs):
+        data = super(ArticleUpdate, self).get_context_data(**kwargs)
+        if self.request.POST:
+            data['article_images'] = ImagesFormSet(
+                self.request.POST,
+                instance=self.object
+            )
+        else:
+            data['article_images'] = ImagesFormSet(instance=self.object)
+        return data
+
+    def form_valid(self, form):
+        context = self.get_context_data()
+        article_images = context['article_images']
+        with transaction.atomic():
+            form.instance.user = self.request.user
+            self.object = form.save()
+            if article_images.is_valid():
+                article_images.instance = self.object
+                article_images.save()
+        return super(UpdateView, self).form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy('my-articles')
+
+
+class ArticleDelete(LoginRequiredMixin, DeleteView):
+    model = Article
+    success_url = reverse_lazy('my-articles')
