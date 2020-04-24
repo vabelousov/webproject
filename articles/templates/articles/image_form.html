@@ -1,0 +1,45 @@
+{% extends "base_generic.html" %}
+{% load static %}
+{% block content %}
+<h4>Edit image</h4>
+<p>
+    <img src="{{ image.get_image }}" width="200px"/>
+</p>
+<div>
+    <div class="entry">
+        <form method="post" enctype="multipart/form-data" action="">
+            {% csrf_token %}
+            {% for field in form.hidden_fields %}
+            {{ field }}
+            {% endfor %}
+            <table>
+                <thead>
+                <h6>{{ image.image_code}}, {{ image.image_text }}</h6>
+                </thead>
+                <tbody>
+                {% for field in form.visible_fields %}
+                <tr>
+                    <td>{{ field.label_tag }}</td>
+                </tr>
+                <tr>
+                    <td>{{ field }}</td>
+                </tr>
+                {% endfor %}
+                {% if form.errors %}
+                {% for key, value in form.errors.items %}
+                <tr>
+                    <td>
+                        <div style="color:red">{{ key }}:{{ value }}</div>
+                    </td>
+                </tr>
+                {% endfor %}
+                {% endif %}
+                </tbody>
+            </table>
+            <p>
+                <input type="submit" value="Submit"/>
+            </p>
+        </form>
+    </div>
+</div>
+{% endblock content %}

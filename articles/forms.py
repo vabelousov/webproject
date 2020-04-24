@@ -3,10 +3,10 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.forms import inlineformset_factory
-from crispy_forms import layout
-from crispy_forms.helper import FormHelper
-from django.shortcuts import render
-from django.template.loader import render_to_string
+# from crispy_forms import layout
+# from crispy_forms.helper import FormHelper
+# from django.shortcuts import render
+# from django.template.loader import render_to_string
 
 from .models import Comment, Profile, Article, Image
 
@@ -66,69 +66,30 @@ class ArticleForm(forms.ModelForm):
             'body': forms.Textarea(attrs={'cols': 120, 'rows': 20}),
         }
 
-    def __init__(self, *args, **kwargs):
-        super(ArticleForm, self).__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.form_tag = True
-        self.helper.form_class = 'form-horizontal'
-        self.helper.label_class = 'col-md-3 create-label'
-        self.helper.field_class = 'col-md-9'
-        self.helper.layout = layout.Layout(
-            layout.Div(
-                layout.Field('title'),
-                layout.Field('author'),
-                layout.Field('summary'),
-                layout.Field('body'),
-                layout.Field('type'),
-                layout.Field('status'),
-                layout.Fieldset('Add images',
-                                Formset('article_images')
-                                ),
-                layout.HTML("<br>"),
-                layout.ButtonHolder(layout.Submit('submit', 'save')),
-            )
-        )
-
 
 class ImagesForm(forms.ModelForm):
     class Meta:
         model = Image
         exclude = ()
+        widgets = {
+            'user': forms.HiddenInput(),
+            'image_code': forms.Textarea(attrs={'cols': 12, 'rows': 1}),
+            'image_text': forms.Textarea(attrs={'cols': 100, 'rows': 1}),
+        }
 
 
 ImagesFormSet = inlineformset_factory(
     Article,
     Image,
     form=ImagesForm,
-    fields=[
+    fields=(
         'image_code',
         'image_text',
         'article',
-        'image_small',
-        'image_middle',
-        'image_orig',
+        'user',
+        'image',
         'article_head',
-        'slideshow'
-    ],
+        'gallery'
+    ),
     extra=1
 )
-
-
-class Formset(layout.LayoutObject):
-    template = "articles/formset.html"
-
-    def __init__(self, formset_name_in_context, template=None):
-        self.formset_name_in_context = formset_name_in_context
-        self.fields = []
-        if template:
-            self.template = template
-
-    def render(
-            self,
-            form,
-            form_style,
-            context,
-            template_pack=layout.TEMPLATE_PACK
-    ):
-        formset = context[self.formset_name_in_context]
-        return render_to_string(self.template, {'formset': formset})

@@ -19,6 +19,7 @@ class Article(models.Model):
         ('topo', 'Topo'),
         ('tip', 'Tip'),
         ('tour', 'Tour'),
+        ('gallery', 'Gallery')
     )
     title = models.CharField(
         max_length=200,
@@ -59,9 +60,27 @@ class Article(models.Model):
     def get_absolute_url(self):
         return reverse('article-detail', args=[str(self.id)])
 
+    def has_head_image(self):
+        rez = True
+        try:
+            if Image.objects.filter(
+                    article__exact=self.id
+            ).filter(article_head__exact=True).count() == 0:
+                rez = False
+        except (ValueError,):
+            rez = False
+        return rez
+
     def get_head_image_url(self):
         try:
-            url = Image.objects.get(article=self.id).image_small.url
+            url = Image.objects.filter(
+                article__exact=self.id
+            ).filter(article_head__exact=True)
+
+            if url.count() > 0:
+                url = url[0].image.url
+            else:
+                url = '/static/images/no-image.png'
         except (ValueError,):
             url = '/static/images/no-image.png'
         return url
@@ -78,33 +97,25 @@ class Article(models.Model):
 
 class Image(models.Model):
     image_code = models.CharField(
-        max_length=10,
+        max_length=12,
         help_text="Add here code to use in the articles"
     )
-    image_small = models.ImageField(
-        upload_to='media/images/small',
-        verbose_name='Small image',
+    image = models.ImageField(
+        upload_to='media/images',
+        verbose_name='Image',
         blank=True
     )
-    image_middle = models.ImageField(
-        upload_to='media/images/middle',
-        verbose_name='Middle image',
-        blank=True
-    )
-    image_orig = models.ImageField(
-        upload_to='media/images/orig',
-        verbose_name='Original image',
-        blank=True
-    )
-    image_text = models.TextField(
-        max_length=1000,
-        help_text="Enter a brief description of the image."
+    image_text = models.CharField(
+        null=False,
+        blank=True,
+        max_length=255,
+        help_text="Alt text."
     )
     article_head = models.BooleanField(
         help_text="Check this, if image is article's main image."
     )
-    slideshow = models.BooleanField(
-        help_text="Check this, if image is included in slideshow"
+    gallery = models.BooleanField(
+        help_text="Check this, if image is included in gallery"
     )
     article = models.ForeignKey(
         "Article",
@@ -112,27 +123,19 @@ class Image(models.Model):
         help_text="Choose article for the image",
         null=True
     )
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        help_text="Photo uploader",
+        default=1,
+    )
 
     def __str__(self):
         return self.image_code
 
-    def get_small_image(self):
+    def get_image(self):
         try:
-            url = self.image_small.url
-        except(ValueError,):
-            url = '/static/images/no-image.png'
-        return url
-
-    def get_middle_image(self):
-        try:
-            url = self.image_middle.url
-        except(ValueError,):
-            url = '/static/images/no-image.png'
-        return url
-
-    def get_orig_image(self):
-        try:
-            url = self.image_orig.url
+            url = self.image.url
         except(ValueError,):
             url = '/static/images/no-image.png'
         return url
@@ -225,22 +228,20 @@ def update_user_profile(sender, instance, created, **kwargs):
     instance.profile.save()
 
 
-#class SiteMenu(models.Model):
+'''
+тут нужно добавить модель меню.
+'''
+# class SiteMenu(models.Model):
 #    menu_title = models.CharField(
 #        max_length=30,
 #        help_text="Menu item"
 #    )
-#    menu_descripion = models.CharField(
+#    menu_desc = models.CharField(
 #        max_length=200,
 #        help_text="Menu description"
 #    )
 #    parent_id =
-#    article = models.ForeignKey(
-#        Article,
-#        on_delete=models.SET_NULL,
-#        help_text="Article",
-#        null=True
-#    )
+#    menu_url =
 #
 #    def __str__(self):
 #       return self.menu_title

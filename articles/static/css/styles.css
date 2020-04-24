@@ -3,3 +3,38 @@
     padding: 0;
     list-style: none;
 }
+
+.nav {
+    margin-top: 20px;
+    padding: 0;
+    list-style: none;
+}
+
+#wrapper {
+  width: 720px;
+  position: relative;
+  left: 50%;
+  margin-left: -360px;
+}
+
+#content {
+  width: 520px;
+  float: right;
+}
+#mainNav {
+  width: 180px;
+  float: left;
+}
+
+#mainNav li {
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+#footer {
+  clear: both;
+}
+
+#content h1, h2, p {
+  padding-right: 20px;
+}

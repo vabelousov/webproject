@@ -1,0 +1,48 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+    <h1>My images</h1>
+    <p><a href="{% url 'image_create' %}">Add image</a></p>
+    {% if image_list %}
+    <table>
+      {% for image in image_list %}
+        {% if forloop.first %}
+        <tr>
+            <td style="background: cyan; line-height:1; white-space:nowrap; border=1">&nbsp;Image&nbsp;</td>
+            <td style="background: cyan; line-height:1; white-space:nowrap; border=1">&nbsp;Image Code&nbsp;</td>
+            <td style="background: cyan; line-height:1; white-space:nowrap; border=1">&nbsp;Image Text&nbsp;</td>
+            <td style="background: cyan; line-height:1; white-space:nowrap; border=1">&nbsp;Image Article&nbsp;</td>
+            <td style="background: cyan; line-height:1; white-space:nowrap; border=1">&nbsp;Is Image<br/>Article Head&nbsp;</td>
+            <td style="background: cyan; line-height:1; white-space:nowrap; border=1">&nbsp;Is Image<br/>in Slide Show&nbsp;</td>
+            <td style="background: cyan; line-height:1; white-space:nowrap; border=1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+            <td style="background: cyan; line-height:1; white-space:nowrap; border=1">&nbsp;&nbsp;&nbsp;&nbsp;</td>
+        </tr>
+        {% endif %}
+      <tr>
+          <td style="line-height:3; white-space:nowrap;"><a href="{% url 'image-view' image.id %}"><img src=" {{ image.get_image }}" width="50"></a></td>
+          <td style="line-height:3; white-space:nowrap;" align="center"><a href="{% url 'image-view' image.id %}">{{ image.image_code }}</a></td>
+          <td style="line-height:3; white-space:nowrap;">{{ image.image_text }}</td>
+          <td style="line-height:3; white-space:nowrap;">{{ image.article }}</td>
+          <td style="line-height:3; white-space:nowrap;">
+              {% if image.article_head == True %}
+              <input type="checkbox" disabled="disabled" checked="checked"/>
+              {% else %}
+              <input type="checkbox" disabled="disabled"/>
+              {% endif %}
+          </td>
+          <td style="line-height:3; white-space:nowrap;">
+              {% if image.gallery == True %}
+              <input type="checkbox" disabled="disabled" checked="checked"/>
+              {% else %}
+              <input type="checkbox" disabled="disabled"/>
+              {% endif %}
+          </td>
+          <td style="line-height:3; white-space:nowrap;"><a href="{% url 'image_update' image.id %}">Edit</a></td>
+          <td style="line-height:3; white-space:nowrap;"><a href="{% url 'image_delete' image.id %}">Delete</a></td>
+      </tr>
+      {% endfor %}
+    </table>
+    {% else %}
+      <p>You do not have any images yet.</p>
+    {% endif %}       
+{% endblock %}

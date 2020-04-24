@@ -2,13 +2,13 @@
 
 {% block content %}
     <h1>My articles</h1>
-
+    <p><a href="{% url 'article_create' %}">New post</a></p>
     {% if article_list %}
     <ul>
 
       {% for article in article_list %} 
       <li>
-        <a href="{% url 'article-detail' article.pk %}">{{article.title}}</a>
+        <a href="{% url 'article-detail' article.id %}">{{article.title}}</a>
           ({{ article.type }} - {{ article.publish }}) --
           <a href="{% url 'article_update' article.id %}">Edit</a>
           <a href="{% url 'article_delete' article.id %}">Delete</a>

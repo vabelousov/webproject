@@ -23,7 +23,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 
 from .models import Article, Image, Comment, Profile
 from .forms import CommentForm, SignUpForm, EditProfileForm,\
-    ProfileForm, ArticleForm, ImagesFormSet
+    ProfileForm, ArticleForm, ImagesFormSet, ImagesForm
 from .tokens import account_activation_token
 
 
@@ -97,12 +97,8 @@ class ArticleDetailView(FormMixin, generic.DetailView):
         '''
         for img in Image.objects.filter(article__exact=context['article'].id):
             context['article'].body = context['article'].body.replace(
-                '[' + img.image_code + '_m]',
-                str(img.get_middle_image())
-            )
-            context['article'].body = context['article'].body.replace(
-                '[' + img.image_code + '_o]',
-                str(img.get_orig_image())
+                '[' + img.image_code + ']',
+                str(img.get_image())
             )
         context['comments'] = Comment.objects.filter(
             comment_article__exact=context['article'].id
@@ -141,6 +137,27 @@ class ArticlesByAuthorListView(LoginRequiredMixin, generic.ListView):
         ).order_by('type').order_by('-publish')
 
 
+class ImagesListView(generic.ListView):
+    model = Image
+    context_object_name = 'images_list'
+    template_name = 'articles/image_list.html'
+    paginate_by = 5
+
+    def get_queryset(self):
+        return Image.objects.filter(gallery__exact=True)
+
+
+class ImagesByUserListView(LoginRequiredMixin, generic.ListView):
+    model = Image
+    template_name = 'articles/user_images.html'
+    paginate_by = 8
+
+    def get_queryset(self):
+        return Image.objects.filter(
+            user=self.request.user
+        ).order_by('article')
+
+
 def signup(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST)
@@ -160,8 +177,6 @@ def signup(request):
             )
             user.email_user(subject, message)
             return HttpResponseRedirect(reverse('account_activation_sent'))
-        else:
-            print('form is not valid!!!!')
     else:
         form = SignUpForm()
     return render(request, 'account/signup.html', {'form': form})
@@ -280,13 +295,14 @@ class ArticleCreate(LoginRequiredMixin, CreateView):
     form_class = ArticleForm
     success_url = None
 
-    def get_context_data(self, **kwargs):
-        data = super(ArticleCreate, self).get_context_data(**kwargs)
-        if self.request.POST:
-            data['article_images'] = ImagesFormSet(self.request.POST)
-        else:
-            data['article_images'] = ImagesFormSet()
-        return data
+    def get(self, request, *args, **kwargs):
+        self.object = None
+        form_class = self.get_form_class()
+        form = self.get_form(form_class)
+        img_form = ImagesFormSet(initial=[{'user': request.user}])
+        return self.render_to_response(
+            self.get_context_data(form=form, img_form=img_form)
+        )
 
     def get_initial(self, *args, **kwargs):
         initial = super(ArticleCreate, self).get_initial()
@@ -299,16 +315,25 @@ class ArticleCreate(LoginRequiredMixin, CreateView):
         )
         return initial
 
-    def form_valid(self, form):
-        context = self.get_context_data()
-        article_images = context['article_images']
-        with transaction.atomic():
-            form.instance.user = self.request.user
-            self.object = form.save()
-            if article_images.is_valid():
-                article_images.instance = self.object
-                article_images.save()
-        return super(CreateView, self).form_valid(form)
+    def post(self, request, *args, **kwargs):
+        self.object = None
+        form_class = self.get_form_class()
+        art_form = self.get_form(form_class)
+        img_form = ImagesFormSet(
+            self.request.POST,
+            self.request.FILES,
+            instance=self.object
+        )
+        if art_form.is_valid() and img_form.is_valid():
+            return self.form_valid(art_form, img_form)
+        else:
+            return self.form_invalid(art_form, img_form)
+
+    def form_valid(self, art_form, img_form):
+        self.object = art_form.save()
+        img_form.instance = self.object
+        img_form.save()
+        return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self):
         return reverse_lazy('my-articles')
@@ -322,24 +347,49 @@ class ArticleUpdate(LoginRequiredMixin, UpdateView):
     def get_context_data(self, **kwargs):
         data = super(ArticleUpdate, self).get_context_data(**kwargs)
         if self.request.POST:
-            data['article_images'] = ImagesFormSet(
+            data['art_form'] = ArticleForm(
+                self.request.POST,
+                instance=self.object
+            )
+            data['img_form'] = ImagesFormSet(
                 self.request.POST,
                 instance=self.object
             )
         else:
-            data['article_images'] = ImagesFormSet(instance=self.object)
+            data['art_form'] = ArticleForm(instance=self.object)
+            data['img_form'] = ImagesFormSet(
+                instance=self.object,
+                initial=[{'user': self.request.user}]
+            )
         return data
 
-    def form_valid(self, form):
-        context = self.get_context_data()
-        article_images = context['article_images']
-        with transaction.atomic():
-            form.instance.user = self.request.user
-            self.object = form.save()
-            if article_images.is_valid():
-                article_images.instance = self.object
-                article_images.save()
-        return super(UpdateView, self).form_valid(form)
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        form_class = self.get_form_class()
+        art_form = self.get_form(form_class)
+        img_form = ImagesFormSet(
+            self.request.POST,
+            self.request.FILES,
+            instance=self.object
+        )
+        if art_form.is_valid() and img_form.is_valid():
+            return self.form_valid(art_form, img_form)
+        else:
+            return self.form_invalid(art_form, img_form)
+
+    def form_valid(self, art_form, img_form):
+        self.object = art_form.save()
+        img_form.instance = self.object
+        img_form.save()
+        return HttpResponseRedirect(self.get_success_url())
+
+    def form_invalid(self, art_form, img_form):
+        return self.render_to_response(
+            self.get_context_data(
+                art_form=art_form,
+                img_form=img_form
+            )
+        )
 
     def get_success_url(self):
         return reverse_lazy('my-articles')
@@ -348,3 +398,47 @@ class ArticleUpdate(LoginRequiredMixin, UpdateView):
 class ArticleDelete(LoginRequiredMixin, DeleteView):
     model = Article
     success_url = reverse_lazy('my-articles')
+
+
+class ImageCreate(LoginRequiredMixin, CreateView):
+    model = Image
+    form_class = ImagesForm
+    success_url = None
+
+    def get_initial(self, *args, **kwargs):
+        initial = super(ImageCreate, self).get_initial()
+        initial.update(
+            {
+                'user': self.request.user.id
+            }
+        )
+        return initial
+
+    def get_success_url(self):
+        return reverse_lazy('my-images')
+
+
+class ImageUpdate(LoginRequiredMixin, UpdateView):
+    model = Image
+    form_class = ImagesForm
+    success_url = None
+
+    def get_success_url(self):
+        return reverse_lazy('my-images')
+
+
+class ImageDelete(LoginRequiredMixin, DeleteView):
+    model = Image
+    success_url = reverse_lazy('my-images')
+
+
+class ImageDetailView(LoginRequiredMixin, generic.DetailView):
+    model = Image
+    context_object_name = 'image_view'
+    template_name = "articles/image_view.html"
+
+
+class ImageView(generic.DetailView):
+    model = Image
+    context_object_name = 'image'
+    template_name = "articles/image.html"

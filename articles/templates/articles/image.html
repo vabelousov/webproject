@@ -1,0 +1,13 @@
+{% extends "base_generic.html" %}
+{% load humanize %}
+{% block content %}
+<article>
+    <header>
+        <h1>{{ image.image_text }}</h1>
+        <p>by {{ image.user.last_name }}, {{ image.user.first_name }}</p>
+    </header>
+    <a href="">
+        <a href="{{ image.get_image }}"><img src="{{ image.get_image }}" width="800px"/></a>
+    </a>
+</article>
+{% endblock %}

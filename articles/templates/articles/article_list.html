@@ -10,7 +10,12 @@
         <hr/>
         <table>
               <tr>
-                  <td><img src="{{ article.get_head_image_url }}" width="240"/></td>
+                  <td>
+                      {% if article.has_head_image %}
+                          <img src="{{ article.get_head_image_url }}" width="240"/>
+                      {% else %} <img src="/static/images/no-image.png" width="240"/>
+                      {% endif %}
+                  </td>
                   <td>
                       <p>
                           <a href="{{ article.get_absolute_url }}">

@@ -9,9 +9,8 @@ class ImageInline(admin.StackedInline):
     model = Image
     fields = [
         (
-            'image_code', 'image_text',
-            'image_small', 'image_middle',
-            'image_orig', 'article_head', 'slideshow'
+            'image_code', 'image_text', 'user',
+            'image', 'article_head', 'gallery'
         ),
     ]
     extra = 0
@@ -50,21 +49,17 @@ class ArticleAdmin(admin.ModelAdmin):
 
 @admin.register(Image)
 class ImageAdmin(admin.ModelAdmin):
-    list_display = ('image_code', 'article', 'article_head', 'slideshow')
-    list_filter = ('slideshow', 'article_head')
+    list_display = ('image_code', 'article', 'user', 'article_head', 'gallery')
+    list_filter = ('gallery', 'article_head')
     fieldsets = (
         (None, {
-            'fields': ('image_code', 'article',)
+            'fields': ('image_code', 'article', 'user',)
         }),
         ('Summary', {
-            'fields': ('image_text', 'article_head', 'slideshow',)
+            'fields': ('image_text', 'article_head', 'gallery',)
         }),
         ('Images', {
-            'fields': ((
-                           'image_small',
-                           'image_middle',
-                           'image_orig',
-                       ),)
+            'fields': ('image',)
         }),
     )
 

@@ -1,0 +1,37 @@
+{% extends "base_generic.html" %}
+{% load humanize %}
+{% block content %}
+<article>
+    <header>
+        <h1>{{ image_view.image_text }}</h1>
+        <p>{{ image_view.image_code }}</p>
+        <p>by {{ image_view.user.last_name }}, {{ image_view.user.first_name }}</p>
+    </header>
+    <a href="">
+        <img src="{{ image_view.get_image }}" width="800px"/>
+    </a>
+    <br/>
+    <table>
+        <tr>
+            <td>Is in article head</td>
+            <td>
+                {% if image_view.article_head == True %}
+                <input type="checkbox" disabled="disabled" checked="checked"/>
+                {% else %}
+                <input type="checkbox" disabled="disabled"/>
+                {% endif %}
+            </td>
+        <tr/>
+        <tr>
+            <td>Is in gallery</td>
+            <td>
+                {% if image_view.gallery == True %}
+                <input type="checkbox" disabled="disabled" checked="checked"/>
+                {% else %}
+                <input type="checkbox" disabled="disabled"/>
+                {% endif %}
+            </td>
+        <tr/>
+    </table>
+</article>
+{% endblock %}
