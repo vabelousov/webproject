@@ -1,0 +1,22 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+    <h1>My posts</h1>
+    <p><a href="{% url 'post_create' %}">New post</a></p>
+    {% if post_list %}
+    <ul>
+
+      {% for post in post_list %}
+      <li>
+        <a href="{% url 'post-detail' post.id %}">{{post.title}}</a>
+          ({{ post.type }} - {{ post.date_published }}) --
+          <a href="{% url 'post_update' post.id %}">Edit</a>
+          <a href="{% url 'post_delete' post.id %}">Delete</a>
+      </li>
+      {% endfor %}
+    </ul>
+
+    {% else %}
+      <p>You do not have any posts yet.</p>
+    {% endif %}       
+{% endblock %}

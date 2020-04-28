@@ -24,13 +24,21 @@ MEDIA_DIR = os.path.join(BASE_DIR, 'media')
 # ../3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'q@#74(tosp_y3y72_o#sn8=-&g9=k62b2$v$lfz82%nl&@0n)k'
+# SECRET_KEY = 'q@#74(tosp_y3y72_o#sn8=-&g9=k62b2$v$lfz82%nl&@0n)k'
+SECRET_KEY = os.environ.get("SECRET_KEY", default="foo")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-MENU_CACHE_TIME = -1
+# DEBUG = True
+DEBUG = int(os.environ.get("DEBUG", default=1))
 
-ALLOWED_HOSTS = []
+# MENU_CACHE_TIME = -1
+MENU_CACHE_TIME = int(os.environ.get("MENU_CACHE_TIME", default=-1))
+
+#  SITE_ID = 1
+SITE_ID = int(os.environ.get("SITE_ID", default=1))
+
+# ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", default="")
 
 
 # Application definition
@@ -44,7 +52,7 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
     'django.contrib.staticfiles',
     'social_django',
-    'articles.apps.ArticlesConfig',
+    'posts.apps.PostsConfig',
 ]
 
 MIDDLEWARE = [
@@ -131,12 +139,9 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
-
 LOGIN_REDIRECT_URL = 'index'
-
-LOGIN_URL = '/'
-
-LOGOUT_URL = 'logout'
+LOGIN_URL = 'index'
+LOGOUT_URL = 'index'
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
@@ -145,8 +150,14 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
 )
 
-SOCIAL_AUTH_FACEBOOK_KEY = '550881829191580'  # App ID
-SOCIAL_AUTH_FACEBOOK_SECRET = '5531d4b547845dc1b07d947677f24a8f'
-SOCIAL_AUTH_LOGIN_ERROR_URL = '/settings/'
-SOCIAL_AUTH_LOGIN_REDIRECT_URL = 'index'
-SOCIAL_AUTH_RAISE_EXCEPTIONS = False
+# SOCIAL_AUTH_FACEBOOK_KEY = '550881829191580'  # App ID
+# SOCIAL_AUTH_FACEBOOK_SECRET = '5531d4b547845dc1b07d947677f24a8f'
+# SOCIAL_AUTH_LOGIN_ERROR_URL = '/settings/'
+# SOCIAL_AUTH_LOGIN_REDIRECT_URL = 'index'
+# SOCIAL_AUTH_RAISE_EXCEPTIONS = False
+SOCIAL_AUTH_FACEBOOK_KEY = os.environ.get("SOCIAL_AUTH_FACEBOOK_KEY", default="foo")
+SOCIAL_AUTH_FACEBOOK_SECRET = os.environ.get("SOCIAL_AUTH_FACEBOOK_SECRET", default="foo")
+SOCIAL_AUTH_LOGIN_ERROR_URL = os.environ.get("SOCIAL_AUTH_LOGIN_ERROR_URL", default="/settings/")
+SOCIAL_AUTH_LOGIN_REDIRECT_URL = os.environ.get("SOCIAL_AUTH_LOGIN_REDIRECT_URL", default="index")
+SOCIAL_AUTH_RAISE_EXCEPTIONS = int(os.environ.get("SOCIAL_AUTH_RAISE_EXCEPTIONS", default=0))
+

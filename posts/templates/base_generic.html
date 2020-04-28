@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% block title %}<title>Up-the-hills</title>{% endblock %}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+    <!-- Добавление дополнительного статического CSS файла -->
+    {% load static %}
+
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+<style>
+img {margin-bottom: -7px}
+.w3-row-padding img {margin-bottom: 12px}
+</style>
+</head>
+<body class="w3-light-grey w3-content" style="max-width:1600px">
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-2">
+            {% block sidebar %}
+            <ul class="nav">
+                {% load group_tags %}
+                <li><a href="{% url 'index' %}">Home</a></li>
+                <li><a href="{% url 'outings' %}">Outings</a></li>
+                <li><a href="{% url 'topos' %}">Topos</a></li>
+                <li><a href="{% url 'tips' %}">Tips</a></li>
+                <li><a href="{% url 'albums' %}">Albums</a></li>
+                <li><a href="{% url 'common-images' %}">Images</a></li>
+            </ul>
+            <ul class="sidebar-nav">
+                {% if user.is_authenticated %}
+                <li>User: {{ user.get_username }}</li>
+                {% if user.is_superuser %}
+                <li><a href="/admin/">Administration panel</a></li>
+                {% endif %}
+                {% if request.user|has_group:"Writers"%}
+                <li><a href="{% url 'my-posts' %}">My posts</a></li>
+                <li><a href="{% url 'my-albums' %}">My albums</a></li>
+                <li><a href="{% url 'my-images' %}">My images</a></li>
+                {% endif %}
+                <li><a href="{% url 'settings' %}">Settings</a></li>
+                <li><a href="{% url 'view_profile' request.user.username %}">Profile</a></li>
+                <li><a href="{% url 'logout' %}?next={{ request.path }}">Logout</a></li>
+                {% else %}
+                <li><a href="{% url 'login' %}?next={{ request.path }}">Login</a></li>
+                <li><a href="{% url 'signup' %}">Sign Up</a></li>
+                {% endif %}
+            </ul>
+            {% endblock %}
+        </div>
+        <div class="col-sm-10 ">
+            {% block content %} {% endblock %}
+            {% block pagination %}
+            {% if is_paginated %}
+            <div class="pagination">
+                <span class="page-links">
+                    {% if page_obj.has_previous %}
+                        <a href="{{ request.path }}?page={{ page_obj.previous_page_number }}">previous</a>
+                    {% endif %}
+                    <span class="page-current">
+                        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+                    </span>
+                    {% if page_obj.has_next %}
+                        <a href="{{ request.path }}?page={{ page_obj.next_page_number }}">next</a>
+                    {% endif %}
+                </span>
+            </div>
+            {% endif %}
+            {% endblock %}
+        </div>
+    </div>
+</div>
+</body>
+</html>

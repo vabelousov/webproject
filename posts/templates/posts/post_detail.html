@@ -1,0 +1,55 @@
+{% extends "base_generic.html" %}
+{% load humanize %}
+{% block content %}
+<article>
+    <header>
+        <h1>{{ post.title }}</h1>
+        <p>{{ post.summary }}</p>
+        <p>by {{ post.author.last_name }}, {{ post.author.first_name }}</p>
+    </header>
+    {% autoescape off %}
+    {{ post.body|safe }}
+    {% endautoescape %}
+</article>
+<br/>
+{% if user.is_authenticated %}
+<hr/>
+<form method="post" action="">
+    {% csrf_token %}
+    <h5>Add a comment as {{ user.last_name }}, {{ user.first_name }}
+                ({{ user.username }})</h5>
+    <table>
+    {{ comment_form.as_table|safe }}
+        </table>
+    <p><input type="submit" value="Post"></p>
+</form>
+{% else %}
+<br/>
+To comment you need to
+<a href="{% url 'login' %}?next={{ request.path }}"> Login</a> --OR--
+<a href="{% url 'social:begin' 'facebook' %}">Login with Facebook</a> --OR --
+<a href="{% url 'signup' %}">Sign UP</a>
+{% endif %}
+<hr/>
+<h3>Comments:</h3>
+{% for comment in comments.all %}
+<div class="comment">
+    <p>
+        <img src="{{ comment.comment_user.profile.get_avatar }}" width="50"/>
+        <b>
+            <a href="{% url 'view_profile' comment.comment_user %}">
+                {{ comment.comment_user.last_name }}, {{ comment.comment_user.first_name }}
+                ({{ comment.comment_user.username }})
+            </a>
+        </b>
+        <i> -- {{ comment.date_created|naturaltime }}</i>
+    <div>
+        {{ comment.comment_text|safe }}
+    </div>
+    <br/>
+    </p>
+</div>
+{% empty %}
+<p>No comments here yet :(</p>
+{% endfor %}
+{% endblock %}

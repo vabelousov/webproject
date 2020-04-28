@@ -23,7 +23,7 @@ from django.urls import path
 from django.views.generic import RedirectView
 from django.conf.urls import url
 
-from articles import views
+from posts import views
 
 # Добавьте URL соотношения, чтобы перенаправить запросы
 # с корневового URL, на URL приложения
@@ -32,7 +32,7 @@ urlpatterns = [
 ]
 
 urlpatterns += [
-     path('home/', include('articles.urls')),
+     path('home/', include('posts.urls')),
 ]
 
 urlpatterns += [

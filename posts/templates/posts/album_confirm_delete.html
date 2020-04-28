@@ -1,0 +1,20 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+<h1>Delete album</h1>
+
+<p>Are you sure you want to delete the album:
+  <br/>{{ album }}
+  <br/>{{ album.description }}
+  <br/> Images in album: {{ album_images_count }}?
+</p>
+
+<img src="{{ album.get_thumbnail }}" width="100"/>
+
+<form action="" method="POST">
+  {% csrf_token %}
+  <input type="submit" action="" value="Yes, delete." />
+</form>
+
+{% endblock %}
