@@ -80,3 +80,7 @@ class SignUpForm(UserCreationForm):
             'password1',
             'password2',
         )
+
+
+class SearchForm(forms.Form):
+    query = forms.CharField()

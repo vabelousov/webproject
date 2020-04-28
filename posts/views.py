@@ -1,4 +1,5 @@
 # -*- coding:utf-8 -*-
+from django.contrib.postgres.search import SearchVector
 from django.urls import reverse, reverse_lazy
 from django.views import generic
 from django.views.generic.edit import FormMixin
@@ -22,7 +23,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 
 from .models import Post, Image, Comment, Profile, Album
 from .forms import CommentForm, SignUpForm, EditProfileForm,\
-    ProfileForm, PostForm, ImagesForm, AlbumForm
+    ProfileForm, PostForm, ImagesForm, AlbumForm, SearchForm
 from .tokens import account_activation_token
 
 
@@ -168,17 +169,20 @@ class PostDetailView(FormMixin, generic.DetailView):
         ниже в цикле я заменяю все вхождения
         условных кодов картинок на их пути
         '''
-        for img in Image.objects.filter(
-                album__exact=Album.objects.get(post=self.object.id)
-        ):
-            context['post'].body = context['post'].body.replace(
-                '[' + img.__str__() + '_m]',
-                str(img.get_image())
-            )
-            context['post'].body = context['post'].body.replace(
-                '[' + img.__str__() + '_o]',
-                str(img.get_original())
-            )
+        try:
+            for img in Image.objects.filter(
+                    album__exact=Album.objects.get(post=self.object.id)
+            ):
+                context['post'].body = context['post'].body.replace(
+                    '[' + img.__str__() + '_m]',
+                    str(img.get_image())
+                )
+                context['post'].body = context['post'].body.replace(
+                    '[' + img.__str__() + '_o]',
+                    str(img.get_original())
+                )
+        except:
+            pass
         context['comments'] = Comment.objects.filter(
             comment_post__exact=context['post'].id
         ).filter(is_active=True).order_by('-date_created')
@@ -218,7 +222,6 @@ class PostsByAuthorListView(LoginRequiredMixin, generic.ListView):
 
 class AlbumsByAuthorListView(generic.ListView):
     model = Album
-    #context_object_name = 'my-albums'
     template_name = 'posts/user_albums.html'
     paginate_by = 3
 
@@ -233,6 +236,11 @@ class CommonImageListView(generic.ListView):
     context_object_name = 'images_list'
     template_name = 'posts/image_list.html'
     paginate_by = 5
+
+    def get_queryset(self):
+        return Image.objects.filter(
+            common__exact=True
+        ).order_by('-date_created')
 
     def get_context_data(self, **kwargs):
         context = super(CommonImageListView, self).get_context_data(**kwargs)
@@ -267,7 +275,7 @@ class ImagesByUserListView(LoginRequiredMixin, generic.ListView):
     def get_queryset(self):
         return Image.objects.filter(
             user=self.request.user
-        ).order_by('id')
+        ).order_by('-date_created')
 
 
 def signup(request):
@@ -402,6 +410,24 @@ def view_profile(request, username):
     return render(request, 'account/view_profile.html', args)
 
 
+def post_search(request):
+    form = SearchForm()
+    query = None
+    results = []
+    if 'query' in request.GET:
+        form = SearchForm(request.GET)
+        if form.is_valid():
+            query = form.cleaned_data['query']
+            results = Post.objects.annotate(
+                search=SearchVector('title', 'summary', 'body'),
+            ).filter(search=query)
+    return render(request,
+                  'posts/search.html',
+                  {'form': form,
+                   'query': query,
+                   'results': results})
+
+
 class PostCreate(LoginRequiredMixin, CreateView):
     model = Post
     form_class = PostForm
@@ -432,10 +458,13 @@ class PostUpdate(LoginRequiredMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super(PostUpdate, self).get_context_data(**kwargs)
-        context['album_images_count'] = Image.objects.filter(album__exact=self.object.id).count()
-        context['post_images'] = Image.objects.filter(
-            album__exact=Album.objects.get(post=self.object.id).id
-        ).all()
+        try:
+            context['album_images_count'] = Image.objects.filter(album__exact=self.object.id).count()
+            context['post_images'] = Image.objects.filter(
+                album__exact=Album.objects.get(post=self.object.id).id
+            ).all()
+        except:
+            pass
         return context
 
 

@@ -18,6 +18,7 @@ urlpatterns = [
     ),
     url(r'^image/(?P<pk>\d+)$', views.ImageView.as_view(), name='image'),
     url(r'^album/(?P<pk>\d+)$', views.AlbumDetailView.as_view(), name='album-view'),
+    url('search/', views.post_search, name='post_search'),
 ]
 
 urlpatterns += [

@@ -33,6 +33,7 @@ img {margin-bottom: -7px}
                 <li><a href="{% url 'tips' %}">Tips</a></li>
                 <li><a href="{% url 'albums' %}">Albums</a></li>
                 <li><a href="{% url 'common-images' %}">Images</a></li>
+                <li><a href="{% url "post_search" %}">Search</a></li>
             </ul>
             <ul class="sidebar-nav">
                 {% if user.is_authenticated %}

@@ -10,13 +10,14 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.safestring import mark_safe
 from uuid import uuid4
+from functools import partial
 
 from django.core.files.base import ContentFile
 from PIL import Image as Img
 
 
-def path_file_resize(instance, filename):
-    upload_to = 'media/images/originals'
+def _update_filename(instance, filename, path):
+    upload_to = path
     ext = filename.split('.')[-1]
     # get filename
     if instance.id:
@@ -28,14 +29,16 @@ def path_file_resize(instance, filename):
         )
     else:
         # set filename as random string
-        filename = 'file_{}_{}_{}.{}'.format(
-            instance.album.post.id,
-            instance.album.id,
+        filename = 'file_{}.{}'.format(
             str(uuid4().hex)[:12],
             ext
         )
     # return the whole path to the file
     return os.path.join(upload_to, filename)
+
+
+def path_file_resize(path):
+    return partial(_update_filename, path=path)
 
 
 class PublishedManager(models.Manager):
@@ -215,17 +218,17 @@ class Album(models.Model):
 
 class Image(models.Model):
     original = models.ImageField(
-        upload_to='media/images/originals',
+        upload_to=path_file_resize('media/images/originals'),
         verbose_name='Original',
         blank=True
     )
     image = models.ImageField(
-        upload_to='media/images/middles',
+        upload_to=path_file_resize('media/images/middles'),
         verbose_name='Middle size',
         editable=False
     )
     thumbnail = models.ImageField(
-        upload_to='media/images/thumbnails',
+        upload_to=path_file_resize('media/images/thumbnails'),
         verbose_name='Thumbnail',
         editable=False
     )
