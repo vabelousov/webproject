@@ -23,7 +23,13 @@ from django.urls import path
 from django.views.generic import RedirectView
 from django.conf.urls import url
 
-from posts import views
+from django.contrib.sitemaps.views import sitemap
+
+from posts import views, sitemap as mysitemap
+
+sitemaps = {
+    'posts': mysitemap.PostSitemap,
+}
 
 # Добавьте URL соотношения, чтобы перенаправить запросы
 # с корневового URL, на URL приложения
@@ -33,6 +39,11 @@ urlpatterns = [
 
 urlpatterns += [
      path('home/', include('posts.urls')),
+]
+
+urlpatterns += [
+    path('sitemap.xml', sitemap, {'sitemaps': sitemaps},
+         name='django.contrib.sitemaps.posts.sitemap'),
 ]
 
 urlpatterns += [

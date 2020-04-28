@@ -3,6 +3,7 @@
 ## Разворачивание ##
 
 ### Шаг 1 - подготовка ###
+      brew doctor; brew update; brew install postgresql  #  установка базы данных PostgreSQL
       mkdir myproject; cd myproject  #  создаем папку проекта и заходим в нее
       git clone https://github.com/vabelousov/webproject.git  #  скачать проект с репозитория
       установить vrtualenv если не стоит: brew install virtualenv
@@ -11,12 +12,14 @@
       source venv/bin/activate  #  активация среды
       cd webproject
       pip install -r requirements.txt  #  установить пакеты
-### Шаг 3 - создание миграций ###
-      find . -path "*/migrations/*.py" -not -name "__init__.py" -delete find . -path "*/migrations/*.pyc" -delete
-      rm db.sqlite3
-      python manage.py makemigrations  #  создание миграций
+### Шаг 3 - создание БД
+      createuser -dP webproject
+      createdb -E utf8 -U webproject webproject
+### Шаг 4 - создание миграций ###
+      python manage.py makemigrations  #  создание миграций (если необходимо)
       python manage.py migrate  #  выполнение миграций
-### Шаг 4 - создание суперпользователя ###
+### Шаг 5 - создание суперпользователя ###
       python manage.py createsuperuser  #  создание суперпользователя
 ### Готово ###
-      python manage.py runserver
+      python manage.py runserver  #  запуск сервера
+      http://localhost:8000/  #  открытие сайта

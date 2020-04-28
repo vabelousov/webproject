@@ -38,6 +38,17 @@ def path_file_resize(instance, filename):
     return os.path.join(upload_to, filename)
 
 
+class PublishedManager(models.Manager):
+    def get_queryset(self):
+        return super(PublishedManager,
+                     self).get_queryset().filter(status='published')
+
+
+class DraftManager(models.Manager):
+    def get_queryset(self):
+        return super(DraftManager, self).get_queryset().filter(status='draft')
+
+
 class Carousel(models.Model):
     image = models.ImageField(
         upload_to='media/images/carousel',
@@ -109,6 +120,10 @@ class Post(models.Model):
     date_published = models.DateTimeField(default=timezone.now)
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
+
+    objects = models.Manager()  # Менеджер по умолчанию
+    published = PublishedManager()  # Собственный менеджер
+    draft = DraftManager()
 
     def __str__(self):
         return self.title
