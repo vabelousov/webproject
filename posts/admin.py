@@ -1,8 +1,10 @@
 # -*- coding:utf-8 -*-
 
 from django.contrib import admin
+from mptt.admin import DraggableMPTTAdmin
 from django.contrib.auth.models import User
-from .models import Post, Image, Comment, Profile, Album
+from .models import Post, Image, Comment, Profile, \
+    MyMenu, Carousel, Category, ImageBasket
 
 
 class ProfileInline(admin.StackedInline):
@@ -21,43 +23,16 @@ class ProfileInline(admin.StackedInline):
     readonly_fields = ['avatar_tag']  # Specify that this read only field
 
 
-class ImageInline(admin.TabularInline):
-    model = Image
-    can_delete = False
-    verbose_name_plural = 'Images'
-    fk_name = 'album'
-    fields = (
-        'image_tag',
-        'image',
-        'alt_text',
-        'thumbnail',
-        'common',
-        'user'
-    )
-    exclude = ('date_created', )
-    readonly_fields = ['image_tag']
-    extra = 0
-
-
-class AlbumInline(admin.TabularInline):
-    model = Album
-    can_delete = False
-    verbose_name_plural = 'Albums'
-    fk_name = 'post'
-    fields = (
-        'title',
-        'description',
-        'type',
-        'author'
-    )
-    extra = 0
-
-
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
-    inlines = [AlbumInline]
-    list_display = ('title', 'display_author', 'type', 'status')
-    list_filter = ('type', 'status', 'date_published')
+    list_display = (
+        'title', 'display_author', 'type',
+        'main_category', 'sub_category',
+        'status'
+    )
+    list_filter = ('type',
+                   'main_category', 'sub_category', 'status', 'date_published'
+                   )
     fieldsets = (
         (None, {
             'fields': ('title', 'summary', 'author', 'thumbnail_id',)
@@ -66,58 +41,22 @@ class PostAdmin(admin.ModelAdmin):
             'fields': ('body',)
         }),
         ('Publishing', {
-            'fields': ('type', 'status', 'date_published',)
+            'fields': (('type',
+                        'main_category', 'sub_category',
+                        ),
+                       ('status', 'date_published',),)
         })
     )
-
-    def get_inline_instances(self, request, obj=None):
-        if not obj:
-            return list()
-        return super(PostAdmin, self).get_inline_instances(request, obj)
 
 
 @admin.register(Image)
 class ImageAdmin(admin.ModelAdmin):
-    list_display = ('image_tag', 'alt_text', 'album', 'user', 'thumbnail', 'common')
+    list_display = ('image_tag', 'alt_text', 'user', 'common')
     list_filter = ('user',)
-    fieldsets = (
-        (None, {
-            'fields': ('user', 'album',)
-        }),
-        ('Summary', {
-            'fields': ('alt_text', 'thumbnail', 'common',)
-        }),
-        ('Images', {
-            'fields': ('image',)
-        }),
-    )
     exclude = ('date_created', )
 
     def image_tag(self, instance):
         return instance.image_tag()
-
-
-@admin.register(Album)
-class AlbumAdmin(admin.ModelAdmin):
-    inlines = [ImageInline]
-    list_display = ('title', 'description', 'post', 'author', 'type')
-    list_filter = ('author', 'type',)
-    fieldsets = (
-        (None, {
-            'fields': ('author', 'post',)
-        }),
-        ('Summary', {
-            'fields': ('title', 'description', 'type',)
-        }),
-    )
-
-    def get_inline_instances(self, request, obj=None):
-        if not obj:
-            return list()
-        return super(AlbumAdmin, self).get_inline_instances(request, obj)
-
-    def image_tag(self, obj):
-        return obj.image.image_tag()
 
 
 class MyUserAdmin(admin.ModelAdmin):
@@ -136,6 +75,7 @@ class MyUserAdmin(admin.ModelAdmin):
 
     def get_location(self, instance):
         return instance.profile.location
+
     get_location.short_description = 'Location'
 
     def get_inline_instances(self, request, obj=None):
@@ -162,6 +102,51 @@ class CommentAdmin(admin.ModelAdmin):
         'date_created'
     )
     search_fields = ('comment_user', 'comment_text')
+
+
+@admin.register(Carousel)
+class CarouselAdmin(admin.ModelAdmin):
+    list_display = (
+        'carousel_tag',
+        'title',
+        'alt_text',
+        'is_active',
+        'order'
+    )
+    list_filter = (
+        'is_active',
+    )
+
+    def carousel_tag(self, instance):
+        return instance.carousel_tag()
+
+
+@admin.register(ImageBasket)
+class ImageBasketAdmin(admin.ModelAdmin):
+    list_display = ('post', 'image')
+    list_filter = ('post', 'image')
+
+
+admin.site.register(
+    MyMenu,
+    DraggableMPTTAdmin,
+    list_display=(
+        'tree_actions',
+        'indented_title',
+        'title',
+        'name',
+        'order',
+    ),
+    list_display_links=(
+        'indented_title',
+    ),
+)
+
+
+@admin.register(Category)
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ('code', 'description')
+    list_filter = ('code',)
 
 
 admin.site.unregister(User)

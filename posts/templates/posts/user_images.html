@@ -1,46 +1,60 @@
 {% extends "base_generic.html" %}
 
 {% block content %}
-    <h1>My images</h1>
-    <p><a href="{% url 'image_create' %}">Add image</a></p>
-    {% if image_list %}
-    <table>
-      {% for image in image_list %}
-        {% if forloop.first %}
-        <tr>
-            <td style="background: cyan; line-height:1; white-space:nowrap; border=1">&nbsp;Image&nbsp;</td>
-            <td style="background: cyan; line-height:1; white-space:nowrap; border=1">&nbsp;Image Code&nbsp;</td>
-            <td style="background: cyan; line-height:1; white-space:nowrap; border=1">&nbsp;Image Text&nbsp;</td>
-            <td style="background: cyan; line-height:1; white-space:nowrap; border=1">&nbsp;Is Image<br/>Article Head&nbsp;</td>
-            <td style="background: cyan; line-height:1; white-space:nowrap; border=1">&nbsp;Is Image<br/>in Slide Show&nbsp;</td>
-            <td style="background: cyan; line-height:1; white-space:nowrap; border=1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
-            <td style="background: cyan; line-height:1; white-space:nowrap; border=1">&nbsp;&nbsp;&nbsp;&nbsp;</td>
-        </tr>
-        {% endif %}
-      <tr>
-          <td style="line-height:3; white-space:nowrap;"><a href="{% url 'image-view' image.id %}"><img src=" {{ image.get_thumbnail }}" width="50"></a></td>
-          <td style="line-height:3; white-space:nowrap;" align="center"><a href="{% url 'image-view' image.id %}">{{ image.image_code }}</a></td>
-          <td style="line-height:3; white-space:nowrap;">{{ image.image_text }}</td>
-          <td style="line-height:3; white-space:nowrap;">
-              {% if image.thumbnail == True %}
-              <input type="checkbox" disabled="disabled" checked="checked"/>
-              {% else %}
-              <input type="checkbox" disabled="disabled"/>
-              {% endif %}
-          </td>
-          <td style="line-height:3; white-space:nowrap;">
-              {% if image.gallery == True %}
-              <input type="checkbox" disabled="disabled" checked="checked"/>
-              {% else %}
-              <input type="checkbox" disabled="disabled"/>
-              {% endif %}
-          </td>
-          <td style="line-height:3; white-space:nowrap;"><a href="{% url 'image_update' image.id %}">Edit</a></td>
-          <td style="line-height:3; white-space:nowrap;"><a href="{% url 'image_delete' image.id %}">Delete</a></td>
-      </tr>
-      {% endfor %}
-    </table>
-    {% else %}
-      <p>You do not have any images yet.</p>
-    {% endif %}       
+    <div class="container row">
+        <div class="col-12">
+            <div class="my-work-list-border">
+                {% for image in image_list %}
+                {% if forloop.first %}
+                <div class="row">
+                    <div class="col-6">
+                        <form method="get" action="{% url 'image_create' %}">
+                            <button type="submit" class="btn btn-outline-primary">New Image</button>
+                        </form>
+                    </div>
+                    <div class="col-2">Image code</a></div>
+                    <div class="col-2">Common</a></div>
+                    <div class="col-1"></div>
+                    <div class="col-1"></div>
+                </div>
+                <hr>
+                {% endif %}
+                <div class="row my-work-list-padding">
+                    <div class="col-6">
+                    <a role="button" href="#" data-target="#modalIMG"
+                       data-toggle="modal" data-whatever="{{ image.get_original }}">
+                       <img src="{{ image.get_image }}" alt="{{ image.alt_text }}" width="100">
+                    </a>
+                    </div>
+                    <div class="col-2">
+                        <a role="button" href="#" data-target="#modalIMG"
+                       data-toggle="modal" data-whatever="{{ image.get_original }}">
+                            {{ image }}
+                        </a></div>
+                    <div class="col-2">
+                         {% if image.common == True %}
+                             <input type="checkbox" disabled="disabled" checked="checked"/>
+                         {% else %}
+                             <input type="checkbox" disabled="disabled"/>
+                         {% endif %}
+                    </div>
+                    <div class="col-1">
+                        <form method="get" action="{% url 'image_update' image.id %}">
+                            <button type="submit" class="btn btn-outline-secondary">Edit</button>
+                        </form>
+                    </div>
+                    <div class="col-1">
+                        <a href="{% url 'image_delete' image.id %}"
+                           class="confirm-delete" title="Delete" data-toggle="modal"
+                           data-target="#taskModal" onclick="getUrl('{% url 'image_delete' image.id %}')">
+                            <button class="btn trigger-btn btn-outline-danger">Delete</button>
+                        </a>
+                    </div>
+                </div>
+                {% empty %}
+                <div><h5 class="text-center">You didn't create anything yet.</h5></div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
 {% endblock %}

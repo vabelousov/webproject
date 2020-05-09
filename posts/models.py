@@ -3,6 +3,8 @@ from io import BytesIO
 import os
 
 from django.db import models
+from mptt.models import MPTTModel, TreeForeignKey
+
 from django.contrib.auth.models import User
 from django.utils import timezone
 from django.urls import reverse
@@ -21,9 +23,7 @@ def _update_filename(instance, filename, path):
     ext = filename.split('.')[-1]
     # get filename
     if instance.id:
-        filename = 'file_{}_{}_{}.{}'.format(
-            instance.album.post.id,
-            instance.album.id,
+        filename = 'file_{}.{}'.format(
             instance.id,
             ext
         )
@@ -52,13 +52,33 @@ class DraftManager(models.Manager):
         return super(DraftManager, self).get_queryset().filter(status='draft')
 
 
+class Category(models.Model):
+    code = models.CharField(max_length=100, blank=True)
+    description = models.CharField(max_length=100, blank=True)
+
+    def __str__(self):
+        return self.code
+
+    class Meta:
+        verbose_name = 'Category'
+        verbose_name_plural = 'Categories'
+
+
 class Carousel(models.Model):
     image = models.ImageField(
         upload_to='media/images/carousel',
         verbose_name='Image',
         blank=True
     )
-    active = models.BooleanField(default=True)
+    alt_text = models.CharField(max_length=100, blank=True)
+    title = models.CharField(max_length=100, blank=True)
+    reverse_url = models.CharField(
+        max_length=200,
+        blank=True,
+        default='under_construction'
+    )
+    url_attr = models.CharField(max_length=100, blank=True)
+    is_active = models.BooleanField(default=True)
     text = models.TextField(
         max_length=1000,
         help_text="Image text",
@@ -68,152 +88,25 @@ class Carousel(models.Model):
     order = models.IntegerField(default=0)
 
     def __str__(self):
-        return self
-
-
-class Post(models.Model):
-    STATUS_CHOICES = (
-        ('draft', 'Draft'),
-        ('published', 'Published'),
-        ('hidden', 'Hidden')
-    )
-    TYPE_CHOICES = (
-        ('outing', 'Outing'),
-        ('topo', 'Topo'),
-        ('tip', 'Tip'),
-        ('other', 'Other')
-    )
-    author = models.ForeignKey(
-        User,
-        on_delete=models.SET_NULL,
-        help_text="Post author",
-        null=True
-    )
-    title = models.CharField(
-        max_length=200,
-        help_text="Post title"
-    )
-    summary = models.TextField(
-        max_length=1000,
-        help_text="Post summary",
-        blank=True,
-        null=True
-    )
-    body = models.TextField(
-        help_text="Post text (html tags allowed)",
-        blank=True,
-        null=True
-    )
-    thumbnail_id = models.IntegerField(
-        help_text="Thumbnail image id",
-        default=0
-    )
-    type = models.CharField(
-        max_length=20,
-        choices=TYPE_CHOICES,
-        default='outing',
-        help_text="Post type"
-    )
-    status = models.CharField(
-        max_length=10,
-        choices=STATUS_CHOICES,
-        default='draft',
-        help_text="Post status"
-    )
-    date_published = models.DateTimeField(default=timezone.now)
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_updated = models.DateTimeField(auto_now=True)
-
-    objects = models.Manager()  # Менеджер по умолчанию
-    published = PublishedManager()  # Собственный менеджер
-    draft = DraftManager()
-
-    def __str__(self):
         return self.title
 
-    def get_post_code(self):
-        return 'pst_' + str(self.id).zfill(8)
-
-    def get_absolute_url(self):
-        return reverse('post-detail', args=[str(self.id)])
-
-    def get_thumbnail(self):
+    def get_carousel(self):
         try:
-            url = Image.objects.filter(id__exact=self.thumbnail_id).first().image.url
+            url = self.image.url
         except:
             url = '/static/images/no-image.png'
         return url
 
-    def display_author(self):
-        return User.objects.get(
-            username=self.author
-        ).first_name + ' ' + User.objects.get(
-            username=self.author
-        ).last_name
+    def carousel_tag(self):
+        return mark_safe(
+            '<img src="%s" width="50" height="50" />' % self.get_carousel()
+        )
 
-    display_author.short_description = 'Author'
+    carousel_tag.short_description = 'Carousel'
 
     class Meta:
-        ordering = ('-date_published',)
-        verbose_name = 'Post'
-        verbose_name_plural = 'Posts'
-
-
-class Album(models.Model):
-    ALBUM_TYPE_CHOICES = (
-        ('common', 'Common'),
-        ('private', 'Private')
-    )
-    title = models.CharField(
-        max_length=200,
-        help_text="Album title"
-    )
-    description = models.CharField(
-        max_length=1000,
-        help_text="Album description",
-        blank=True,
-        null=True
-    )
-    post = models.OneToOneField(
-        Post,
-        on_delete=models.SET_NULL,
-        blank=True,
-        null=True
-    )
-    author = models.ForeignKey(
-        User,
-        on_delete=models.SET_NULL,
-        help_text="Album author",
-        default=1,
-        null=True
-    )
-    type = models.CharField(
-        max_length=20,
-        choices=ALBUM_TYPE_CHOICES,
-        default='private',
-        help_text="Album type"
-    )
-    date_created = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return self.title
-
-    def get_absolute_url(self):
-        return reverse('album-view', args=[str(self.id)])
-
-    def get_thumbnail(self):
-        try:
-            url = Image.objects.filter(
-                album__exact=self.id
-            ).filter(is_album_thumbnail__exact=True).first().thumbnail.url
-        except:
-            url = '/static/images/no-image.png'
-        return url
-
-    class Meta:
-        ordering = ('-date_created',)
-        verbose_name = 'Albums'
-        verbose_name_plural = 'Albums'
+        verbose_name = 'Carousel'
+        verbose_name_plural = 'Carouseles'
 
 
 class Image(models.Model):
@@ -238,14 +131,6 @@ class Image(models.Model):
         help_text="Uploader",
         default=1,
     )
-    album = models.ForeignKey(
-        Album,
-        on_delete=models.CASCADE,
-        help_text="Album",
-        default=1,
-        blank=True,
-        null=True
-    )
     alt_text = models.CharField(
         null=False,
         blank=True,
@@ -254,10 +139,6 @@ class Image(models.Model):
     )
     common = models.BooleanField(
         help_text="Common image",
-        default=False
-    )
-    is_album_thumbnail = models.BooleanField(
-        help_text="Album thumbnail",
         default=False
     )
     date_created = models.DateTimeField(auto_now_add=True)
@@ -393,6 +274,117 @@ class Image(models.Model):
         verbose_name_plural = 'Images'
 
 
+class Post(models.Model):
+    STATUS_CHOICES = (
+        ('draft', 'Draft'),
+        ('published', 'Published'),
+        ('hidden', 'Hidden')
+    )
+    TYPE_CHOICES = (
+        ('stories', 'Stories'),
+        ('topos', 'Topos'),
+        ('tips', 'Tips'),
+        ('others', 'Others')
+    )
+    author = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        help_text="Post author",
+        null=True
+    )
+    title = models.CharField(
+        max_length=200,
+        help_text="Post title"
+    )
+    summary = models.TextField(
+        max_length=1000,
+        help_text="Post summary",
+        blank=True,
+        null=True
+    )
+    body = models.TextField(
+        help_text="Post text (html tags allowed)",
+        blank=True,
+        null=True
+    )
+    thumbnail_url = models.CharField(
+        max_length=500,
+        help_text="Thumbnail url",
+        blank=True
+    )
+    type = models.CharField(
+        max_length=20,
+        choices=TYPE_CHOICES,
+        default='outing',
+        help_text="Post type"
+    )
+    main_category = models.ForeignKey(
+        Category,
+        on_delete=models.SET_NULL,
+        help_text="Main category",
+        null=True,
+        related_name='main_category'
+    )
+    sub_category = models.ForeignKey(
+        Category,
+        on_delete=models.SET_NULL,
+        help_text="Sub category",
+        null=True,
+        related_name='sub_category'
+    )
+    status = models.CharField(
+        max_length=10,
+        choices=STATUS_CHOICES,
+        default='draft',
+        help_text="Post status"
+    )
+    date_published = models.DateTimeField(default=timezone.now)
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_updated = models.DateTimeField(auto_now=True)
+
+    objects = models.Manager()  # Менеджер по умолчанию
+    published = PublishedManager()  # Собственный менеджер
+    draft = DraftManager()  # Собственный менеджер
+
+    def __str__(self):
+        return self.title
+
+    def get_post_code(self):
+        return 'pst_' + str(self.id).zfill(8)
+
+    def get_absolute_url(self):
+        return reverse('post-detail', args=[str(self.id)])
+
+    def get_thumbnail(self):
+        if len(self.thumbnail_url) > 0:
+            url = self.thumbnail_url
+        else:
+            url = '/static/images/no-image.png'
+        return url
+
+    def display_author(self):
+        return User.objects.get(
+            username=self.author
+        ).first_name + ' ' + User.objects.get(
+            username=self.author
+        ).last_name
+
+    display_author.short_description = 'Author'
+
+    class Meta:
+        ordering = ('-date_published',)
+        verbose_name = 'Post'
+        verbose_name_plural = 'Posts'
+
+
+class ImageBasket(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, null=True)
+    image = models.ForeignKey(Image, on_delete=models.SET_NULL, null=True)
+
+    def __str__(self):
+        return self.post.title + '_' + str(self.image.id)
+
+
 class Comment(models.Model):
     comment_post = models.ForeignKey(
         Post,
@@ -504,23 +496,23 @@ def update_user_profile(sender, instance, created, **kwargs):
     instance.profile.save()
 
 
-'''
-тут нужно добавить модель меню.
-'''
-# class SiteMenu(models.Model):
-#    menu_title = models.CharField(
-#        max_length=30,
-#        help_text="Menu item"
-#    )
-#    menu_desc = models.CharField(
-#        max_length=200,
-#        help_text="Menu description"
-#    )
-#    parent_id =
-#    menu_url =
-#
-#    def __str__(self):
-#       return self.menu_title
-#
-#    def get_parent(self):
-#        return SiteMenu.objects.get(id=self.parent)
+class MyMenu(MPTTModel):
+    title = models.CharField(max_length=50, unique=True)
+    name = models.CharField(max_length=100)
+    reverse_url = models.CharField(
+        max_length=200,
+        blank=True,
+        default='under_construction'
+    )
+    url_attr = models.CharField(max_length=100, blank=True)
+    parent = TreeForeignKey(
+        'self',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='children'
+    )
+    order = models.CharField(max_length=3, default='000')
+
+    class MPTTMeta:
+        order_insertion_by = ['order']

@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import login
 from django.contrib.auth.models import User
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponseRedirect
 from django.contrib.sites.shortcuts import get_current_site
 from django.utils.encoding import force_bytes, force_text
@@ -21,138 +21,59 @@ from django.contrib import messages
 from social_django.models import UserSocialAuth
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 
-from .models import Post, Image, Comment, Profile, Album
+from .models import Post, Image, Comment, Profile, Carousel, ImageBasket
 from .forms import CommentForm, SignUpForm, EditProfileForm,\
-    ProfileForm, PostForm, ImagesForm, AlbumForm, SearchForm
+    ProfileForm, PostForm, ImagesForm, SearchForm
 from .tokens import account_activation_token
 
 
 def index(request):
-    num_published_outings = Post.objects.filter(
-        status__exact='published'
-    ).filter(
-        type__exact='outing'
-    ).count()
-    num_published_topos = Post.objects.filter(
-        status__exact='published'
-    ).filter(
-        type__exact='topo'
-    ).count()
-    num_published_tips = Post.objects.filter(
-        status__exact='published'
-    ).filter(
-        type__exact='tip'
-    ).count()
-    num_published_albums = Album.objects.filter(
-        type__exact='common'
-    ).count()
-    num_published_images = Image.objects.count()
+    carousel = Carousel.objects.filter(
+        is_active__exact=True
+    ).order_by(
+        'order'
+    ).all()
+
     return render(
         request,
         'index.html',
-        context={'num_published_outings': num_published_outings,
-                 'num_published_topos': num_published_topos,
-                 'num_published_tips': num_published_tips,
-                 'num_published_albums': num_published_albums,
-                 'num_published_images': num_published_images,
-                 },
+        context={'carousel': carousel, },
     )
 
 
-class OutingListView(generic.ListView):
+def page_is_under_construction(request):
+    return render(request, 'posts/page_is_under_construction.html', )
+
+
+class PostListView(generic.ListView):
     model = Post
     context_object_name = 'post_list'
     template_name = 'posts/post_list.html'
     paginate_by = 3
 
     def get_queryset(self):
-        return Post.objects.filter(
-            type__exact='outing'
-        ).filter(status__exact='published').order_by('-date_published')
+        try:
+            qs = Post.published.filter(
+                type__exact=self.kwargs['type']
+            ).filter(
+                main_category__code__exact=self.kwargs['category']
+            ).order_by('-date_published')
+        except:
+            try:
+                qs = Post.published.filter(
+                    type__exact=self.kwargs['type']
+                ).order_by('-date_published')
+            except:
+                qs = Post.published.order_by('-date_published')
+                print(qs)
+        return qs
 
     def get_context_data(self, **kwargs):
-        context = super(OutingListView, self).get_context_data(**kwargs)
-        context['list_name'] = 'Outings'
-        return context
-
-
-class TopoListView(generic.ListView):
-    model = Post
-    context_object_name = 'post_list'
-    template_name = 'posts/post_list.html'
-    paginate_by = 3
-
-    def get_queryset(self):
-        return Post.objects.filter(
-            type__exact='topo'
-        ).filter(status__exact='published').order_by('-date_published')
-
-    def get_context_data(self, **kwargs):
-        context = super(TopoListView, self).get_context_data(**kwargs)
-        context['list_name'] = 'Topos'
-        return context
-
-
-class TipListView(generic.ListView):
-    model = Post
-    context_object_name = 'post_list'
-    template_name = 'posts/post_list.html'
-    paginate_by = 3
-
-    def get_queryset(self):
-        return Post.objects.filter(
-            type__exact='tip'
-        ).filter(status__exact='published').order_by('-date_published')
-
-    def get_context_data(self, **kwargs):
-        context = super(TipListView, self).get_context_data(**kwargs)
-        context['list_name'] = 'Tips'
-        return context
-
-
-class AlbumListView(generic.ListView):
-    model = Post
-    context_object_name = 'album_list'
-    template_name = 'posts/album_list.html'
-    paginate_by = 3
-
-    def get_queryset(self):
-        return Album.objects.filter(
-            type__exact='common'
-        ).order_by('-date_created')
-
-    def get_context_data(self, **kwargs):
-        context = super(AlbumListView, self).get_context_data(**kwargs)
-        context['list_name'] = 'Albums'
-        return context
-
-
-class AlbumDetailView(generic.DetailView):
-    model = Album
-    template_name = 'posts/album_view.html'
-
-    def get_context_data(self, **kwargs):
-        context = super(AlbumDetailView, self).get_context_data(**kwargs)
-        img1 = []
-        img2 = []
-        img3 = []
-        i = 0
-        all_img = Image.objects.filter(
-            album__exact=self.object.id
-        ).order_by('-date_created')
-        cnt = all_img.count()
-        for img in all_img:
-            if i % 3 == 0:
-                img1.append(img)
-            if i % 3 == 1:
-                img2.append(img)
-            if i % 3 == 2:
-                img3.append(img)
-            i = i + 1
-        context['album_images_1'] = img1
-        context['album_images_2'] = img2
-        context['album_images_3'] = img3
-        context['img_count'] = cnt
+        context = super(PostListView, self).get_context_data(**kwargs)
+        try:
+            context['list_name'] = self.kwargs['type']
+        except:
+            context['list_name'] = 'All posts'
         return context
 
 
@@ -165,24 +86,7 @@ class PostDetailView(FormMixin, generic.DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(PostDetailView, self).get_context_data(**kwargs)
-        '''
-        ниже в цикле я заменяю все вхождения
-        условных кодов картинок на их пути
-        '''
-        try:
-            for img in Image.objects.filter(
-                    album__exact=Album.objects.get(post=self.object.id)
-            ):
-                context['post'].body = context['post'].body.replace(
-                    '[' + img.__str__() + '_m]',
-                    str(img.get_image())
-                )
-                context['post'].body = context['post'].body.replace(
-                    '[' + img.__str__() + '_o]',
-                    str(img.get_original())
-                )
-        except:
-            pass
+
         context['comments'] = Comment.objects.filter(
             comment_post__exact=context['post'].id
         ).filter(is_active=True).order_by('-date_created')
@@ -220,17 +124,6 @@ class PostsByAuthorListView(LoginRequiredMixin, generic.ListView):
         ).order_by('type').order_by('-date_published')
 
 
-class AlbumsByAuthorListView(generic.ListView):
-    model = Album
-    template_name = 'posts/user_albums.html'
-    paginate_by = 3
-
-    def get_queryset(self):
-        return Album.objects.filter(
-            author__exact=self.request.user
-        ).order_by('-date_created')
-
-
 class CommonImageListView(generic.ListView):
     model = Image
     context_object_name = 'images_list'
@@ -247,22 +140,26 @@ class CommonImageListView(generic.ListView):
         img1 = []
         img2 = []
         img3 = []
+        img4 = []
         i = 0
         all_img = Image.objects.filter(
             common__exact=True
         ).order_by('-date_created')
         cnt = all_img.count()
         for img in all_img:
-            if i % 3 == 0:
+            if i % 4 == 0:
                 img1.append(img)
-            if i % 3 == 1:
+            if i % 4 == 1:
                 img2.append(img)
-            if i % 3 == 2:
+            if i % 4 == 2:
                 img3.append(img)
+            if i % 4 == 3:
+                img4.append(img)
             i = i + 1
         context['common_images_1'] = img1
         context['common_images_2'] = img2
         context['common_images_3'] = img3
+        context['common_images_4'] = img4
         context['img_count'] = cnt
         return context
 
@@ -404,6 +301,7 @@ def edit_profile(request):
 def view_profile(request, username):
     person_user = User.objects.get(username=username)
     person = Profile.objects.get(user=person_user)
+    print(person_user.profile.get_avatar)
     args = {}
     args['person'] = person
     args['person_user'] = person_user
@@ -459,10 +357,7 @@ class PostUpdate(LoginRequiredMixin, UpdateView):
     def get_context_data(self, **kwargs):
         context = super(PostUpdate, self).get_context_data(**kwargs)
         try:
-            context['album_images_count'] = Image.objects.filter(album__exact=self.object.id).count()
-            context['post_images'] = Image.objects.filter(
-                album__exact=Album.objects.get(post=self.object.id).id
-            ).all()
+            context['basket'] = ImageBasket.objects.filter(post__id__exact=context['post'].id)
         except:
             pass
         return context
@@ -471,6 +366,11 @@ class PostUpdate(LoginRequiredMixin, UpdateView):
 class PostDelete(LoginRequiredMixin, DeleteView):
     model = Post
     success_url = reverse_lazy('my-posts')
+
+    def get(self, request, *args, **kwargs):
+        obj = get_object_or_404(Post, id=self.kwargs.get('pk'))
+        obj.delete()
+        return redirect('my-posts')
 
 
 class ImageCreate(LoginRequiredMixin, CreateView):
@@ -482,7 +382,7 @@ class ImageCreate(LoginRequiredMixin, CreateView):
         initial = super(ImageCreate, self).get_initial()
         initial.update(
             {
-                'user': self.request.user
+                'user': self.request.user.id
             }
         )
         return initial
@@ -504,52 +404,7 @@ class ImageDelete(LoginRequiredMixin, DeleteView):
     model = Image
     success_url = reverse_lazy('my-images')
 
-
-class ImageDetailView(LoginRequiredMixin, generic.DetailView):
-    model = Image
-    context_object_name = 'image_view'
-    template_name = "posts/image_view.html"
-
-
-class ImageView(generic.DetailView):
-    model = Image
-    context_object_name = 'image'
-    template_name = "posts/image.html"
-
-
-class AlbumCreate(LoginRequiredMixin, CreateView):
-    model = Album
-    form_class = AlbumForm
-    success_url = None
-
-    def get_initial(self, *args, **kwargs):
-        initial = super(AlbumCreate, self).get_initial()
-        initial.update(
-            {
-                'author': self.request.user,
-                'type': 'private'
-            }
-        )
-        return initial
-
-    def get_success_url(self):
-        return reverse_lazy('my-albums')
-
-
-class AlbumUpdate(LoginRequiredMixin, UpdateView):
-    model = Album
-    form_class = AlbumForm
-    success_url = None
-
-    def get_success_url(self):
-        return reverse_lazy('my-albums')
-
-
-class AlbumDelete(LoginRequiredMixin, DeleteView):
-    model = Album
-    success_url = reverse_lazy('my-albums')
-
-    def get_context_data(self, **kwargs):
-        context = super(AlbumDelete, self).get_context_data(**kwargs)
-        context['album_images_count'] = Image.objects.filter(album__exact=self.object.id).count()
-        return context
+    def get(self, request, *args, **kwargs):
+        obj = get_object_or_404(Image, id=self.kwargs.get('pk'))
+        obj.delete()
+        return redirect('my-images')

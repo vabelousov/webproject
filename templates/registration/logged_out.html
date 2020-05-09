@@ -1,7 +1,16 @@
 {% extends "base_generic.html" %}
 
 {% block content %}
-<p>Logged out!</p>  
+    <div class="container">
+        <div class="row justify-content-center my-login-margin">
+            <div class="col-md-6">
+                <div class="card">
+                    <h3 class="text-center pt-5">You have successfully logged out!</h3>
 
-<a href="{% url 'login'%}">Click here to login again.</a>
+                    <div class="card-body text-center"><a href="{% url 'login'%}">Click here to login again.</a></div>
+                </div> <!-- card.// -->
+            </div> <!-- col.//-->
+
+        </div> <!-- row.//-->
+    </div>
 {% endblock %}

@@ -1,0 +1,40 @@
+<!-- modal delete popup confirmation -->
+<div id="taskModal" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Confirm deletion</h4>
+            </div>
+            <div class="modal-body">Are your sure you want to delete?</div>
+            <div class="modal-footer">
+                <a id="del_obj" class="btn btn-outline-danger" type="button" data-dismiss="modal" href="" onclick="goto()">Delete</a>
+                <a class="btn btn-outline-secondary" type="button" data-dismiss="modal">Cancel</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--modal image popup -->
+<div class="modal fade" id="modalIMG">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-body mb-0 p-0">
+				<img id="myImage" src="" style="width:100%">
+			</div>
+			<div class="modal-footer">
+				<button class="btn btn-outline-primary btn-rounded btn-md ml-4 text-center"
+                        data-dismiss="modal" type="button">Close</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+$('#modalIMG').on('show.bs.modal', function (event) {
+
+    var button = $(event.relatedTarget)
+    var img_url = button.data('whatever')
+    var modal = $(this)
+    modal.find('.modal-body #myImage').attr("src", img_url);
+})
+</script>

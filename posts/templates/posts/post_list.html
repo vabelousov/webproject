@@ -1,32 +1,43 @@
 {% extends "base_generic.html" %}
 
 {% block content %}
-    <h1>{{ list_name }}</h1>
 
-    {% if post_list %}
-    <ul>
-
-      {% for post in post_list %}
-        <hr/>
-        <table>
-              <tr>
-                  <td>
-                      <img src="{{ post.get_thumbnail }}" class="img-thumbnail" width="240"/>
-                  </td>
-                  <td>
-                      <p>
-                          <a href="{{ post.get_absolute_url }}">
-                             {{ post.title }}</a> ({{post.author.last_name}}, {{ post.author.first_name }})
-                          <br/>
-                          {{ post.summary }}
-                      </p>
-                  </td>
-              </tr>
-        </table>
-      {% endfor %}
-
-    </ul>
-    {% else %}
-      <p>There are no {{ list_name }} in the list.</p>
-    {% endif %}       
+{% regroup post_list|dictsort:'type' by type as post_by_type_list %}
+<div class="container row">
+    <div class="col-12">
+    {% for type in post_by_type_list %}
+    {% regroup type.list|dictsort:'main_category.code' by main_category.code as post_by_cat_list %}
+        {% for main_category in post_by_cat_list %}
+        <div class="my-page-list-border">
+            <a href="{% url 'pages' type.grouper %}">
+                {{ type.grouper }}
+            </a>/<a href="{% url 'pages' type.grouper|add:'/'|add:main_category.grouper %}">
+                {{ main_category.grouper }}
+            </a>
+            <div class="row">
+                {% for post in main_category.list|dictsortreversed:'date_published' %}
+                <div class="col-md-3 my-main-cat-itm">
+                    <div>
+                        <div class="my-main-cat-itm-img">
+                            <a href="{{ post.get_absolute_url }}">
+                                <img src="{{ post.get_thumbnail }}" width="100%">
+                            </a>
+                        </div>
+                        <div class="my-main-cat-itm-text">
+                            <a href="{{ post.get_absolute_url }}">{{ post.title }} by {{ post.author.first_name }} {{post.author.last_name}}</a>
+                        </div>
+                        <div class="my-main-cat-itm-text">
+                            <a href="{{ post.get_absolute_url }}">{{ post.summary|truncatechars:100 }}</a>
+                        </div>
+                    </div>
+                </div>
+             {% empty %}
+            <p>No post in this category</p>
+            {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    {% endfor %}
+    </div>
+</div>
 {% endblock %}

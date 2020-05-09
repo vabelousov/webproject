@@ -1,27 +1,50 @@
 {% extends "base_generic.html" %}
 
-{% block title %}<title>Up-the-hills: search</title>{% endblock %}
+{% block title %}<title>Above the CLOUDS: search</title>{% endblock %}
 
 {% block content %}
-  {% if query %}
-    <h1>Posts containing "{{ query }}"</h1>
-    <h3>
-      {% with results.count as total_results %}
-	Found {{ total_results }} result{{ total_results|pluralize }}
-      {% endwith %}
-    </h3>
-    {% for post in results %}
-      <h4><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></h4>
-      {{ post.body|truncatewords:5 }}
-    {% empty %}
-      <p>There are no results for your query.</p>
-    {% endfor %}
-    <p><a href="{% url "post_search" %}">Search again</a></p>
-  {% else %}
-    <h1>Search for posts</h1>
-    <form action="." method="get">
-      {{ form.as_p }}
-      <input type="submit" value="Search">
-    </form>
-  {% endif %}
+
+<div class="container row">
+    <div class="col-12">
+        <h2 class="text-center">Search results</h2>
+        <div class="my-page-list-border">
+            <div class="mx-auto my-2 order-0 order-md-1 position-relative">
+                <form class="form-inline my-2 my-lg-0" action="." method="get">
+                    <div class="form-group">
+                        {{ form.query.errors }}
+                        <label for="{{ form.query.id_for_label }}">{{ form.query.label_tag }}</label>
+                        {{ form.query }}
+                    </div>
+                    <div class="form-group">
+                        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+                    </div>
+                </form>
+            </div>
+            {% if query %}
+            <h5>Posts containing "{{ query }}"</h5>
+            <h6>{% with results.count as total_results %}
+                Found {{ total_results }} result{{ total_results|pluralize }}
+                {% endwith %}
+            </h6>
+            <div class="row my-search-box">
+                {% for post in results %}
+                <div class="col-md-3 my-search-box-itm">
+                    <div>
+                        <div class="my-search-box-padding">
+                            <a href="{{ post.get_absolute_url }}"><img src="{{ post.get_thumbnail}}" width="100%"></a>
+                        </div>
+                        <div class="my-search-box-text-padding"><a href="{{ post.get_absolute_url }}">{{ post.title
+                            }}</a></div>
+                        <div class="my-search-box-text-padding"><a href="{{ post.get_absolute_url }}">{{
+                            post.summary|truncatewords:5 }}</a></div>
+                    </div>
+                </div>
+                {% empty %}
+                <p>There are no results for your query.</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
 {% endblock %}

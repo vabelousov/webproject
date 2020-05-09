@@ -1,55 +1,69 @@
 {% extends "base_generic.html" %}
 {% load humanize %}
 {% block content %}
-<article>
-    <header>
-        <h1>{{ post.title }}</h1>
-        <p>{{ post.summary }}</p>
-        <p>by {{ post.author.last_name }}, {{ post.author.first_name }}</p>
-    </header>
-    {% autoescape off %}
-    {{ post.body|safe }}
-    {% endautoescape %}
-</article>
-<br/>
-{% if user.is_authenticated %}
-<hr/>
-<form method="post" action="">
-    {% csrf_token %}
-    <h5>Add a comment as {{ user.last_name }}, {{ user.first_name }}
-                ({{ user.username }})</h5>
-    <table>
-    {{ comment_form.as_table|safe }}
-        </table>
-    <p><input type="submit" value="Post"></p>
-</form>
-{% else %}
-<br/>
-To comment you need to
-<a href="{% url 'login' %}?next={{ request.path }}"> Login</a> --OR--
-<a href="{% url 'social:begin' 'facebook' %}">Login with Facebook</a> --OR --
-<a href="{% url 'signup' %}">Sign UP</a>
-{% endif %}
-<hr/>
-<h3>Comments:</h3>
-{% for comment in comments.all %}
-<div class="comment">
-    <p>
-        <img src="{{ comment.comment_user.profile.get_avatar }}" width="50"/>
-        <b>
-            <a href="{% url 'view_profile' comment.comment_user %}">
-                {{ comment.comment_user.last_name }}, {{ comment.comment_user.first_name }}
-                ({{ comment.comment_user.username }})
-            </a>
-        </b>
-        <i> -- {{ comment.date_created|naturaltime }}</i>
-    <div>
-        {{ comment.comment_text|safe }}
+<div class="container row">
+    <div class="col-12">
+        <div class="my-post-top">
+            <h1 class="text-center">{{ post.title }}</h1>
+            <h6>
+                <p>{{ post.summary }}</p>
+            </h6>
+            <br>
+            <h5>by {{ post.author.first_name }} {{ post.author.last_name }}</h5>
+        </div>
+        <div class="my-page-list-border">
+            <!-- post content begin -->
+            <article class="my-post-article">
+                {% autoescape off %}
+                {{ post.body|safe }}
+                {% endautoescape %}
+            </article>
+            <!-- post content end -->
+            <div class="my-post-comments">
+                {% if user.is_authenticated %}
+                <form method="post" action="">
+                    {% csrf_token %}
+                    {% for field in comment_form.hidden_fields %}
+                       {{ field }}
+                    {% endfor %}
+
+                    <div class="form-group">
+                        {{ comment_form.comment_text.errors }}
+                        <label for="{{ comment_form.comment_text.id_for_label }}">{{ comment_form.comment_text.label_tag }}</label>
+                        {{ comment_form.comment_text|safe }}
+                    </div>
+                    <button class="btn btn-outline-primary" type="submit">Post</button>
+                </form>
+                {% else %}
+                <br>
+                To comment you need to
+                <a href="{% url 'login' %}?next={{ request.path }}"> Login</a> --OR--
+                <a href="{% url 'social:begin' 'facebook' %}">Login with Facebook</a> --OR --
+                <a href="{% url 'signup' %}">Sign UP</a>
+                {% endif %}
+                <br>
+                <h3>Comments:</h3>
+                {% for comment in comments.all %}
+                <hr>
+                <div class="row">
+                    <div class="col-1">
+                        <a href="{% url 'view_profile' comment.comment_user %}">
+                            <img src="{{ comment.comment_user.profile.get_avatar }}" width="50"/>
+                            {{ comment.comment_user.last_name }}, {{ comment.comment_user.first_name }}
+                            ({{ comment.comment_user.username }})
+                        </a>
+                    </div>
+                    <div class="col-10">
+                        <i> -- {{ comment.date_created|naturaltime }}</i>
+                        <p>{{ comment.comment_text|safe }}</p>
+                    </div>
+                </div>
+                {% empty %}
+                <p>No comments here yet :(</p>
+                {% endfor %}
+            </div>
+        </div>
     </div>
-    <br/>
-    </p>
 </div>
-{% empty %}
-<p>No comments here yet :(</p>
-{% endfor %}
+
 {% endblock %}

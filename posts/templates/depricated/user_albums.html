@@ -1,0 +1,59 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+    <div class="container row">
+        <div class="col-12">
+            <div class="my-work-list-border">
+                {% for album in album_list %}
+                {% if forloop.first %}
+                <div class="row">
+                    <div class="col-3">
+                        <div class="row">
+                            <div class="col-2">
+                                <form method="get" action="{% url 'album_create' %}">
+                                    <button type="submit" class="btn btn-outline-primary">New album</button>
+                                </form>
+                            </div>
+                            <div class="col text-center">Album</div>
+                        </div>
+                    </div>
+                    <div class="col-3 text-center">Description</div>
+                    <div class="col-3 text-center">Post</div>
+                    <div class="col-1">Type</div>
+                    <div class="col-1"></div>
+                    <div class="col-1"></div>
+                </div>
+                <hr>
+                {% endif %}
+                <div class="row my-work-list-padding">
+                    <div class="col-3"><a href="{% url 'album-view' album.id %}">{{ album.title }}</a></div>
+                    <div class="col-3"><a href="{% url 'album-view' album.id %}">{{ album.description }}</a></div>
+                    <div class="col-3">
+                        {% if album.post %}
+                        <a href="{% url 'post-detail' album.post.id %}">{{ album.post }}</a>
+                        {% else %}
+                        None
+                        {% endif %}
+                    </div>
+                    <div class="col-1">{{ album.type }}</div>
+                    <div class="col-1">
+                        <form method="get" action="{% url 'album_update' album.id %}">
+                            <button type="submit" class="btn btn-outline-secondary">Edit</button>
+                        </form>
+                    </div>
+                    <div class="col-1">
+                        <a href="{% url 'album_delete' album.id %}"
+                           class="confirm-delete" title="Delete" data-toggle="modal"
+                           data-target="#taskModal" onclick="getUrl('{% url 'album_delete' album.id %}')">
+                            <button class="btn trigger-btn btn-outline-danger">Delete</button>
+                        </a>
+                    </div>
+                </div>
+                {% empty %}
+                <div><h5 class="text-center">You didn't create anything yet.</h5></div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

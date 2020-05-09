@@ -1,0 +1,63 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+    <div class="container row">
+        <div class="col-10">
+            <div>
+                <h2 class="text-center">Albums</h2>
+            </div>
+            <div class="row my-page-list-border">
+                {% for album in album_list %}
+                <div class="col-md-4">
+                    <div class="thumbnail">
+                        <a href="{{ album.get_absolute_url }}">
+                            <img src="{{ album.get_thumbnail }}" alt="" style="width:100%">
+                            <div class="caption">
+                                <p>{{ album.title }} ({{album.author.last_name}}, {{ album.author.first_name }})
+                                    {{ album.description }}</p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                {% empty %}
+                <p>No albums here</p>
+                {% endfor %}
+            </div>
+        </div>
+       <div class="col-2 my-right-panel">
+            <h5 class="text-center">New posts</h5>
+            <div class="row my-right-panel-item">
+                <div>
+                    <div class="my-right-panel-itm-image">
+                        <a href="post.html"><img src="static/images/post_sm.jpg" width="100%"></a>
+                    </div>
+                    <div class="my-right-panel-itm-text">
+                        <a href="post.html">Parette di Arnad - Tiko Saab</a>
+                    </div>
+                </div>
+            </div>
+            <div class="row my-right-panel-item">
+                <div>
+                    <div class="my-right-panel-itm-image">
+                        <a href="post.html"><img src="static/images/post_sm.jpg" width="100%"></a>
+                    </div>
+                    <div class="my-right-panel-itm-text">
+                        <a href="post.html">Parette di Arnad - Tiko Saab</a>
+                    </div>
+                </div>
+            </div>
+            <div class="row my-right-panel-item">
+                <div>
+                    <div class="my-right-panel-itm-image">
+                        <a href="post.html"><img src="static/images/post_sm.jpg" width="100%"></a>
+                    </div>
+                    <div class="my-right-panel-itm-text">
+                        <a href="post.html">Parette di Arnad - Tiko Saab</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

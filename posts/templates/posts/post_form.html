@@ -2,58 +2,97 @@
 {% load static %}
 {% block content %}
 
-<h4>Edit post</h4>
-<br/>
-
-<form method="post" enctype="multipart/form-data" action="" class="form-horizontal">
-    {% csrf_token %}
-    {% for field in form.hidden_fields %}
-    {{ field }}
-    {% endfor %}
-    {% for field in form.visible_fields %}
-<div class="form-group">
-        <div class="col-sm-2">
-            {{ field.label_tag }}
-        </div>
-        <div class="col-sm-10" >
-            {{ field }}
-        </div>
-</div>
-    {% endfor %}
-    {% if form.errors %}
-    {% for key, value in form.errors.items %}
-    <div class="form-group">
-        <div class="col-sm-2 bg-danger">
-            {{ key }}
-        </div>
-        <div class="col-sm-4 bg-danger">
-            {{ value }}
+<div class="container row">
+    <div class="col-8">
+        <h2 class="text-center">Edit post</h2>
+        <div class="my-page-list-border">
+            <form method="post" enctype="multipart/form-data" action="">
+                {% csrf_token %}
+                {% for field in form.hidden_fields %}
+                {{ field }}
+                {% endfor %}
+                <div class="form-group">
+                    <p>{{ form.title.errors }}</p>
+                    <label for="{{ form.title.id_for_label }}">{{ form.title.label_tag }}</label>
+                    {{ form.title }}
+                </div>
+                <div class="form-group">
+                    {{ form.summary.errors }}
+                    <label for="{{ form.summary.id_for_label }}">{{ form.summary.label_tag }}</label>
+                    {{ form.summary }}
+                </div>
+                <div class="form-group">
+                    {{ form.body.errors }}
+                    <label for="{{ form.body.id_for_label }}">{{ form.body.label_tag }}</label>
+                    <input type="button" class="btn btn-outline-info" value="<img>"
+                           onclick="insert_IMG_AtCaret('id_body')">
+                    <input type="button" class="btn btn-outline-info" value="<a href>"
+                           onclick="insert_AHREF_AtCaret('id_body')">
+                    {{ form.body }}
+                </div>
+                <div class="form-group">
+                    {{ form.thumbnail_url.errors }}
+                    <label for="{{ form.thumbnail_url.id_for_label }}">{{ form.thumbnail_url.label_tag }}</label>
+                    {{ form.thumbnail_url }}
+                </div>
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col">
+                            {{ form.type.errors }}
+                            <label for="{{ form.type.id_for_label }}">{{ form.type.label_tag }}</label>
+                            {{ form.type }}
+                        </div>
+                        <div class="col">
+                            {{ form.status.errors }}
+                            <label for="{{ form.status.id_for_label }}">{{ form.status.label_tag }}</label>
+                            {{ form.status }}
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col">
+                            {{ form.main_category.errors }}
+                            <label for="{{ form.main_category.id_for_label }}">{{ form.main_category.label_tag
+                                }}</label>
+                            {{ form.main_category }}
+                        </div>
+                        <div class="col">
+                            {{ form.sub_category.errors }}
+                            <label for="{{ form.sub_category.id_for_label }}">{{ form.sub_category.label_tag }}</label>
+                            {{ form.sub_category }}
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-outline-primary">Save</button>
+            </form>
         </div>
     </div>
-    {% endfor %}
-    {% endif %}
-    <div class="row">
-        <div class="col-4">
-            <button type="submit" class="btn btn-primary">Submit</button>
+    <div class="col-4">
+        <h5 class="text-center my-right-panel">Photo-basket:</h5>
+        <div class="row my-post-right-panel-border">
+            {% for img in basket %}
+            <div class="col-md-6">
+                <div class="thumbnail my-post-right-panel-thumbnail">
+                    <a href="#">
+                        <img src="{{ img.image.get_image }}" alt="Lights" width="100%">
+                    </a>
+                    <div class="caption">
+                        <p>
+                            <input type="button" value="t"
+                                   onclick="insert_URL_AtCaret('id_thumbnail_url', '{{ img.image.get_thumbnail }}')">
+                            <input type="button" value="m"
+                                   onclick="insert_URL_AtCaret('id_body', '{{ img.image.get_image }}')">
+                            <input type="button" value="o"
+                                   onclick="insert_URL_AtCaret('id_body', '{{ img.image.get_original }}')">
+                        </p>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-md-6">No images in gallery.</div>
+            {% endfor %}
         </div>
     </div>
-</form>
-
-<div class="w3-content" style="max-width:1500px">
-<div class="w3-bar-block w3-center">
-        <h5>current post images</h5>
-</div>
-{% if album_images_count > 0 %}
-<div class="row">
-    {% for img in post_images %}
-        <div class="col-md-2 col-sm-4 col-xs-6">
-            <img src="{{ img.get_image }}" class="img-fluid" style="width:100%">
-            <input type="text" value="{{ img }}" readonly id="{{ img }}" size="12">
-        </div>
-    {% endfor %}
-</div>
-{% else %}
-<p>There are no images in the list.</p>
-{% endif %}
 </div>
 {% endblock content %}

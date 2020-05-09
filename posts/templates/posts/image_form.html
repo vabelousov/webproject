@@ -1,42 +1,40 @@
 {% extends "base_generic.html" %}
 {% load static %}
 {% block content %}
-<h4>Edit image</h4>
-<p>
-    <img src="{{ image.get_image }}" width="200px"/>
-</p>
-<div>
-    <div class="entry">
-        <form method="post" enctype="multipart/form-data" action="">
-            {% csrf_token %}
-            {% for field in form.hidden_fields %}
-            {{ field }}
-            {% endfor %}
-            <table>
-                <tbody>
-                {% for field in form.visible_fields %}
-                <tr>
-                    <td>{{ field.label_tag }}</td>
-                </tr>
-                <tr>
-                    <td>{{ field }}</td>
-                </tr>
+<div class="container row">
+    <div class="col-12">
+        <h2 class="text-center">Edit image</h2>
+        <div class="my-page-list-border">
+            <form method="post" enctype="multipart/form-data" action="">
+                {% csrf_token %}
+                {% for field in form.hidden_fields %}
+                {{ field }}
                 {% endfor %}
-                {% if form.errors %}
-                {% for key, value in form.errors.items %}
-                <tr>
-                    <td>
-                        <div style="color:red">{{ key }}:{{ value }}</div>
-                    </td>
-                </tr>
-                {% endfor %}
-                {% endif %}
-                </tbody>
-            </table>
-            <p>
-                <input type="submit" value="Submit"/>
-            </p>
-        </form>
+                <div class="form-group">
+                    <img src="{{ image.get_image }}" width="200px"/>
+                </div>
+                <div class="form-group">
+                    <p>{{ form.orignal.errors }}</p>
+                    <label for="{{ form.original.id_for_label }}">{{ form.original.label_tag }}</label>
+                    {{ form.original }}
+                </div>
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-10">
+                            <p>{{ form.alt_text.errors }}</p>
+                            <label for="{{ form.alt_text.id_for_label }}">{{ form.alt_text.label_tag }}</label>
+                            {{ form.alt_text }}
+                        </div>
+                        <div class="col-2">
+                            <p>{{ form.common.errors }}</p>
+                            <label for="{{ form.common.id_for_label }}">{{ form.common.label_tag }}</label>
+                            {{ form.common }}
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-outline-primary">Save</button>
+            </form>
+        </div>
     </div>
 </div>
 {% endblock content %}

@@ -1,18 +1,43 @@
 {% extends 'base_generic.html' %}
 {% block content %}
-<H1>View Profile</H1>
-<hr/>
-<img src="{{ person.get_avatar }}" width="80"/>
-<hr/>
-<strong>Username:</strong> {{ person_user.username }} <br/>
-<strong>First name:</strong> {{ person_user.first_name }} <br/>
-<strong>Last name:</strong> {{ person_user.last_name }} <br/>
-<strong>Email:</strong> {{ person_user.email }} <br/>
-<strong>Bio:</strong> {{ person.bio }} <br/>
-<strong>Location:</strong> {{ person.location }} </br>
-<hr/>
-{% if user.username == person_user.username %}
-<a href="{% url 'edit_profile' %}">Edit your profile</a>
-<br/>
-{% endif %}
+   <div class="container row">
+        <div class="col-12">
+            <div class="profile-container">
+                <div class="row">
+                    <div class="col-md-6 img">
+                        <h5>USERNAME: {{ person_user.username}}</h5>
+                        <br>
+                        <img src="{{ person.get_avatar }}" alt="" class="img-rounded" width="150px">
+                        {% if user.username == person_user.username %}
+                        <br>
+                        <a href="{% url 'edit_profile' %}">Edit your profile</a>
+                        <br>
+                        <a href="{% url 'settings' %}">Social accounts</a>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6 details">
+                        <blockquote>
+                            <h5>{{ person_user.first_name }} {{ person_user.last_name }}</h5>
+                            <small><cite title="Source Title"><i class="icon-map-marker">{{ person.location }}</i></cite></small>
+                            <br>
+                            <small>{{ person.birth_date|date:"SHORT_DATE_FORMAT" }}</small>
+                        </blockquote>
+                        <br>
+                        <blockquote>
+                            <h5>about me</h5>
+                            <small>
+                                <cite title="Source Title">
+                                    <i class="icon-map-marker">{{ person.bio }}</i>
+                                </cite>
+                            </small>
+                        </blockquote>
+                        <br>
+                        <p>
+                            {{ person_user.email }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}

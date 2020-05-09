@@ -1,8 +1,10 @@
 #  служебные файлы кроме __init__.py
 .DS_Store
 db.sqlite3
+styles_old.css
 .env*
 posts/migrations/*.*
+posts/templates/depricated/*.*
 
 __*
 !__init__.py
