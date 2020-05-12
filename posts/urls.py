@@ -6,22 +6,33 @@ from . import views
 
 urlpatterns = [
     url(r'^$', views.index, name='index'),
-    url(r'^pages/(?P<type>\D+)/(?P<category>\D+)/$', views.PostListView.as_view(), name='pages'),
-    url(r'^pages/(?P<type>\D+)/$', views.PostListView.as_view(), name='pages'),
+    url(
+        r'^pages/(?P<type>\D+)/(?P<category>\D+)/$',
+        views.PostListView.as_view(),
+        name='pages'
+    ),
+    url(
+        r'^pages/(?P<type>\D+)/$',
+        views.PostListView.as_view(),
+        name='pages'
+    ),
     url(r'^pages/$', views.PostListView.as_view(), name='pages'),
-
     url(
         r'^page/(?P<pk>\d+)$',
         views.PostDetailView.as_view(),
         name='post-detail'
     ),
-    url(r'^common-images/$', views.CommonImageListView.as_view(), name='common-images'),
-    url('search/', views.post_search, name='post_search'),
     url(
-        r'^page_is_under_construction/$',
-        views.page_is_under_construction,
-        name='under-construction'
+        r'^common-images/$',
+        views.CommonImageListView.as_view(),
+        name='common-images'
     ),
+    url(
+        r'^tagged-images/(?P<slug>[-\w]+)/$',
+        views.ImageTagListView.as_view(),
+        name="tagged-images"
+    ),
+    url('search/', views.post_search, name='post_search'),
 ]
 
 urlpatterns += [

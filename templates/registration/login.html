@@ -32,13 +32,12 @@
                                 {{ form.password.errors }}
                                 <label for="{{ form.password.id_for_label }}">{{ form.password.label_tag }}</label>
                               <input type="password" name="password" class="form-control" autocomplete="current-password" required id="id_password">
-                            </div> <!-- form-group end.// -->
-
+                            </div>
                             <div class="form-group">
                                 <button type="submit" class="btn btn-outline-primary btn-block"> Login </button>
-                            </div> <!-- form-group// -->
+                            </div>
                         </form>
-                    </article> <!-- card-body end .// -->
+                    </article>
                     <div class="border-top card-body text-center">
                       No account? <a href="{% url 'signup' %}">Signup</a>
                       <br>
@@ -46,7 +45,6 @@
                       <a href="{% url 'social:begin' 'facebook' %}">Login with Facebook</a>
                       <br/>
                       <br/>
-                      {# Assumes you setup the password_reset view in your URLconf #}
                       <p><a href="{% url 'password_reset' %}">Lost password?</a></p>
                     </div>
                 </div>

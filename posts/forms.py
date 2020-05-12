@@ -2,6 +2,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+from taggit.forms import TagWidget
 
 from .models import Comment, Profile, Post, Image
 
@@ -30,7 +31,8 @@ class ImagesForm(forms.ModelForm):
         widgets = {
             'user': forms.HiddenInput(),
             'alt_text': forms.TextInput(attrs={'class': 'form-control'}),
-            'common': forms.CheckboxInput(attrs={'class': 'form-control'}),
+            'common': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'tags': TagWidget(attrs={'class': 'form-control'}),
         }
 
 
@@ -92,3 +94,10 @@ class SignUpForm(UserCreationForm):
 
 class SearchForm(forms.Form):
     query = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
+
+
+class UserImagesForm(forms.Form):
+    image_object = forms.ModelMultipleChoiceField(
+        queryset=Image.objects.all(),
+        widget=forms.CheckboxSelectMultiple,
+    )

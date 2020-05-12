@@ -18,18 +18,26 @@
                     <label for="{{ form.original.id_for_label }}">{{ form.original.label_tag }}</label>
                     {{ form.original }}
                 </div>
-                <div class="form-group">
-                    <div class="row">
-                        <div class="col-10">
+                <div class="form-row">
+                    <div class="form-group col">
                             <p>{{ form.alt_text.errors }}</p>
                             <label for="{{ form.alt_text.id_for_label }}">{{ form.alt_text.label_tag }}</label>
                             {{ form.alt_text }}
+                    </div>
+                        <div class="form-group col">
+                            <p>{{ form.tags.errors }}</p>
+                            <label for="{{form.tags.id_for_label}}">{{ form.tags.label_tag }}</label>
+                            {{ form.tags }}
+                            {% comment %}
+                            <input type="text" name="tags" value="{{ form.tags.value }}" class="form-control" id="id_tags">
+                            {% endcomment %}
                         </div>
-                        <div class="col-2">
-                            <p>{{ form.common.errors }}</p>
-                            <label for="{{ form.common.id_for_label }}">{{ form.common.label_tag }}</label>
-                            {{ form.common }}
-                        </div>
+                </div>
+                <div class="form-group">
+                    <div class="form-check">
+                        <p>{{ form.common.errors }}</p>
+                        {{ form.common }}
+                        <label for="{{ form.common.id_for_label }}" class="form-check-label">{{ form.common.label_tag }}</label>
                     </div>
                 </div>
                 <button type="submit" class="btn btn-outline-primary">Save</button>

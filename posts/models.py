@@ -4,7 +4,7 @@ import os
 
 from django.db import models
 from mptt.models import MPTTModel, TreeForeignKey
-
+from taggit.managers import TaggableManager
 from django.contrib.auth.models import User
 from django.utils import timezone
 from django.urls import reverse
@@ -16,6 +16,18 @@ from functools import partial
 
 from django.core.files.base import ContentFile
 from PIL import Image as Img
+
+
+def listToString(s):
+    # initialize an empty string
+    str1 = ""
+
+    # traverse in the string
+    for ele in s:
+        str1 += ele
+
+        # return string
+    return str1
 
 
 def _update_filename(instance, filename, path):
@@ -50,6 +62,13 @@ class PublishedManager(models.Manager):
 class DraftManager(models.Manager):
     def get_queryset(self):
         return super(DraftManager, self).get_queryset().filter(status='draft')
+
+
+class HiddenManager(models.Manager):
+    def get_queryset(self):
+        return super(
+            HiddenManager, self
+        ).get_queryset().filter(status='hidden')
 
 
 class Category(models.Model):
@@ -143,22 +162,29 @@ class Image(models.Model):
     )
     date_created = models.DateTimeField(auto_now_add=True)
 
+    tags = TaggableManager(blank=True, help_text='Tags list.')  # менеджер тэгов
+
     def __str__(self):
         return 'img_' + str(self.id).zfill(8)
 
     def save(self, *args, **kwargs):
         """
-        Make and save the thumbnail for the photo here.
+        Make and save the thumbnail and middle size for the photo here.
         """
-        if self.pk is None:
+        # if self.pk is None:
+        if self.original:
             if not self.make_thumbnail():
                 raise Exception(
                     'Could not create thumbnail - is the file type valid?'
                 )
             if not self.make_middle():
                 raise Exception(
-                    'Could not create middle size image - is the file type valid?'
+                    'Could not create middle size\
+                    image - is the file type valid?'
                 )
+        else:
+            self.thumbnail.delete()
+            self.image.delete()
         super(Image, self).save(*args, **kwargs)
 
     def make_thumbnail(self):
@@ -241,6 +267,16 @@ class Image(models.Model):
         temp_image.close()
 
         return True
+
+    def is_in_basket(self):
+        bsk = None
+        try:
+            bsk = ImageBasket.objects.filter(
+                user__exact=self.user
+            ).filter(image__id__exact=self.id)
+        except:
+            pass
+        return True if bsk else False
 
     def get_image(self):
         try:
@@ -345,6 +381,23 @@ class Post(models.Model):
     objects = models.Manager()  # Менеджер по умолчанию
     published = PublishedManager()  # Собственный менеджер
     draft = DraftManager()  # Собственный менеджер
+    hidden = HiddenManager()  # Собственный менеджер
+
+    @staticmethod
+    def _create_post_records(count=3, tp='stories', mc='alpinism', sc=''):
+        from loremipsum import get_sentences
+        for i in range(count):
+            pst = Post()
+            pst.title = tp.capitalize() + ' ' + mc.capitalize() + ' ' + str(i)
+            pst.summary = listToString(get_sentences(3, True))
+            pst.body = '<p>' + listToString(get_sentences(10, True)) + '</p>'
+            pst.author = User.objects.get(username='vladimir')
+            pst.status = 'published'
+            pst.type = tp
+            pst.main_category = Category.objects.get(code=mc)
+            pst.sub_category = Category.objects.get(code=sc)
+            pst.thumbnail_url = '/media/media/images/thumbnails/file_63e871582a15.jpg'
+            pst.save()
 
     def __str__(self):
         return self.title
@@ -372,17 +425,33 @@ class Post(models.Model):
     display_author.short_description = 'Author'
 
     class Meta:
-        ordering = ('-date_published',)
+        ordering = (
+            'type',
+            'main_category',
+            'sub_category',
+            '-date_published',
+        )
         verbose_name = 'Post'
         verbose_name_plural = 'Posts'
 
 
+#Post._create_post_records(10, 'stories', 'alpinism')
+#Post._create_post_records(10, 'stories', 'multipitches')
+#Post._create_post_records(10, 'stories', 'climbing')
+#Post._create_post_records(10, 'topos', 'alpinism')
+#Post._create_post_records(10, 'topos', 'multipitches')
+#Post._create_post_records(10, 'topos', 'climbing')
+#Post._create_post_records(10, 'tips', 'alpinism')
+#Post._create_post_records(10, 'tips', 'adaptation')
+#Post._create_post_records(10, 'tips', 'equipment')
+
+
 class ImageBasket(models.Model):
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, null=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     image = models.ForeignKey(Image, on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
-        return self.post.title + '_' + str(self.image.id)
+        return self.user.username + '_' + str(self.image.id)
 
 
 class Comment(models.Model):

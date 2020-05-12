@@ -3,13 +3,18 @@
 {% block content %}
     <div class="container row">
         <div class="col-12">
-            <h2 class="text-center">Images</h2>
+            <h2 class="text-center">Images{% if tag %} Tagged As {{ tag|title }}{% endif %}</h2>
+            {% for tg in tags %}
+                {% if forloop.first %} Tags: {% endif %}
+                <a href="{% url 'tagged-images' tg.slug %}">{{ tg|title }}</a>,
+            {% endfor %}
+
             <div class="gallery-row my-page-list-border">
                 {% if img_count > 0 %}
                 <div class="gallery-column">
                     {% for img in common_images_1 %}
                     <a role="button" href="#" data-target="#modalIMG"
-                       data-toggle="modal" data-whatever="{{ img.get_original }}">
+                       data-toggle="modal" data-whatever="{{ img.get_original }}" data-atext="{{ img.alt_text }}" data-tags="{{ img.tags.all|join:', ' }}">
                        <img src="{{ img.get_image }}" alt="{{ img.alt_text }}">
                     </a>
                     {% endfor %}
@@ -17,7 +22,7 @@
                 <div class="gallery-column">
                     {% for img in common_images_2 %}
                     <a role="button" href="#" data-target="#modalIMG"
-                       data-toggle="modal" data-whatever="{{ img.get_original }}">
+                       data-toggle="modal" data-whatever="{{ img.get_original }}" data-atext="{{ img.alt_text }}" data-tags="{{ img.tags.all|join:', ' }}">
                        <img src="{{ img.get_image }}" alt="{{ img.alt_text }}">
                     </a>
                     {% endfor %}
@@ -25,7 +30,7 @@
                 <div class="gallery-column">
                     {% for img in common_images_3 %}
                     <a role="button" href="#" data-target="#modalIMG"
-                       data-toggle="modal" data-whatever="{{ img.get_original }}">
+                       data-toggle="modal" data-whatever="{{ img.get_original }}" data-atext="{{ img.alt_text }}" data-tags="{{ img.tags.all|join:', ' }}">
                        <img src="{{ img.get_image }}" alt="{{ img.alt_text }}">
                     </a>
                     {% endfor %}
@@ -33,7 +38,7 @@
                 <div class="gallery-column">
                     {% for img in common_images_4 %}
                     <a role="button" href="#" data-target="#modalIMG"
-                       data-toggle="modal" data-whatever="{{ img.get_original }}">
+                       data-toggle="modal" data-whatever="{{ img.get_original }}" data-atext="{{ img.alt_text }}" data-tags="{{ img.tags.all|join:', ' }}">
                        <img src="{{ img.get_image }}" alt="{{ img.alt_text }}">
                     </a>
                     {% endfor %}

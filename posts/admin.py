@@ -35,7 +35,7 @@ class PostAdmin(admin.ModelAdmin):
                    )
     fieldsets = (
         (None, {
-            'fields': ('title', 'summary', 'author', 'thumbnail_id',)
+            'fields': ('title', 'summary', 'author', 'thumbnail_url',)
         }),
         ('Text', {
             'fields': ('body',)
@@ -123,8 +123,8 @@ class CarouselAdmin(admin.ModelAdmin):
 
 @admin.register(ImageBasket)
 class ImageBasketAdmin(admin.ModelAdmin):
-    list_display = ('post', 'image')
-    list_filter = ('post', 'image')
+    list_display = ('user', 'image')
+    list_filter = ('user', 'image')
 
 
 admin.site.register(

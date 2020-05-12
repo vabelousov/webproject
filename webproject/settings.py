@@ -13,33 +13,42 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+import environ
+
+env = environ.Env(
+    # set casting, default value
+    DEBUG=(bool, False)
+)
+# reading .env file
+environ.Env.read_env()
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MEDIA_DIR = os.path.join(BASE_DIR, 'media')
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/
 # ../3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-# SECRET_KEY = 'q@#74(tosp_y3y72_o#sn8=-&g9=k62b2$v$lfz82%nl&@0n)k'
-SECRET_KEY = os.environ.get("SECRET_KEY", default="foo")
+# SECRET_KEY = os.environ.get("SECRET_KEY", default="foo")
+SECRET_KEY = env('SECRET_KEY', default='foo')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # DEBUG = True
-DEBUG = int(os.environ.get("DEBUG", default=1))
+# DEBUG = int(os.environ.get("DEBUG", default=1))
+DEBUG = env('DEBUG', default=False)
 
 # MENU_CACHE_TIME = -1
-MENU_CACHE_TIME = int(os.environ.get("MENU_CACHE_TIME", default=-1))
+# MENU_CACHE_TIME = int(os.environ.get("MENU_CACHE_TIME", default=-1))
+MENU_CACHE_TIME = int(env('MENU_CACHE_TIME', default=-1))
 
 #  SITE_ID = 1
-SITE_ID = int(os.environ.get("SITE_ID", default=1))
+# SITE_ID = int(os.environ.get("SITE_ID", default=1))
+SITE_ID = env('SITE_ID', default=1)
 
 # ALLOWED_HOSTS = []
-ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", default="")
-
+ALLOWED_HOSTS = tuple(env.list('DJANGO_ALLOWED_HOSTS', default=[]))
 
 # Application definition
 
@@ -56,6 +65,7 @@ INSTALLED_APPS = [
     'django.contrib.postgres',
     'social_django',
     'mptt',
+    'taggit',
     'posts.apps.PostsConfig',
 ]
 
@@ -97,17 +107,8 @@ WSGI_APPLICATION = 'webproject.wsgi.application'
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        #'ENGINE': 'django.db.backends.sqlite3',
-        #'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-        "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.postgresql"),
-        "NAME": os.environ.get("SQL_DATABASE", "webproject"),
-        "USER": os.environ.get("SQL_USER", "webproject"),
-        "PASSWORD": os.environ.get("SQL_PASSWORD", "password"),
-        "HOST": os.environ.get("SQL_HOST", "localhost"),
-        "PORT": os.environ.get("SQL_PORT", "5432"),
-        "DATABASE": os.environ.get("SQL_DATABASE", "postgres"),
-    }
+    'default': env.db(),  # Raises ImproperlyConfigured exception if DATABASE_URL not in os.environ
+    'extra': env.db('SQLITE_URL', default='sqlite:////tmp/my-tmp-sqlite.db')
 }
 
 
@@ -150,25 +151,36 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
+
+LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'index'
-LOGIN_URL = 'index'
-LOGOUT_URL = 'index'
+LOGOUT_URL = 'logout'
+LOGOUT_REDIRECT_URL = 'login'
+
+# LOGIN_REDIRECT_URL = 'index'
+# LOGIN_URL = 'index'
+# LOGOUT_URL = 'index'
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 AUTHENTICATION_BACKENDS = (
+    'social_core.backends.instagram.InstagramOAuth2',
     'social_core.backends.facebook.FacebookOAuth2',
     'django.contrib.auth.backends.ModelBackend',
 )
 
-# SOCIAL_AUTH_FACEBOOK_KEY = '550881829191580'  # App ID
-# SOCIAL_AUTH_FACEBOOK_SECRET = '5531d4b547845dc1b07d947677f24a8f'
-# SOCIAL_AUTH_LOGIN_ERROR_URL = '/settings/'
-# SOCIAL_AUTH_LOGIN_REDIRECT_URL = 'index'
-# SOCIAL_AUTH_RAISE_EXCEPTIONS = False
-SOCIAL_AUTH_FACEBOOK_KEY = os.environ.get("SOCIAL_AUTH_FACEBOOK_KEY", default="foo")
-SOCIAL_AUTH_FACEBOOK_SECRET = os.environ.get("SOCIAL_AUTH_FACEBOOK_SECRET", default="foo")
-SOCIAL_AUTH_LOGIN_ERROR_URL = os.environ.get("SOCIAL_AUTH_LOGIN_ERROR_URL", default="/settings/")
-SOCIAL_AUTH_LOGIN_REDIRECT_URL = os.environ.get("SOCIAL_AUTH_LOGIN_REDIRECT_URL", default="index")
-SOCIAL_AUTH_RAISE_EXCEPTIONS = int(os.environ.get("SOCIAL_AUTH_RAISE_EXCEPTIONS", default=0))
-
+SOCIAL_AUTH_FACEBOOK_KEY = '550881829191580'
+SOCIAL_AUTH_FACEBOOK_SECRET = env('FACEBOOK_SECRET', default='foo')
+SOCIAL_AUTH_FACEBOOK_SCOPE = ['email', 'user_link']
+SOCIAL_AUTH_FACEBOOK_PROFILE_EXTRA_PARAMS = {
+  'fields': 'id, name, email, picture.type(large), link'
+}
+SOCIAL_AUTH_FACEBOOK_EXTRA_DATA = [
+    ('name', 'name'),
+    ('email', 'email'),
+    ('picture', 'picture'),
+    ('link', 'profile_url'),
+]
+SOCIAL_AUTH_LOGIN_ERROR_URL = '/settings/'
+SOCIAL_AUTH_LOGIN_REDIRECT_URL = 'index'
+SOCIAL_AUTH_RAISE_EXCEPTIONS = False

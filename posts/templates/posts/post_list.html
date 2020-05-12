@@ -2,6 +2,19 @@
 
 {% block content %}
 
+{% comment %}
+{% regroup post_list|dictsort:'type' by type as post_by_type_list %}
+{% for type in post_by_type_list %}
+{% regroup type.list|dictsort:'main_category.code' by main_category.code as post_by_cat_list %}
+{% for main_category in post_by_cat_list %}
+{{ type.grouper|title }} / {{ main_category.grouper|title }}<br>
+{% for post in main_category.list|dictsortreversed:'date_published' %}
+   {{ post.title }}<br>
+{% endfor %}
+{% endfor %}
+{% endfor %}
+{% endcomment %}
+
 {% regroup post_list|dictsort:'type' by type as post_by_type_list %}
 <div class="container row">
     <div class="col-12">
@@ -10,9 +23,9 @@
         {% for main_category in post_by_cat_list %}
         <div class="my-page-list-border">
             <a href="{% url 'pages' type.grouper %}">
-                {{ type.grouper }}
+                {{ type.grouper|title }}
             </a>/<a href="{% url 'pages' type.grouper|add:'/'|add:main_category.grouper %}">
-                {{ main_category.grouper }}
+                {{ main_category.grouper|title }}
             </a>
             <div class="row">
                 {% for post in main_category.list|dictsortreversed:'date_published' %}

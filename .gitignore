@@ -2,7 +2,7 @@
 .DS_Store
 db.sqlite3
 styles_old.css
-.env*
+webproject/.env
 posts/migrations/*.*
 posts/templates/depricated/*.*
 

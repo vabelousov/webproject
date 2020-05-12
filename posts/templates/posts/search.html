@@ -9,7 +9,7 @@
         <h2 class="text-center">Search results</h2>
         <div class="my-page-list-border">
             <div class="mx-auto my-2 order-0 order-md-1 position-relative">
-                <form class="form-inline my-2 my-lg-0" action="." method="get">
+                <form class="form-inline" action="." method="get">
                     <div class="form-group">
                         {{ form.query.errors }}
                         <label for="{{ form.query.id_for_label }}">{{ form.query.label_tag }}</label>
@@ -21,22 +21,20 @@
                 </form>
             </div>
             {% if query %}
-            <h5>Posts containing "{{ query }}"</h5>
+            <h6>Posts containing "{{ query }}"</h6>
             <h6>{% with results.count as total_results %}
                 Found {{ total_results }} result{{ total_results|pluralize }}
                 {% endwith %}
             </h6>
             <div class="row my-search-box">
-                {% for post in results %}
+                {% for post in page_obj|dictsortreversed:'date_published' %}
                 <div class="col-md-3 my-search-box-itm">
                     <div>
                         <div class="my-search-box-padding">
                             <a href="{{ post.get_absolute_url }}"><img src="{{ post.get_thumbnail}}" width="100%"></a>
                         </div>
-                        <div class="my-search-box-text-padding"><a href="{{ post.get_absolute_url }}">{{ post.title
-                            }}</a></div>
-                        <div class="my-search-box-text-padding"><a href="{{ post.get_absolute_url }}">{{
-                            post.summary|truncatewords:5 }}</a></div>
+                        <div class="my-search-box-text-padding"><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></div>
+                        <div class="my-search-box-text-padding"><a href="{{ post.get_absolute_url }}">{{ post.summary|truncatewords:5 }}</a></div>
                     </div>
                 </div>
                 {% empty %}

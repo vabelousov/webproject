@@ -45,14 +45,12 @@
             <div class="order-1 offset-left">
                 {% show_menu menu %}
             </div>
-            {% comment %}
             <div class="mx-auto my-2 order-0 order-md-1 position-relative">
-                <form class="form-inline my-2 my-lg-0" action="." method="get">
-                    <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+                <form class="form-inline my-2 my-lg-0" action="{% url 'post_search' %}" method="get">
+                    <input type="text" name="query" class="form-control" required id="id_query">
                     <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
                 </form>
             </div>
-            {% endcomment %}
             <div class="order-3 offset-right">
                 <ul class="navbar-nav ml-auto">
                     {% if user.is_authenticated %}
@@ -72,6 +70,9 @@
                             </li>
                             {% if user.is_superuser %}
                             <li class="dropdown-item"><a href="/admin/">Administration panel</a></li>
+                            <li class="dropdown-item"><a href="{% url 'typo-graphica' %}">Типографика</a></li>
+                            <li class="dropdown-item"><a href="{% url 'site-statistics' %}">Статистика</a></li>
+                            <li class="dropdown-item"><a href="{% url 'under-construction' %}">Under Construction</a></li>
                             {% endif %}
                             {% if request.user|has_group:"Writers"%}
                             <li class="nav-item dropdown">
@@ -80,7 +81,6 @@
                                 <ul class="dropdown-menu left" aria-labelledby="navbarDropdown">
                                     <li class="dropdown-item"><a href="{% url 'my-posts' %}">My posts</a></li>
                                     <li class="dropdown-item"><a href="{% url 'my-images' %}">My images</a></li>
-                                    <li class="dropdown-item"><a href="{% url 'under-construction' %}">Under Construction</a></li>
                                 </ul>
                             </li>
                             {% endif %}
@@ -112,20 +112,39 @@
 <section>
     {% block content %} {% endblock %}
     {% block pagination %}
+    {% comment %}
     {% if is_paginated %}
     <div class="pagination">
-        <span class="page-links">
+        <span class="step-links">
             {% if page_obj.has_previous %}
-            <a href="{{ request.path }}?page={{ page_obj.previous_page_number }}">previous</a>
+                <a href="?page=1">&laquo; first</a>
+                <a href="{{ request.path }}?page={{ page_obj.previous_page_number }}{% if request.GET.query %}&query={{request.GET.query }}{% endif %}">previous</a>
             {% endif %}
             <span class="page-current">
                 Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
             </span>
             {% if page_obj.has_next %}
-            <a href="{{ request.path }}?page={{ page_obj.next_page_number }}">next</a>
+                <a href="{{ request.path }}?page={{ page_obj.next_page_number }}{% if request.GET.query %}&query={{request.GET.query }}{% endif %}">next</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.query %}&query={{request.GET.query }}{% endif %}">last &raquo;</a>
             {% endif %}
         </span>
     </div>
+    {% endif %}
+    {% endcomment %}
+    {% if is_paginated %}
+                    <div class="container">
+                    <ul class="pagination justify-content-center my-pagination-padding">
+                        {% if page_obj.has_previous %}
+                        <li class="page-item"><a class="page-link" href="{{ request.path }}?page=1{% if request.GET.query %}&query={{request.GET.query }}{% endif %}">&laquo;</a></li>
+                        <li class="page-item"><a class="page-link" href="{{ request.path }}?page={{ page_obj.previous_page_number }}{% if request.GET.query %}&query={{request.GET.query }}{% endif %}">Previous</a></li>
+                        {% endif %}
+                        <li class="page-item active"><a class="page-link" href="#">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.</a></li>
+                        {% if page_obj.has_next %}
+                        <li class="page-item"><a class="page-link" href="{{ request.path }}?page={{ page_obj.next_page_number }}{% if request.GET.query %}&query={{request.GET.query }}{% endif %}">Next</a></li>
+                        <li class="page-item"><a class="page-link" href="{{ request.path }}?page={{ page_obj.paginator.num_pages }}{% if request.GET.query %}&query={{request.GET.query }}{% endif %}">&raquo;</a></li>
+                        {% endif %}
+                    </ul>
+                    </div>
     {% endif %}
     {% endblock %}
 </section>

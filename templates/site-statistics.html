@@ -1,0 +1,13 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+<H1>Статистика</H1>
+<ul>
+    <li>Posts: published - {{ published_count }}, draft - {{ draft_count }}, hidden - {{ hidden_count}}</li>
+    <li>Comments: total - {{ comment_count }}, inactive - {{ inactive_comment_count }}</li>
+    <li>Images: total - {{ images_count }}, common - {{ common_images_count }}</li>
+    <li>Carousel: {{ carousel_count }}</li>
+    <li>Category: {{ category_count }}</li>
+    <li>Menu: {{ menu_count }}</li>
+</ul>
+{% endblock %}

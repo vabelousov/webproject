@@ -24,6 +24,7 @@
 			<div class="modal-footer">
 				<button class="btn btn-outline-primary btn-rounded btn-md ml-4 text-center"
                         data-dismiss="modal" type="button">Close</button>
+                <p></p>
 			</div>
 		</div>
 	</div>
@@ -31,10 +32,16 @@
 
 <script type="text/javascript">
 $('#modalIMG').on('show.bs.modal', function (event) {
-
     var button = $(event.relatedTarget)
     var img_url = button.data('whatever')
+    var alt_text = button.data('atext')
+    var image_tags = button.data('tags')
     var modal = $(this)
     modal.find('.modal-body #myImage').attr("src", img_url);
+    let p = document.querySelector('p');
+    p.innerHTML = alt_text;
+    if (image_tags) {
+        p.innerHTML += '&nbsp;&nbsp;Tags:&nbsp;' + image_tags;
+    }
 })
 </script>

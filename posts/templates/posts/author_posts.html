@@ -9,9 +9,9 @@
                     <div class="col">
                         <div class="row">
                             <div class="col-2">
-                                <form method="get" action="{% url 'post_create' %}">
-                                    <button type="submit" class="btn btn-outline-primary">New post</button>
-                                </form>
+                                <a href="{% url 'post_create' %}">
+                                    <button class="btn btn-outline-primary">New post</button>
+                                </a>
                             </div>
                             <div class="col text-center">Post</div>
                         </div>
@@ -36,9 +36,9 @@
                     <div class="col-1">{{ post.third_category }}</div>
                     <div class="col-1">{{ post.status }}</div>
                     <div class="col-1">
-                        <form method="get" action="{% url 'post_update' post.id %}">
-                            <button type="submit" class="btn btn-outline-secondary">Edit</button>
-                        </form>
+                        <a href="{% url 'post_update' post.id %}">
+                            <button class="btn btn-outline-secondary">Edit</button>
+                        </a>
                     </div>
                     <div class="col-1">
                         <a href="{% url 'post_delete' post.id %}"

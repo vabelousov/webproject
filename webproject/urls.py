@@ -92,4 +92,15 @@ urlpatterns += [
         name='view_profile'
     ),
     url(r'^edit_profile/$', views.edit_profile, name='edit_profile'),
+    url(r'^typo-graphica/$', views.typo_graphica, name='typo-graphica'),
+    url(
+        r'^page_is_under_construction/$',
+        views.page_is_under_construction,
+        name='under-construction'
+    ),
+    url(
+        r'^site-statistics/$',
+        views.site_statistics,
+        name='site-statistics'
+    ),
 ]

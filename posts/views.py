@@ -1,7 +1,9 @@
 # -*- coding:utf-8 -*-
 from django.contrib.postgres.search import SearchVector
+from django.template.context_processors import csrf
 from django.urls import reverse, reverse_lazy
 from django.views import generic
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.views.generic.edit import FormMixin
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -21,9 +23,10 @@ from django.contrib import messages
 from social_django.models import UserSocialAuth
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 
-from .models import Post, Image, Comment, Profile, Carousel, ImageBasket
+from .models import Post, Image, Comment, Profile, Carousel,\
+    ImageBasket, Category, MyMenu
 from .forms import CommentForm, SignUpForm, EditProfileForm,\
-    ProfileForm, PostForm, ImagesForm, SearchForm
+    ProfileForm, PostForm, ImagesForm, SearchForm, UserImagesForm
 from .tokens import account_activation_token
 
 
@@ -42,14 +45,37 @@ def index(request):
 
 
 def page_is_under_construction(request):
-    return render(request, 'posts/page_is_under_construction.html', )
+    return render(request, 'page_is_under_construction.html', )
+
+
+def typo_graphica(request):
+    return render(request, 'typographica.html', )
+
+
+def site_statistics(request):
+    args = {}
+    args['published_count'] = Post.published.count()
+    args['draft_count'] = Post.draft.count()
+    args['hidden_count'] = Post.hidden.count()
+    args['comment_count'] = Comment.objects.count()
+    args['inactive_comment_count'] = Comment.objects.filter(
+        is_active__exact=False
+    ).count()
+    args['images_count'] = Image.objects.count()
+    args['common_images_count'] = Image.objects.filter(
+        common__exact=True
+    ).count()
+    args['carousel_count'] = Carousel.objects.count()
+    args['category_count'] = Category.objects.count()
+    args['menu_count'] = MyMenu.objects.count()
+    return render(request, 'site-statistics.html', args)
 
 
 class PostListView(generic.ListView):
+    paginate_by = 9
     model = Post
     context_object_name = 'post_list'
     template_name = 'posts/post_list.html'
-    paginate_by = 3
 
     def get_queryset(self):
         try:
@@ -57,24 +83,15 @@ class PostListView(generic.ListView):
                 type__exact=self.kwargs['type']
             ).filter(
                 main_category__code__exact=self.kwargs['category']
-            ).order_by('-date_published')
+            ).all()
         except:
             try:
                 qs = Post.published.filter(
                     type__exact=self.kwargs['type']
-                ).order_by('-date_published')
+                ).all()
             except:
-                qs = Post.published.order_by('-date_published')
-                print(qs)
+                qs = Post.published.all()
         return qs
-
-    def get_context_data(self, **kwargs):
-        context = super(PostListView, self).get_context_data(**kwargs)
-        try:
-            context['list_name'] = self.kwargs['type']
-        except:
-            context['list_name'] = 'All posts'
-        return context
 
 
 class PostDetailView(FormMixin, generic.DetailView):
@@ -116,7 +133,7 @@ class PostDetailView(FormMixin, generic.DetailView):
 class PostsByAuthorListView(LoginRequiredMixin, generic.ListView):
     model = Post
     template_name = 'posts/author_posts.html'
-    paginate_by = 10
+    paginate_by = 30
 
     def get_queryset(self):
         return Post.objects.filter(
@@ -128,12 +145,10 @@ class CommonImageListView(generic.ListView):
     model = Image
     context_object_name = 'images_list'
     template_name = 'posts/image_list.html'
-    paginate_by = 5
+    paginate_by = 10
 
     def get_queryset(self):
-        return Image.objects.filter(
-            common__exact=True
-        ).order_by('-date_created')
+        return Image.objects.filter(common__exact=True)
 
     def get_context_data(self, **kwargs):
         context = super(CommonImageListView, self).get_context_data(**kwargs)
@@ -142,9 +157,7 @@ class CommonImageListView(generic.ListView):
         img3 = []
         img4 = []
         i = 0
-        all_img = Image.objects.filter(
-            common__exact=True
-        ).order_by('-date_created')
+        all_img = context['images_list'].all()
         cnt = all_img.count()
         for img in all_img:
             if i % 4 == 0:
@@ -161,18 +174,85 @@ class CommonImageListView(generic.ListView):
         context['common_images_3'] = img3
         context['common_images_4'] = img4
         context['img_count'] = cnt
+        context['tags'] = Image.tags.all()
+        return context
+
+
+class ImageTagListView(generic.ListView):
+    model = Image
+    context_object_name = 'images_list'
+    template_name = 'posts/image_list.html'
+    paginate_by = 10
+
+    def get_queryset(self):
+        return Image.objects.filter(
+            common__exact=True
+        ).filter(tags__slug=self.kwargs.get("slug")).all()
+
+    def get_context_data(self, **kwargs):
+        context = super(ImageTagListView, self).get_context_data(**kwargs)
+
+        img1 = []
+        img2 = []
+        img3 = []
+        img4 = []
+        i = 0
+        all_img = context['images_list'].all()
+        cnt = all_img.count()
+        for img in all_img:
+            if i % 4 == 0:
+                img1.append(img)
+            if i % 4 == 1:
+                img2.append(img)
+            if i % 4 == 2:
+                img3.append(img)
+            if i % 4 == 3:
+                img4.append(img)
+            i = i + 1
+        context['common_images_1'] = img1
+        context['common_images_2'] = img2
+        context['common_images_3'] = img3
+        context['common_images_4'] = img4
+        context['img_count'] = cnt
+
+        context["tag"] = self.kwargs.get("slug")
         return context
 
 
 class ImagesByUserListView(LoginRequiredMixin, generic.ListView):
     model = Image
+    form_class = UserImagesForm
     template_name = 'posts/user_images.html'
-    paginate_by = 8
+    paginate_by = 10
 
     def get_queryset(self):
         return Image.objects.filter(
             user=self.request.user
-        ).order_by('-date_created')
+        )
+
+    def post(self, request, *args, **kwargs):
+        form = UserImagesForm(request.POST)
+        if form.is_valid():
+            if 'img-action' in request.POST:
+                if 'delete-selected' in request.POST['img-action']:
+                    if form.cleaned_data['image_object']:
+                        for item in form.cleaned_data['image_object']:
+                            item.delete()
+                if 'clear-from-basket' in request.POST['img-action']:
+                    if form.cleaned_data['image_object']:
+                        for item in form.cleaned_data['image_object']:
+                            bsk = ImageBasket.objects.filter(
+                                user__exact=self.request.user
+                            ).filter(image__id__exact=item.id).first()
+                            bsk.delete()
+                if 'add-to-basket' in request.POST['img-action']:
+                    if form.cleaned_data['image_object']:
+                        for item in form.cleaned_data['image_object']:
+                            bsk = ImageBasket()
+                            bsk.user = request.user
+                            bsk.image = item
+                            bsk.save()
+        return HttpResponseRedirect('')
 
 
 def signup(request):
@@ -301,7 +381,6 @@ def edit_profile(request):
 def view_profile(request, username):
     person_user = User.objects.get(username=username)
     person = Profile.objects.get(user=person_user)
-    print(person_user.profile.get_avatar)
     args = {}
     args['person'] = person
     args['person_user'] = person_user
@@ -312,18 +391,37 @@ def post_search(request):
     form = SearchForm()
     query = None
     results = []
+
     if 'query' in request.GET:
         form = SearchForm(request.GET)
         if form.is_valid():
             query = form.cleaned_data['query']
-            results = Post.objects.annotate(
+            results = Post.published.annotate(
                 search=SearchVector('title', 'summary', 'body'),
             ).filter(search=query)
-    return render(request,
-                  'posts/search.html',
-                  {'form': form,
-                   'query': query,
-                   'results': results})
+
+    paginator = Paginator(results, 2)
+    page_number = request.GET.get('page')
+
+    try:
+        # Если существует, то выбираем эту страницу
+        page_obj = paginator.page(page_number)
+    except PageNotAnInteger:
+        # Если None, то выбираем первую страницу
+        page_obj = paginator.page(1)
+    except EmptyPage:
+        # Если вышли за последнюю страницу, то возвращаем последнюю
+        page_obj = paginator.page(paginator.num_pages)
+
+    args = {}
+    args.update(csrf(request))
+    args['form'] = form
+    args['results'] = results
+    args['page_obj'] = page_obj
+    args['query'] = query
+    if page_obj:
+        args['is_paginated'] = True
+    return render(request, 'posts/search.html', args)
 
 
 class PostCreate(LoginRequiredMixin, CreateView):
@@ -335,7 +433,7 @@ class PostCreate(LoginRequiredMixin, CreateView):
         initial = super(PostCreate, self).get_initial()
         initial.update(
             {
-                'type': 'article',
+                'type': 'stories',
                 'status': 'draft',
                 'author': self.request.user.id
             }
@@ -357,7 +455,9 @@ class PostUpdate(LoginRequiredMixin, UpdateView):
     def get_context_data(self, **kwargs):
         context = super(PostUpdate, self).get_context_data(**kwargs)
         try:
-            context['basket'] = ImageBasket.objects.filter(post__id__exact=context['post'].id)
+            context['basket'] = ImageBasket.objects.filter(
+                user__id__exact=self.request.user.id
+            )
         except:
             pass
         return context

@@ -11,8 +11,21 @@
                 <article class="card-body">
                     <h5>Facebook</h5>
                     {% if facebook_login %}
-                    <p>Connected as <a href="https://facebook.com/{{ facebook_login.extra_data.id }}/" target="_blank">{{
-                        facebook_login.extra_data.id }}</a></p>
+
+            <!-- Add from here -->
+        {% for ass in backends.associated %}
+          {% if ass.provider == 'facebook' %}
+            <div class="col-md-6 text-center">
+                <img src="{{ass.extra_data.picture.data.url}}" alt="" width="150" height="150" style="border-radius: 50%">
+            </div>
+            <div class="col-md-6 social-container my-2">                 <p> Signed in via:  {{ ass.provider }} </p>
+                <p> Name:  {{ ass.extra_data.name }} </p>
+                <p> Provider url: <a href="{{ass.extra_data.profile_url}}">link</a></p>
+            </div>
+          {% endif %}
+        {% endfor %}
+
+                    <p>Connected as <a href="https://facebook.com/{{ facebook_login.extra_data.id }}/" target="_blank">{{ facebook_login.extra_data.id }}</a></p>
                     {% if can_disconnect %}
                     <form method="post" action="{% url 'social:disconnect' 'facebook' %}">
                         {% csrf_token %}

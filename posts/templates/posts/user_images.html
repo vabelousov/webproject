@@ -3,45 +3,67 @@
 {% block content %}
     <div class="container row">
         <div class="col-12">
-            <div class="my-work-list-border">
+            <div class="my-work-list-border" id="controls">
+                <form action="" method="post">
+                {% csrf_token %}
                 {% for image in image_list %}
                 {% if forloop.first %}
                 <div class="row">
-                    <div class="col-6">
-                        <form method="get" action="{% url 'image_create' %}">
-                            <button type="submit" class="btn btn-outline-primary">New Image</button>
-                        </form>
+                    <div class="col-2">
+                        <a href="{% url 'image_create' %}">
+                            <button class="btn btn-outline-primary">New Image</button>
+                        </a>
                     </div>
-                    <div class="col-2">Image code</a></div>
-                    <div class="col-2">Common</a></div>
-                    <div class="col-1"></div>
-                    <div class="col-1"></div>
+                    <div class="col-3">Tags</div>
+                    <div class="col-2">Alt text</a></div>
+                    <div class="col-1">Common</a></div>
+                    <div class="col-1">In<br>Basket</a></div>
+                    <div class="col-3">
+                        <input type="checkbox" id="checkall">
+                        &nbsp;
+                        <select name="img-action">
+                            <option value="0">-----------------</option>
+                            <option value="delete-selected">Delete selected</option>
+                            <option value="add-to-basket">Add to basket</option>
+                            <option value="clear-from-basket">Delete in Basket</option>
+                        </select>
+                        <button type="submit" class="btn btn-outline-primary">Go</button>
+                    </div>
                 </div>
                 <hr>
                 {% endif %}
                 <div class="row my-work-list-padding">
-                    <div class="col-6">
+                    <div class="col-2">
                     <a role="button" href="#" data-target="#modalIMG"
-                       data-toggle="modal" data-whatever="{{ image.get_original }}">
+                       data-toggle="modal" data-whatever="{{ image.get_original }}" data-atext="{{ image.alt_text }}" data-tags="{{ image.tags.all|join:', ' }}">
                        <img src="{{ image.get_image }}" alt="{{ image.alt_text }}" width="100">
                     </a>
                     </div>
+                    <div class="col-3">
+                        {% for tag in image.tags.all %}<a href="{% url 'tagged-images' tag.slug %}"> {{ tag.name }}</a>{% if not forloop.last %}, {% endif %} {% endfor %}
+                    </div>
                     <div class="col-2">
                         <a role="button" href="#" data-target="#modalIMG"
-                       data-toggle="modal" data-whatever="{{ image.get_original }}">
-                            {{ image }}
+                       data-toggle="modal" data-whatever="{{ image.get_original }}" data-atext="{{ image.alt_text }}" data-tags="{{ image.tags.all|join:', ' }}">
+                            {{ image.alt_text }}
                         </a></div>
-                    <div class="col-2">
-                         {% if image.common == True %}
-                             <input type="checkbox" disabled="disabled" checked="checked"/>
-                         {% else %}
-                             <input type="checkbox" disabled="disabled"/>
+                    <div class="col-1">
+                         {% if image.common %}
+                             &#x2714;
                          {% endif %}
                     </div>
                     <div class="col-1">
-                        <form method="get" action="{% url 'image_update' image.id %}">
-                            <button type="submit" class="btn btn-outline-secondary">Edit</button>
-                        </form>
+                         {% if image.is_in_basket %}
+                             &#x2714;
+                         {% endif %}
+                    </div>
+                    <div class="col-1">
+                        <input type="checkbox" value="{{ image.id }}" name="image_object">
+                    </div>
+                    <div class="col-1">
+                        <a href="{% url 'image_update' image.id %}">
+                            <button type="button" class="btn btn-outline-secondary">Edit</button>
+                        </a>
                     </div>
                     <div class="col-1">
                         <a href="{% url 'image_delete' image.id %}"
@@ -54,7 +76,17 @@
                 {% empty %}
                 <div><h5 class="text-center">You didn't create anything yet.</h5></div>
                 {% endfor %}
+                </form>
             </div>
         </div>
     </div>
+<script>
+$('#checkall').click(function(){
+	if ($(this).is(':checked')){
+		$('#controls input:checkbox').prop('checked', true);
+	} else {
+		$('#controls input:checkbox').prop('checked', false);
+	}
+});
+</script>
 {% endblock %}
