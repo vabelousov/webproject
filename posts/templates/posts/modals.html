@@ -1,14 +1,15 @@
+{% load i18n %}
 <!-- modal delete popup confirmation -->
 <div id="taskModal" class="modal fade">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">Confirm deletion</h4>
+                <h4 class="modal-title">{% trans "Confirm deletion" %}</h4>
             </div>
-            <div class="modal-body">Are your sure you want to delete?</div>
+            <div class="modal-body">{% trans "Are your sure you want to delete?" %}</div>
             <div class="modal-footer">
-                <a id="del_obj" class="btn btn-outline-danger" type="button" data-dismiss="modal" href="" onclick="goto()">Delete</a>
-                <a class="btn btn-outline-secondary" type="button" data-dismiss="modal">Cancel</a>
+                <a id="del_obj" class="btn btn-outline-danger" type="button" data-dismiss="modal" href="" onclick="goto()">{% trans "Delete" %}</a>
+                <a class="btn btn-outline-secondary" type="button" data-dismiss="modal">{% trans "Cancel" %}</a>
             </div>
         </div>
     </div>
@@ -23,7 +24,7 @@
 			</div>
 			<div class="modal-footer">
 				<button class="btn btn-outline-primary btn-rounded btn-md ml-4 text-center"
-                        data-dismiss="modal" type="button">Close</button>
+                        data-dismiss="modal" type="button">{% trans "Close" %}</button>
                 <p></p>
 			</div>
 		</div>

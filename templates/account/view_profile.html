@@ -1,18 +1,19 @@
 {% extends 'base_generic.html' %}
+{% load i18n %}
 {% block content %}
    <div class="container row">
         <div class="col-12">
             <div class="profile-container">
                 <div class="row">
                     <div class="col-md-6 img">
-                        <h5>USERNAME: {{ person_user.username}}</h5>
+                        <h5>{% trans "USERNAME" %}: {{ person_user.username}}</h5>
                         <br>
                         <img src="{{ person.get_avatar }}" alt="" class="img-rounded" width="150px">
                         {% if user.username == person_user.username %}
                         <br>
-                        <a href="{% url 'edit_profile' %}">Edit your profile</a>
+                        <a href="{% url 'edit_profile' %}">{% trans "Edit your profile" %}</a>
                         <br>
-                        <a href="{% url 'settings' %}">Social accounts</a>
+                        <a href="{% url 'settings' %}">{% trans "Social accounts" %}</a>
                         {% endif %}
                     </div>
                     <div class="col-md-6 details">
@@ -24,7 +25,7 @@
                         </blockquote>
                         <br>
                         <blockquote>
-                            <h5>about me</h5>
+                            <h5>{% trans "about me" %}</h5>
                             <small>
                                 <cite title="Source Title">
                                     <i class="icon-map-marker">{{ person.bio }}</i>

@@ -22,10 +22,11 @@ from django.urls import include
 from django.urls import path
 from django.views.generic import RedirectView
 from django.conf.urls import url
-
+from django.conf.urls.i18n import i18n_patterns
 from django.contrib.sitemaps.views import sitemap
-
 from posts import views, sitemap as mysitemap
+
+admin.autodiscover()
 
 sitemaps = {
     'posts': mysitemap.PostSitemap,
@@ -34,21 +35,25 @@ sitemaps = {
 # Добавьте URL соотношения, чтобы перенаправить запросы
 # с корневового URL, на URL приложения
 urlpatterns = [
+
+    path('i18n/', include('django.conf.urls.i18n')),
     path('admin/', admin.site.urls),
 ]
 
-urlpatterns += [
+urlpatterns += i18n_patterns(
      path('home/', include('posts.urls')),
-]
+    prefix_default_language=False,
+)
 
-urlpatterns += [
+
+urlpatterns += i18n_patterns(
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps},
          name='django.contrib.sitemaps.posts.sitemap'),
-]
+)
 
-urlpatterns += [
+urlpatterns += i18n_patterns(
     path('', RedirectView.as_view(url='/home/', permanent=True)),
-]
+)
 
 urlpatterns += static(
     settings.STATIC_URL, document_root=settings.STATIC_ROOT
@@ -58,14 +63,14 @@ urlpatterns += static(
     settings.MEDIA_URL, document_root=settings.MEDIA_ROOT
 )
 
-urlpatterns += [
+urlpatterns += i18n_patterns(
     path('accounts/', include('django.contrib.auth.urls')),
-]
+)
 
-urlpatterns += [
-    url(r'^signup/$', views.signup, name='signup'),
-    url(
-        r'^account_activation_sent/$',
+urlpatterns += i18n_patterns(
+    path('signup/', views.signup, name='signup'),
+    path(
+        'account_activation_sent/',
         views.account_activation_sent,
         name='account_activation_sent'
     ),
@@ -79,10 +84,10 @@ urlpatterns += [
         views.activate,
         name='activate'
     ),
-    url(r'^oauth/', include('social_django.urls', namespace='social')),
-    url(r'^settings/$', views.settings, name='settings'),
-    url(
-        r'^settings/password/$',
+    path('oauth/', include('social_django.urls', namespace='social')),
+    path('settings/', views.settings, name='settings'),
+    path(
+        'settings/password/',
         views.password,
         name='password'
     ),
@@ -91,16 +96,16 @@ urlpatterns += [
         views.view_profile,
         name='view_profile'
     ),
-    url(r'^edit_profile/$', views.edit_profile, name='edit_profile'),
-    url(r'^typo-graphica/$', views.typo_graphica, name='typo-graphica'),
-    url(
-        r'^page_is_under_construction/$',
+    path('edit_profile/', views.edit_profile, name='edit_profile'),
+    path('typo-graphica/', views.typo_graphica, name='typo-graphica'),
+    path(
+        'page_is_under_construction/',
         views.page_is_under_construction,
         name='under-construction'
     ),
-    url(
-        r'^site-statistics/$',
+    path(
+        'site-statistics/',
         views.site_statistics,
         name='site-statistics'
     ),
-]
+)

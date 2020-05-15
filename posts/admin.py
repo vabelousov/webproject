@@ -4,7 +4,7 @@ from django.contrib import admin
 from mptt.admin import DraggableMPTTAdmin
 from django.contrib.auth.models import User
 from .models import Post, Image, Comment, Profile, \
-    MyMenu, Carousel, Category, ImageBasket
+    MyMenu, Carousel, Category, ImageBasket, Type
 
 
 class ProfileInline(admin.StackedInline):
@@ -145,6 +145,12 @@ admin.site.register(
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
+    list_display = ('code', 'description')
+    list_filter = ('code',)
+
+
+@admin.register(Type)
+class TypeAdmin(admin.ModelAdmin):
     list_display = ('code', 'description')
     list_filter = ('code',)
 

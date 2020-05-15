@@ -1,16 +1,22 @@
 {% extends "base_generic.html" %}
-
+{% load i18n %}
 {% block content %}
     <div class="container row">
         <div class="col-12">
-            <h2 class="text-center">Images{% if tag %} Tagged As {{ tag|title }}{% endif %}</h2>
-            {% for tg in tags %}
-                {% if forloop.first %} Tags: {% endif %}
-                <a href="{% url 'tagged-images' tg.slug %}">{{ tg|title }}</a>,
-            {% endfor %}
-
+            <h2 class="text-center">{% trans "Images" %}{% if tag %} {% trans "tagged as" %} {{ tag|title }}{% endif %}</h2>
+            {% if tags %}
+            <div class="tags_block">
+                {% trans 'Tags' %}<hr>
+                {% for tg in tags %}
+                    <span class="tag-link-styles">
+                         <a href="{% url 'tagged-images' tg.slug %}">{{ tg|title }}</a>
+                    </span>
+                {% endfor %}
+            </div>
+            {% endif %}
             <div class="gallery-row my-page-list-border">
                 {% if img_count > 0 %}
+
                 <div class="gallery-column">
                     {% for img in common_images_1 %}
                     <a role="button" href="#" data-target="#modalIMG"
@@ -44,7 +50,7 @@
                     {% endfor %}
                 </div>
                 {% else %}
-                <p>There are no images in the list.</p>
+                <p>{% trans "There are no images in the list." %}</p>
                 {% endif %}
             </div>
         </div>

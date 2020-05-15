@@ -1,0 +1,16 @@
+{% load mptt_tags %}
+{% for node in menu %}
+     {% if node.is_root_node %}
+       <div class="col text-center">
+       {% if node.reverse_url %}
+         {% if node.url_attr %}
+           <a href="{% url node.reverse_url node.url_attr %}">{{ node.name }}</a>
+         {% else %}
+           <a href="{% url node.reverse_url %}">{{ node.name }}</a>
+         {% endif %}
+       {% else %}
+         {{ node.name }}
+       {% endif %}
+       </div>
+     {% endif %}
+{% endfor %}

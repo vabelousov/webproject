@@ -1,13 +1,14 @@
 {% extends "base_generic.html" %}
-
+{% load i18n %}
 {% block content %}
-<H1>Статистика</H1>
+<H1>{% trans "Statistics" %}</H1>
 <ul>
-    <li>Posts: published - {{ published_count }}, draft - {{ draft_count }}, hidden - {{ hidden_count}}</li>
-    <li>Comments: total - {{ comment_count }}, inactive - {{ inactive_comment_count }}</li>
-    <li>Images: total - {{ images_count }}, common - {{ common_images_count }}</li>
-    <li>Carousel: {{ carousel_count }}</li>
-    <li>Category: {{ category_count }}</li>
-    <li>Menu: {{ menu_count }}</li>
+    <li>{% trans "Posts" %}: {% trans "published" %} - {{ published_count }}, {% trans "draft" %} - {{ draft_count }}, {% trans "hidden" %} - {{ hidden_count}}</li>
+    <li>{% trans "Comments" %}: {% trans "total" %} - {{ comment_count }}, {% trans "inactive" %} - {{ inactive_comment_count }}</li>
+    <li>{% trans "Images" %}: {% trans "total" %} - {{ images_count }}, {% trans "common" %} - {{ common_images_count }}</li>
+    <li>{% trans "Carousel" %}: {{ carousel_count }}</li>
+    <li>{% trans "Category" %}: {{ category_count }}</li>
+    <li>{% trans "Type" %}: {{ type_count }}</li>
+    <li>{% trans "Menu" %}: {{ menu_count }}</li>
 </ul>
 {% endblock %}

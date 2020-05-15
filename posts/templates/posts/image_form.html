@@ -1,9 +1,10 @@
 {% extends "base_generic.html" %}
 {% load static %}
+{% load i18n %}
 {% block content %}
 <div class="container row">
     <div class="col-12">
-        <h2 class="text-center">Edit image</h2>
+        <h2 class="text-center">{% trans "Edit image" %}</h2>
         <div class="my-page-list-border">
             <form method="post" enctype="multipart/form-data" action="">
                 {% csrf_token %}
@@ -40,7 +41,7 @@
                         <label for="{{ form.common.id_for_label }}" class="form-check-label">{{ form.common.label_tag }}</label>
                     </div>
                 </div>
-                <button type="submit" class="btn btn-outline-primary">Save</button>
+                <button type="submit" class="btn btn-outline-primary">{% trans "Save" %}</button>
             </form>
         </div>
     </div>

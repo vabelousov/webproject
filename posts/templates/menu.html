@@ -8,29 +8,29 @@
        {% else %}
          <a class="dropdown-item dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
        {% endif %}
-       <span>{{ node.name }}</span></a>
+       {{ node.name }}</a>
    {% else %}
      {% if node.is_root_node %}
        <li class="nav-item">
        {% if node.reverse_url %}
          {% if node.url_attr %}
-           <a class="nav-link" href="{% url node.reverse_url node.url_attr %}"><span>{{ node.name }}</span></a>
+           <a class="nav-link" href="{% url node.reverse_url node.url_attr %}">{{ node.name }}</a>
          {% else %}
-           <a class="nav-link" href="{% url node.reverse_url %}"><span>{{ node.name }}</span></a>
+           <a class="nav-link" href="{% url node.reverse_url %}">{{ node.name }}</a>
          {% endif %}
        {% else %}
-         <span>{{ node.name }}</span>
+         {{ node.name }}
        {% endif %}
      {% else %}
        <li class="dropdown-item">
        {% if node.reverse_url %}
          {% if node.url_attr %}
-           <a href="{% url node.reverse_url node.url_attr %}"><span>{{ node.name }}</span></a>
+           <a href="{% url node.reverse_url node.url_attr %}">{{ node.name }}</a>
          {% else %}
-           <a href="{% url node.reverse_url %}"><span>{{ node.name }}</span></a>
+           <a href="{% url node.reverse_url %}">{{ node.name }}</a>
          {% endif %}
        {% else %}
-         <span>{{ node.name }}</span>
+         {{ node.name }}
        {% endif %}
      {% endif %}
    {% endif %}

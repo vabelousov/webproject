@@ -5,6 +5,7 @@ styles_old.css
 webproject/.env
 posts/migrations/*.*
 posts/templates/depricated/*.*
+locale/
 
 __*
 !__init__.py

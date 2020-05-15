@@ -7,3 +7,4 @@ django-mptt
 loremipsum
 django-taggit
 django-environ
+django-modeltranslation

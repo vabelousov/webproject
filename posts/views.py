@@ -1,4 +1,5 @@
 # -*- coding:utf-8 -*-
+from django.utils.translation import gettext as _
 from django.contrib.postgres.search import SearchVector
 from django.template.context_processors import csrf
 from django.urls import reverse, reverse_lazy
@@ -6,7 +7,7 @@ from django.views import generic
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.views.generic.edit import FormMixin
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.auth import login
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect, get_object_or_404
@@ -24,7 +25,7 @@ from social_django.models import UserSocialAuth
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 
 from .models import Post, Image, Comment, Profile, Carousel,\
-    ImageBasket, Category, MyMenu
+    ImageBasket, Category, MyMenu, Type
 from .forms import CommentForm, SignUpForm, EditProfileForm,\
     ProfileForm, PostForm, ImagesForm, SearchForm, UserImagesForm
 from .tokens import account_activation_token
@@ -48,10 +49,12 @@ def page_is_under_construction(request):
     return render(request, 'page_is_under_construction.html', )
 
 
+@login_required
 def typo_graphica(request):
     return render(request, 'typographica.html', )
 
 
+@login_required
 def site_statistics(request):
     args = {}
     args['published_count'] = Post.published.count()
@@ -67,6 +70,7 @@ def site_statistics(request):
     ).count()
     args['carousel_count'] = Carousel.objects.count()
     args['category_count'] = Category.objects.count()
+    args['type_count'] = Type.objects.count()
     args['menu_count'] = MyMenu.objects.count()
     return render(request, 'site-statistics.html', args)
 
@@ -80,14 +84,14 @@ class PostListView(generic.ListView):
     def get_queryset(self):
         try:
             qs = Post.published.filter(
-                type__exact=self.kwargs['type']
+                type__code__exact=self.kwargs['type']
             ).filter(
                 main_category__code__exact=self.kwargs['category']
             ).all()
         except:
             try:
                 qs = Post.published.filter(
-                    type__exact=self.kwargs['type']
+                    type__code__exact=self.kwargs['type']
                 ).all()
             except:
                 qs = Post.published.all()
@@ -130,15 +134,20 @@ class PostDetailView(FormMixin, generic.DetailView):
         return super(PostDetailView, self).form_valid(form)
 
 
-class PostsByAuthorListView(LoginRequiredMixin, generic.ListView):
+class PostsByAuthorListView(PermissionRequiredMixin, generic.ListView):
+    permission_required = [
+        'posts.add_post',
+        'posts.change_post',
+        'posts.delete_post'
+    ]
     model = Post
-    template_name = 'posts/author_posts.html'
+    template_name = 'posts/user_posts.html'
     paginate_by = 30
 
     def get_queryset(self):
         return Post.objects.filter(
             author=self.request.user
-        ).order_by('type').order_by('-date_published')
+        ).order_by('type__code').order_by('-date_published')
 
 
 class CommonImageListView(generic.ListView):
@@ -219,7 +228,12 @@ class ImageTagListView(generic.ListView):
         return context
 
 
-class ImagesByUserListView(LoginRequiredMixin, generic.ListView):
+class ImagesByUserListView(PermissionRequiredMixin, generic.ListView):
+    permission_required = [
+        'posts.add_image',
+        'posts.change_image',
+        'posts.delete_image'
+    ]
     model = Image
     form_class = UserImagesForm
     template_name = 'posts/user_images.html'
@@ -343,11 +357,11 @@ def password(request):
             update_session_auth_hash(request, form.user)
             messages.success(
                 request,
-                'Your password was successfully updated!'
+                _('Your password was successfully updated!')
             )
             return redirect('settings')
         else:
-            messages.error(request, 'Please correct the error below.')
+            messages.error(request, _('Please correct the error below.'))
     else:
         form = PasswordForm(request.user)
     return render(request, 'account/password.html', {'form': form})
@@ -424,7 +438,8 @@ def post_search(request):
     return render(request, 'posts/search.html', args)
 
 
-class PostCreate(LoginRequiredMixin, CreateView):
+class PostCreate(PermissionRequiredMixin, CreateView):
+    permission_required = 'posts.add_post'
     model = Post
     form_class = PostForm
     success_url = None
@@ -433,7 +448,7 @@ class PostCreate(LoginRequiredMixin, CreateView):
         initial = super(PostCreate, self).get_initial()
         initial.update(
             {
-                'type': 'stories',
+                # 'type': 'stories',
                 'status': 'draft',
                 'author': self.request.user.id
             }
@@ -444,7 +459,8 @@ class PostCreate(LoginRequiredMixin, CreateView):
         return reverse_lazy('my-posts')
 
 
-class PostUpdate(LoginRequiredMixin, UpdateView):
+class PostUpdate(PermissionRequiredMixin, UpdateView):
+    permission_required = 'posts.change_post'
     model = Post
     form_class = PostForm
     success_url = None
@@ -463,7 +479,8 @@ class PostUpdate(LoginRequiredMixin, UpdateView):
         return context
 
 
-class PostDelete(LoginRequiredMixin, DeleteView):
+class PostDelete(PermissionRequiredMixin, DeleteView):
+    permission_required = 'posts.delete_post'
     model = Post
     success_url = reverse_lazy('my-posts')
 
@@ -473,7 +490,8 @@ class PostDelete(LoginRequiredMixin, DeleteView):
         return redirect('my-posts')
 
 
-class ImageCreate(LoginRequiredMixin, CreateView):
+class ImageCreate(PermissionRequiredMixin, CreateView):
+    permission_required = 'posts.add_image'
     model = Image
     form_class = ImagesForm
     success_url = None
@@ -491,7 +509,8 @@ class ImageCreate(LoginRequiredMixin, CreateView):
         return reverse_lazy('my-images')
 
 
-class ImageUpdate(LoginRequiredMixin, UpdateView):
+class ImageUpdate(PermissionRequiredMixin, UpdateView):
+    permission_required = 'posts.change_image'
     model = Image
     form_class = ImagesForm
     success_url = None
@@ -500,7 +519,8 @@ class ImageUpdate(LoginRequiredMixin, UpdateView):
         return reverse_lazy('my-images')
 
 
-class ImageDelete(LoginRequiredMixin, DeleteView):
+class ImageDelete(PermissionRequiredMixin, DeleteView):
+    permission_required = 'posts.delete_image'
     model = Image
     success_url = reverse_lazy('my-images')
 

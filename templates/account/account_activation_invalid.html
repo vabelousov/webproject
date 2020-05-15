@@ -1,11 +1,11 @@
 {% extends 'base_generic.html' %}
-
+{% load i18n %}
 {% block content %}
     <div class="container">
         <div class="row justify-content-center my-login-margin">
             <div class="col-md-6">
                 <div class="card">
-                    <p>The confirmation link was invalid, possibly because it has already been used.</p>
+                    <p>{% trans "The confirmation link was invalid, possibly because it has already been used." %}</p>
                 </div>
             </div>
         </div>

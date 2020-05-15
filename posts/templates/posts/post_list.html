@@ -1,21 +1,8 @@
 {% extends "base_generic.html" %}
-
+{% load i18n %}
+{% load posts_tags %}
 {% block content %}
-
-{% comment %}
-{% regroup post_list|dictsort:'type' by type as post_by_type_list %}
-{% for type in post_by_type_list %}
-{% regroup type.list|dictsort:'main_category.code' by main_category.code as post_by_cat_list %}
-{% for main_category in post_by_cat_list %}
-{{ type.grouper|title }} / {{ main_category.grouper|title }}<br>
-{% for post in main_category.list|dictsortreversed:'date_published' %}
-   {{ post.title }}<br>
-{% endfor %}
-{% endfor %}
-{% endfor %}
-{% endcomment %}
-
-{% regroup post_list|dictsort:'type' by type as post_by_type_list %}
+{% regroup post_list|dictsort:'type.code' by type.code as post_by_type_list %}
 <div class="container row">
     <div class="col-12">
     {% for type in post_by_type_list %}
@@ -23,33 +10,37 @@
         {% for main_category in post_by_cat_list %}
         <div class="my-page-list-border">
             <a href="{% url 'pages' type.grouper %}">
-                {{ type.grouper|title }}
+                {{ type.grouper|type_desc }}
             </a>/<a href="{% url 'pages' type.grouper|add:'/'|add:main_category.grouper %}">
-                {{ main_category.grouper|title }}
+                {{ main_category.grouper|cat_desc }}
             </a>
             <div class="row">
                 {% for post in main_category.list|dictsortreversed:'date_published' %}
-                <div class="col-md-3 my-main-cat-itm">
+                <div class="col-md-3 my-cat-itm">
                     <div>
-                        <div class="my-main-cat-itm-img">
+                        <div class="my-cat-itm-img">
                             <a href="{{ post.get_absolute_url }}">
                                 <img src="{{ post.get_thumbnail }}" width="100%">
                             </a>
                         </div>
-                        <div class="my-main-cat-itm-text">
-                            <a href="{{ post.get_absolute_url }}">{{ post.title }} by {{ post.author.first_name }} {{post.author.last_name}}</a>
+                        <div class="my-cat-itm-text">
+                            <a href="{{ post.get_absolute_url }}">{{ post.title }} {% trans "by" %} {{ post.author.first_name }} {{post.author.last_name}}</a>
                         </div>
-                        <div class="my-main-cat-itm-text">
-                            <a href="{{ post.get_absolute_url }}">{{ post.summary|truncatechars:100 }}</a>
+                        <div class="my-cat-itm-text">
+                            {{ post.summary|truncatechars:100 }}
                         </div>
                     </div>
                 </div>
              {% empty %}
-            <p>No post in this category</p>
+            <p>{% trans "No post in this category" %}</p>
             {% endfor %}
             </div>
         </div>
+        {% empty %}
+        <p>{% trans "No post in this category" %}</p>
         {% endfor %}
+    {% empty %}
+        <p>{% trans "No post in this category" %}</p>
     {% endfor %}
     </div>
 </div>

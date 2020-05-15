@@ -1,22 +1,28 @@
 {% extends "base_generic.html" %}
 {% load humanize %}
+{% load i18n %}
 {% block content %}
 <div class="container row">
     <div class="col-12">
-        <div class="my-post-top">
-            <h1 class="text-center">{{ post.title }}</h1>
-            <h6>
-                <p>{{ post.summary }}</p>
-            </h6>
-            <br>
-            <h5>by {{ post.author.first_name }} {{ post.author.last_name }}</h5>
-        </div>
-        <div class="my-page-list-border">
-            <!-- post content begin -->
             <article class="my-post-article">
+                <header>
+                    <h1 class="text-center">{{ post.title }}</h1>
+                    <p>{{ post.summary }}</p>
+                    <strong>
+                        {% trans "by" %} {{ post.author.first_name }} {{ post.author.last_name }}
+                    </strong>
+                    {% if perms.posts.change_post %}
+                        <a href="{% url 'post_update' post.id %}">
+                            {% trans "Edit post" %}
+                        </a>
+                    {% endif %}
+                </header>
                 {% autoescape off %}
                 {{ post.body|safe }}
                 {% endautoescape %}
+                <footer>
+                    {{ post.date_published|date }}
+                </footer>
             </article>
             <!-- post content end -->
             <div class="my-post-comments">
@@ -26,44 +32,49 @@
                     {% for field in comment_form.hidden_fields %}
                        {{ field }}
                     {% endfor %}
-
                     <div class="form-group">
                         {{ comment_form.comment_text.errors }}
-                        <label for="{{ comment_form.comment_text.id_for_label }}">{{ comment_form.comment_text.label_tag }}</label>
+                        <h2><label for="{{ comment_form.comment_text.id_for_label }}">
+                            {{ comment_form.comment_text.label_tag }}</label></h2>
                         {{ comment_form.comment_text|safe }}
                     </div>
-                    <button class="btn btn-outline-primary" type="submit">Post</button>
+                    <button class="btn btn-outline-primary" type="submit">{% trans "Post" %}</button>
                 </form>
                 {% else %}
-                <br>
-                To comment you need to
-                <a href="{% url 'login' %}?next={{ request.path }}"> Login</a> --OR--
-                <a href="{% url 'social:begin' 'facebook' %}">Login with Facebook</a> --OR --
-                <a href="{% url 'signup' %}">Sign UP</a>
+                <h3>{% trans "To comment you need to" %}
+                    <a href="{% url 'login' %}?next={{ request.path }}">{% trans "Login" %}</a> (
+                    <a href="{% url 'social:begin' 'facebook' %}">{% trans "with Facebook" %}</a> {% trans "or" %}
+                    <a href="{% url 'signup' %}">{% trans "Sign UP" %}</a> )
+                </h3>
                 {% endif %}
                 <br>
-                <h3>Comments:</h3>
+                <h3>{% trans "Comments" %}:</h3>
                 {% for comment in comments.all %}
                 <hr>
                 <div class="row">
-                    <div class="col-1">
+                    <div class="col-2">
                         <a href="{% url 'view_profile' comment.comment_user %}">
-                            <img src="{{ comment.comment_user.profile.get_avatar }}" width="50"/>
-                            {{ comment.comment_user.last_name }}, {{ comment.comment_user.first_name }}
+                            <img src="{{ comment.comment_user.profile.get_avatar }}" width="80"/>
+                            {{ comment.comment_user.last_name }}<br>
+                            {{ comment.comment_user.first_name }}<br>
                             ({{ comment.comment_user.username }})
                         </a>
                     </div>
                     <div class="col-10">
-                        <i> -- {{ comment.date_created|naturaltime }}</i>
-                        <p>{{ comment.comment_text|safe }}</p>
+                        <div class="row">
+                            <i>{{ comment.date_created|naturaltime }}</i>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <p>{{ comment.comment_text|safe }}</p>
+                        </div>
                     </div>
                 </div>
                 {% empty %}
-                <p>No comments here yet :(</p>
+                <p>{% trans "No comments here yet" %} :(</p>
                 {% endfor %}
+                <hr>
             </div>
-        </div>
     </div>
 </div>
-
 {% endblock %}

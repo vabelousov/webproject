@@ -14,6 +14,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 
 import os
 import environ
+from django.utils.translation import gettext_lazy as _
 
 env = environ.Env(
     # set casting, default value
@@ -53,6 +54,7 @@ ALLOWED_HOSTS = tuple(env.list('DJANGO_ALLOWED_HOSTS', default=[]))
 # Application definition
 
 INSTALLED_APPS = [
+    'modeltranslation',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -72,6 +74,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -91,6 +94,7 @@ TEMPLATES = [
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
+                'django.template.context_processors.i18n',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'social_django.context_processors.backends',
@@ -134,8 +138,6 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
-
-LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'Europe/Paris'  # 'UTC'
 
@@ -184,3 +186,23 @@ SOCIAL_AUTH_FACEBOOK_EXTRA_DATA = [
 SOCIAL_AUTH_LOGIN_ERROR_URL = '/settings/'
 SOCIAL_AUTH_LOGIN_REDIRECT_URL = 'index'
 SOCIAL_AUTH_RAISE_EXCEPTIONS = False
+
+
+# язык сайта по умолчанию, если не удалось определить язык другими способами
+LANGUAGE_CODE = 'ru'
+# LANGUAGE_CODE = 'en-us'
+
+# список доступных языков
+LANGUAGES = (
+    ('ru', _('Russian')),
+    ('en', _('English')),
+    ('fr', _('French')),
+)
+
+# указываем, где лежат файлы перевода
+LOCALE_PATHS = (
+    'locale',
+)
+
+MODELTRANSLATION_DEFAULT_LANGUAGE = 'en'
+MODELTRANSLATION_TRANSLATION_REGISTRY = 'posts.translation'

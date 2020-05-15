@@ -65,13 +65,8 @@ body {
   Roboto
 */
 h1, h2, h3, h4 {
-  color: #648880;
+  color: #000;
 }
-/*
-h1, h3, h4, h5, p {
-  margin-bottom: 22px;
-}
-*/
 h1 {
   font-size: 36px;
   line-height: 44px;
@@ -87,16 +82,42 @@ h4 {
   font-size: 18px;
 }
 h5 {
-  color: #a9b2b9;
+  color: #000;
   font-size: 14px;
   font-weight: 400;
-  text-transform: uppercase;
 }
 strong {
   font-weight: 400;
 }
 cite, em {
   font-style: italic;
+}
+p {
+}
+span {
+}
+/*
+  ==================================
+  отзывчивая типографика
+  ==================================
+*/
+html {
+  font-size: 1rem;
+}
+@include media-breakpoint-up(sm) {
+  html {
+    font-size: 1.2rem;
+  }
+}
+@include media-breakpoint-up(md) {
+  html {
+    font-size: 1.4rem;
+  }
+}
+@include media-breakpoint-up(lg) {
+  html {
+    font-size: 1.6rem;
+  }
 }
 /*
   ========================================
@@ -109,21 +130,6 @@ a {
 }
 a:hover {
   color: #a9b2b9;
-}
-/*
-p a {
-  border-bottom: 1px solid #dfe2e5;
-}
-*/
-.primary-footer a {
-  color: #648880;
-  text-decoration: none;
-}
-.primary-footer a:hover {
-  color: #a9b2b9;
-}
-.navbar a {
-  text-decoration: none;
 }
 /*
   ========================================
@@ -182,6 +188,14 @@ p a {
   padding: 2px;
   border: 1px solid rgba(0,0,0,.15);
 }
+.navbar a {
+  color: #648880;
+  text-decoration: none;
+}
+.navbar a:hover {
+  color: #a9b2b9;
+  text-decoration: none;
+}
 .bg-custom {
   background-color: #fff; !important;
 }
@@ -192,20 +206,19 @@ p a {
 */
 .container {
   max-width: 1280px;
+  min-height: 300px;
   padding: 0px;
 }
 .my-page-list-border {
   margin: 0px 0px 30px 30px;
   padding: 20px;
-  border: 1px solid rgba(0,0,0,.15);
+  /* border: 1px solid rgba(0,0,0,.15); */
 }
-
 /*
   =======================================
   carousel
   =======================================
 */
-
 /* Carousel Header Styles */
 .header-text {
     position: absolute;
@@ -236,43 +249,39 @@ p a {
   =============================
 */
 .primary-footer {
-  height: 90px;
-  padding-top: 30px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 800px;
+  height: 100px;
+  padding-top: 20px;
   background: #fff;
-  border: 1px solid rgba(0,0,0,.15);
+  /* border: 1px solid rgba(0,0,0,.15); */
+  position: relative;
 }
 .primary-footer-margin {
-  margin-left: 20px;
-  margin-right: 20px;
+  margin-top: 20px;
+}
+.primary-footer a {
+  color: #648880;
+  text-decoration: none;
+}
+.primary-footer a:hover {
+  color: #a9b2b9;
 }
 /*
   =================================
   main cat page
   =================================
 */
-.my-main-cat-itm {
+.my-cat-itm {
   margin: 20px;
-  border: 1px solid rgba(0,0,0,.15);
+  /* border: 1px solid rgba(0,0,0,.15); */
 }
-.my-main-cat-itm-img {
+.my-cat-itm-img {
   padding: 10px;
 }
-.my-main-cat-itm-text {
-  margin: 0px 10px 10px 10px;
-}
-/*
-  =================================
-  sub cat page
-  =================================
-*/
-.my-sub-cat-itm {
-  margin: 20px;
-  border: 1px solid rgba(0,0,0,.15);
-}
-.my-sub-cat-itm-img {
-  padding: 10px;
-}
-.my-sub-cat-itm-text {
+.my-cat-itm-text {
+  text-align: justify;
   margin: 0px 10px 10px 10px;
 }
 /*
@@ -428,6 +437,9 @@ p a {
   post edit right panel
   ===========================
 */
+.my-right-panel {
+  margin-top: 60px;
+}
 .my-post-right-panel-border {
   margin: 0px 0px 10px 10px;
   padding: 20px;
@@ -456,7 +468,9 @@ p a {
   margin: 50px;
 }
 /*
-  my posts, albums and images
+  ============================
+  my posts and images
+  ============================
 */
 .my-work-list-border {
   margin: 20px;
@@ -479,20 +493,33 @@ p a {
   post view
   ===============================
 */
-.my-post-top {
-  padding: 30px;
+article {
+  margin-left: auto;
+  margin-right: auto;
+  width: 800px;
 }
-.my-post-article {
-  padding: 20px;
+article header {
+  margin-bottom: 40px;
 }
+article h1 {
+  margin: 20px;
+}
+article p {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
 .my-post-comments {
-  padding: 20px;
-  border: 1px solid rgba(0,0,0,.15);
+  margin-top: 30px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 700px;
 }
 .my-post-comments img {
   padding: 5px;
   border: 1px solid rgba(0,0,0,.15);
 }
+
 /*
   ================================
   search
@@ -520,4 +547,44 @@ p a {
 */
 .my-pagination-padding {
   padding: 10px;
+}
+/*
+  =================================
+  обтекаемый блок слева
+  =================================
+*/
+.tags_block {
+    float: right; /* Обтекание по правому краю */
+    background: #fff; /* Цвет фона */
+    padding: 10px; /* Поля вокруг текста */
+    margin-left: 20px; /* Отступ справа */
+    width: 15%; /* Ширина блока */
+}
+.tag-link-styles a{
+   background-color:#e9f6fc;
+   text-decoration:none;
+   padding:2px 7px 2px 7px;
+   border:1px solid #CFCECE;
+   border-radius:6px;
+   line-height:1.8;
+   margin-right:3px;
+   color:#007205;
+}
+.tag-link-styles a:hover{
+   color:#a43900;
+   }
+/*
+  =====================================
+  переключатель языка
+  =====================================
+*/
+#language-switcher .bootstrap-select {
+    width: 120px;
+    margin-top: 10px;
+    margin-left: 8px;
+}
+
+#language-switcher .bootstrap-select button {
+    padding-top: 3px;
+    padding-bottom: 3px;
 }

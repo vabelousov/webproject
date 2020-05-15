@@ -1,15 +1,15 @@
 {% extends 'base_generic.html' %}
-
+{% load i18n %}
 {% block content %}
    <div class="container">
         <div class="row justify-content-center my-login-margin">
             <div class="col-md-6">
                 <div class="card">
                     <header class="card-header">
-                        <a href="{% url 'login' %}" class="float-right btn btn-outline-primary mt-1">Login</a>
-                        <h4 class="card-title mt-2">Sign Up</h4>
+                        <a href="{% url 'login' %}" class="float-right btn btn-outline-primary mt-1">{% trans "Login" %}</a>
+                        <h4 class="card-title mt-2">{% trans "Sign Up" %}</h4>
                     </header>
-                    <article class="card-body">
+                    <div class="card-body">
                         <form method="POST">
                           {% csrf_token %}
                             <div class="form-group">
@@ -21,26 +21,26 @@
                             <div class="form-group">
                               {{ form.email.errors }}
                               <label for="{{ form.email.id_for_label }}">{{ form.email.label_tag }}</label>
-                              <input type="email" name="email" class="form-control" maxlength="254" required id="id_email" value="{{ form.email.value }}">
+                              {{ form.email }}
                               <small>{{ form.email.help_text }}</small>
                             </div>
                             <div class="form-group">
                               {{ form.password1.errors }}
                               <label for="{{ form.password1.id_for_label }}">{{ form.password1.label_tag }}</label>
-                              <input type="password" name="password1" class="form-control" autocomplete="new-password" required id="id_password1">
+                                {{ form.password1 }}
                              <small>{{ form.password1.help_text }}</small>
                             </div>
                            <div class="form-group">
                               {{ form.password2.errors }}
                              <label for="{{ form.password2.id_for_label }}">{{ form.password2.label_tag }}</label>
-                             <input type="password" name="password2" class="form-control" autocomplete="new-password" required id="id_password2">
+                                {{ form.password2 }}
                              <small>{{ form.password2.help_text }}</small>
                             </div>
                             <div class="form-group">
-                                <button type="submit" class="btn btn-outline-primary btn-block"> Signup </button>
-                            </div> <!-- form-group// -->
+                                <button type="submit" class="btn btn-outline-primary btn-block">{% trans "Signup" %}</button>
+                            </div>
                         </form>
-                    </article> <!-- card-body end .// -->
+                    </div>
                     <div class="border-top card-body text-center">
                     </div>
                 </div>

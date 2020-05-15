@@ -1,10 +1,10 @@
 {% extends "base_generic.html" %}
 {% load static %}
+{% load i18n %}
 {% block content %}
-
 <div class="container row">
     <div class="col-8">
-        <h2 class="text-center">Edit post</h2>
+        <h2 class="text-center">{% trans "Edit post" %}</h2>
         <div class="my-page-list-border">
             <form method="post" enctype="multipart/form-data" action="">
                 {% csrf_token %}
@@ -63,12 +63,12 @@
                         </div>
                     </div>
                 </div>
-                <button type="submit" class="btn btn-outline-primary">Save</button>
+                <button type="submit" class="btn btn-outline-primary">{% trans "Save" %}</button>
             </form>
         </div>
     </div>
     <div class="col-4">
-        <h5 class="text-center my-right-panel">Photo-basket:</h5>
+        <h5 class="text-center my-right-panel">{% trans "Photo-basket" %}:</h5>
         <div class="row my-post-right-panel-border">
             {% for img in basket %}
             <div class="col-md-6">
@@ -89,7 +89,7 @@
                 </div>
             </div>
             {% empty %}
-            <div class="col-md-6">No images in gallery.</div>
+            <div class="col-md-6">{% trans "No images in basket" %}.</div>
             {% endfor %}
         </div>
     </div>

@@ -14,6 +14,8 @@ from django.utils.safestring import mark_safe
 from uuid import uuid4
 from functools import partial
 
+from django.utils.translation import gettext as _
+
 from django.core.files.base import ContentFile
 from PIL import Image as Img
 
@@ -71,40 +73,82 @@ class HiddenManager(models.Manager):
         ).get_queryset().filter(status='hidden')
 
 
-class Category(models.Model):
-    code = models.CharField(max_length=100, blank=True)
-    description = models.CharField(max_length=100, blank=True)
+class Type(models.Model):
+    code = models.CharField(
+        verbose_name=_('Code'),
+        max_length=100,
+        blank=True
+    )
+    description = models.CharField(
+        verbose_name=_('Description'),
+        max_length=100,
+        blank=True
+    )
 
     def __str__(self):
         return self.code
 
     class Meta:
-        verbose_name = 'Category'
-        verbose_name_plural = 'Categories'
+        verbose_name = _('Type')
+        verbose_name_plural = _('Types')
+
+
+class Category(models.Model):
+    code = models.CharField(
+        verbose_name=_('Code'),
+        max_length=100,
+        blank=True
+    )
+    description = models.CharField(
+        verbose_name=_('Description'),
+        max_length=100,
+        blank=True
+    )
+
+    def __str__(self):
+        return self.code
+
+    class Meta:
+        verbose_name = _('Category')
+        verbose_name_plural = _('Categories')
 
 
 class Carousel(models.Model):
     image = models.ImageField(
+        verbose_name=_('Image'),
         upload_to='media/images/carousel',
-        verbose_name='Image',
         blank=True
     )
-    alt_text = models.CharField(max_length=100, blank=True)
-    title = models.CharField(max_length=100, blank=True)
+    alt_text = models.CharField(
+        verbose_name=_('Alt'),
+        max_length=100,
+        blank=True
+    )
+    title = models.CharField(
+        verbose_name=_('Title'),
+        max_length=100,
+        blank=True
+    )
     reverse_url = models.CharField(
+        verbose_name=_('reverse URL'),
         max_length=200,
         blank=True,
         default='under_construction'
     )
-    url_attr = models.CharField(max_length=100, blank=True)
-    is_active = models.BooleanField(default=True)
+    url_attr = models.CharField(
+        verbose_name=_('URL attr'),
+        max_length=100,
+        blank=True
+    )
+    is_active = models.BooleanField(verbose_name=_('Active'), default=True)
     text = models.TextField(
+        verbose_name=_('Text'),
         max_length=1000,
         help_text="Image text",
         blank=True,
         null=True
     )
-    order = models.IntegerField(default=0)
+    order = models.IntegerField(verbose_name=_('Order'), default=0)
 
     def __str__(self):
         return self.title
@@ -121,48 +165,55 @@ class Carousel(models.Model):
             '<img src="%s" width="50" height="50" />' % self.get_carousel()
         )
 
-    carousel_tag.short_description = 'Carousel'
+    carousel_tag.short_description = _('Carousel')
 
     class Meta:
-        verbose_name = 'Carousel'
-        verbose_name_plural = 'Carouseles'
+        verbose_name = _('Carousel')
+        verbose_name_plural = _('Carousels')
 
 
 class Image(models.Model):
     original = models.ImageField(
         upload_to=path_file_resize('media/images/originals'),
-        verbose_name='Original',
+        verbose_name=_('Original'),
         blank=True
     )
     image = models.ImageField(
         upload_to=path_file_resize('media/images/middles'),
-        verbose_name='Middle size',
+        verbose_name=_('Middle size'),
         editable=False
     )
     thumbnail = models.ImageField(
         upload_to=path_file_resize('media/images/thumbnails'),
-        verbose_name='Thumbnail',
+        verbose_name=_('Thumbnail'),
         editable=False
     )
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        help_text="Uploader",
+        help_text=_('Uploader'),
         default=1,
+        verbose_name=_('User')
     )
     alt_text = models.CharField(
         null=False,
         blank=True,
         max_length=255,
-        help_text="Alt text"
+        help_text=_('Alt text'),
+        verbose_name=_('Alt text')
     )
     common = models.BooleanField(
-        help_text="Common image",
-        default=False
+        help_text=_('Common image'),
+        default=False,
+        verbose_name=_('Common')
     )
     date_created = models.DateTimeField(auto_now_add=True)
 
-    tags = TaggableManager(blank=True, help_text='Tags list.')  # менеджер тэгов
+    tags = TaggableManager(
+        blank=True,
+        help_text='Tags list.',
+        verbose_name=_('Tags')
+    )  # менеджер тэгов
 
     def __str__(self):
         return 'img_' + str(self.id).zfill(8)
@@ -175,12 +226,12 @@ class Image(models.Model):
         if self.original:
             if not self.make_thumbnail():
                 raise Exception(
-                    'Could not create thumbnail - is the file type valid?'
+                    _('Could not create thumbnail - is the file type valid?')
                 )
             if not self.make_middle():
                 raise Exception(
-                    'Could not create middle size\
-                    image - is the file type valid?'
+                    _('Could not create middle size\
+                    image - is the file type valid?')
                 )
         else:
             self.thumbnail.delete()
@@ -306,73 +357,77 @@ class Image(models.Model):
 
     class Meta:
         ordering = ('-id',)
-        verbose_name = 'Image'
-        verbose_name_plural = 'Images'
+        verbose_name = _('Image')
+        verbose_name_plural = _('Images')
 
 
 class Post(models.Model):
     STATUS_CHOICES = (
-        ('draft', 'Draft'),
-        ('published', 'Published'),
-        ('hidden', 'Hidden')
-    )
-    TYPE_CHOICES = (
-        ('stories', 'Stories'),
-        ('topos', 'Topos'),
-        ('tips', 'Tips'),
-        ('others', 'Others')
+        ('draft', _('Draft')),
+        ('published', _('Published')),
+        ('hidden', _('Hidden'))
     )
     author = models.ForeignKey(
         User,
         on_delete=models.SET_NULL,
-        help_text="Post author",
-        null=True
+        help_text=_('Post author'),
+        null=True,
+        verbose_name=_('Author')
     )
     title = models.CharField(
         max_length=200,
-        help_text="Post title"
+        help_text=_('Post title'),
+        verbose_name=_('Post title')
     )
     summary = models.TextField(
         max_length=1000,
-        help_text="Post summary",
+        help_text=_('Post summary'),
         blank=True,
-        null=True
+        null=True,
+        verbose_name=_('Post summary')
     )
     body = models.TextField(
-        help_text="Post text (html tags allowed)",
+        help_text=_('Post text (html tags allowed)'),
         blank=True,
-        null=True
+        null=True,
+        verbose_name=_('Post text')
     )
     thumbnail_url = models.CharField(
         max_length=500,
-        help_text="Thumbnail url",
-        blank=True
+        help_text=_('Thumbnail url'),
+        blank=True,
+        verbose_name=_('Thumbnail URL')
     )
-    type = models.CharField(
-        max_length=20,
-        choices=TYPE_CHOICES,
-        default='outing',
-        help_text="Post type"
+    type = models.ForeignKey(
+        Type,
+        on_delete=models.SET_NULL,
+        help_text=_('Post type'),
+        null=True,
+        related_name='type',
+        verbose_name=_('Post type')
     )
     main_category = models.ForeignKey(
         Category,
         on_delete=models.SET_NULL,
-        help_text="Main category",
+        help_text=_('Main category'),
         null=True,
-        related_name='main_category'
+        related_name='main_category',
+        verbose_name=_('Category')
     )
     sub_category = models.ForeignKey(
         Category,
         on_delete=models.SET_NULL,
-        help_text="Sub category",
+        help_text=_('Sub category'),
         null=True,
-        related_name='sub_category'
+        related_name='sub_category',
+        verbose_name=_('Sub Category')
     )
     status = models.CharField(
         max_length=10,
         choices=STATUS_CHOICES,
         default='draft',
-        help_text="Post status"
+        help_text=_('Post status'),
+        verbose_name=_('Post status')
     )
     date_published = models.DateTimeField(default=timezone.now)
     date_created = models.DateTimeField(auto_now_add=True)
@@ -393,7 +448,7 @@ class Post(models.Model):
             pst.body = '<p>' + listToString(get_sentences(10, True)) + '</p>'
             pst.author = User.objects.get(username='vladimir')
             pst.status = 'published'
-            pst.type = tp
+            pst.type = Type.objects.get(code=tp)
             pst.main_category = Category.objects.get(code=mc)
             pst.sub_category = Category.objects.get(code=sc)
             pst.thumbnail_url = '/media/media/images/thumbnails/file_63e871582a15.jpg'
@@ -422,7 +477,7 @@ class Post(models.Model):
             username=self.author
         ).last_name
 
-    display_author.short_description = 'Author'
+    display_author.short_description = _('Author')
 
     class Meta:
         ordering = (
@@ -431,27 +486,41 @@ class Post(models.Model):
             'sub_category',
             '-date_published',
         )
-        verbose_name = 'Post'
-        verbose_name_plural = 'Posts'
+        verbose_name = _('Post')
+        verbose_name_plural = _('Posts')
 
 
-#Post._create_post_records(10, 'stories', 'alpinism')
-#Post._create_post_records(10, 'stories', 'multipitches')
-#Post._create_post_records(10, 'stories', 'climbing')
-#Post._create_post_records(10, 'topos', 'alpinism')
-#Post._create_post_records(10, 'topos', 'multipitches')
-#Post._create_post_records(10, 'topos', 'climbing')
-#Post._create_post_records(10, 'tips', 'alpinism')
-#Post._create_post_records(10, 'tips', 'adaptation')
-#Post._create_post_records(10, 'tips', 'equipment')
+#Post._create_post_records(5, 'stories', 'alpinism')
+#Post._create_post_records(4, 'stories', 'multipitches')
+#Post._create_post_records(7, 'stories', 'climbing')
+#Post._create_post_records(12, 'topos', 'alpinism')
+#Post._create_post_records(3, 'topos', 'multipitches')
+#Post._create_post_records(2, 'topos', 'climbing')
+#Post._create_post_records(3, 'tips', 'alpinism')
+#Post._create_post_records(4, 'tips', 'adaptation')
+#Post._create_post_records(5, 'tips', 'equipment')
 
 
 class ImageBasket(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
-    image = models.ForeignKey(Image, on_delete=models.SET_NULL, null=True)
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        null=True,
+        verbose_name=_('User')
+    )
+    image = models.ForeignKey(
+        Image,
+        on_delete=models.SET_NULL,
+        null=True,
+        verbose_name=_('Image')
+    )
 
     def __str__(self):
         return self.user.username + '_' + str(self.image.id)
+
+    class Meta:
+        verbose_name = _('Basket')
+        verbose_name_plural = _('Baskets')
 
 
 class Comment(models.Model):
@@ -459,22 +528,28 @@ class Comment(models.Model):
         Post,
         on_delete=models.CASCADE,
         related_name='comments',
-        help_text='Comments',
-        null=True
+        help_text=_('Comments'),
+        null=True,
+        verbose_name=_('Post')
     )
     comment_user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         related_name='users',
-        help_text='Comment user',
-        null=True
+        help_text=_('Comment user'),
+        null=True,
+        verbose_name=_('Commentator')
     )
-    comment_text = models.TextField(help_text='Comment text')
+    comment_text = models.TextField(
+        help_text='Comment text',
+        verbose_name=_('Comment')
+    )
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(
         default=True,
-        help_text='Active comment'
+        help_text=_('Active comment'),
+        verbose_name=_('Is active')
     )
 
     def __str__(self):
@@ -485,31 +560,41 @@ class Comment(models.Model):
 
     class Meta:
         ordering = ('date_created',)
-        verbose_name = 'Comment'
-        verbose_name_plural = 'Comments'
+        verbose_name = _('Comment')
+        verbose_name_plural = _('Comments')
 
 
 class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    email_confirmed = models.BooleanField(default=False)
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name=_('User')
+    )
+    email_confirmed = models.BooleanField(
+        default=False,
+        verbose_name=_('E-mail')
+    )
     bio = models.TextField(
         max_length=500,
         blank=True,
-        help_text='Few words about you'
+        help_text=_('Few words about you'),
+        verbose_name=_('BIO')
     )
     location = models.CharField(
         max_length=30,
         blank=True,
-        help_text='Add your location e.g. Moscow'
+        help_text=_('Add your location e.g. Moscow'),
+        verbose_name=_('Location')
     )
     birth_date = models.DateField(
         null=True,
         blank=True,
-        help_text='Add your birthday here'
+        help_text=_('Add your birthday here'),
+        verbose_name=_('Birth date')
     )
     avatar = models.ImageField(
         upload_to='media/images/users',
-        verbose_name='Avatar image',
+        verbose_name=_('Avatar image'),
         blank=True
     )
 
@@ -525,7 +610,7 @@ class Profile(models.Model):
         if self.avatar:
             if not self.make_avatar():
                 raise Exception(
-                    'Could not create avatar - is the file type valid?'
+                    _('Could not create avatar - is the file type valid?')
                 )
 
     def make_avatar(self):
@@ -554,8 +639,8 @@ class Profile(models.Model):
     avatar_tag.short_description = 'Avatar'
 
     class Meta:
-        verbose_name = 'Profile'
-        verbose_name_plural = 'Profiles'
+        verbose_name = _('Profile')
+        verbose_name_plural = _('Profiles')
 
 
 @receiver(post_save, sender=User)
@@ -566,22 +651,39 @@ def update_user_profile(sender, instance, created, **kwargs):
 
 
 class MyMenu(MPTTModel):
-    title = models.CharField(max_length=50, unique=True)
-    name = models.CharField(max_length=100)
+    title = models.CharField(
+        max_length=50,
+        unique=True,
+        verbose_name=_('Title')
+    )
+    name = models.CharField(
+        max_length=100,
+        verbose_name=_('Name')
+    )
     reverse_url = models.CharField(
         max_length=200,
         blank=True,
-        default='under_construction'
+        default='under_construction',
+        verbose_name=_('Reverse url')
     )
-    url_attr = models.CharField(max_length=100, blank=True)
+    url_attr = models.CharField(
+        max_length=100,
+        blank=True,
+        verbose_name=_('URL attr')
+    )
     parent = TreeForeignKey(
         'self',
         on_delete=models.CASCADE,
         null=True,
         blank=True,
-        related_name='children'
+        related_name='children',
+        verbose_name=_('Parent node')
     )
-    order = models.CharField(max_length=3, default='000')
+    order = models.CharField(
+        max_length=3,
+        default='000',
+        verbose_name=_('Sort order')
+    )
 
     class MPTTMeta:
         order_insertion_by = ['order']

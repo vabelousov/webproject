@@ -1,37 +1,36 @@
 {% extends "base_generic.html" %}
-
+{% load i18n %}
 {% block content %}
     <div class="container row">
         <div class="col-12">
             <div class="my-work-list-border" id="controls">
                 <form action="" method="post">
                 {% csrf_token %}
-                {% for image in image_list %}
-                {% if forloop.first %}
                 <div class="row">
                     <div class="col-2">
                         <a href="{% url 'image_create' %}">
-                            <button class="btn btn-outline-primary">New Image</button>
+                            <button type="button" class="btn-sm btn-outline-primary">{% trans "New Image" %}</button>
                         </a>
                     </div>
-                    <div class="col-3">Tags</div>
-                    <div class="col-2">Alt text</a></div>
-                    <div class="col-1">Common</a></div>
-                    <div class="col-1">In<br>Basket</a></div>
+                    <div class="col-3">{% trans "Tags" %}</div>
+                    <div class="col-2">{% trans "Alt text" %}</a></div>
+                    <div class="col-1">{% trans "Common" %}</a></div>
+                    <div class="col-1">{% trans "In<br>Basket" %}</a></div>
                     <div class="col-3">
                         <input type="checkbox" id="checkall">
                         &nbsp;
                         <select name="img-action">
                             <option value="0">-----------------</option>
-                            <option value="delete-selected">Delete selected</option>
-                            <option value="add-to-basket">Add to basket</option>
-                            <option value="clear-from-basket">Delete in Basket</option>
+                            <option value="delete-selected">{% trans "Delete selected" %}</option>
+                            <option value="add-to-basket">{% trans "Add to basket" %}</option>
+                            <option value="clear-from-basket">{% trans "Delete in Basket" %}</option>
                         </select>
-                        <button type="submit" class="btn btn-outline-primary">Go</button>
+                        <button type="submit" class="btn-sm btn-outline-primary">{% trans "Go" %}</button>
                     </div>
                 </div>
                 <hr>
-                {% endif %}
+                {% for image in image_list %}
+
                 <div class="row my-work-list-padding">
                     <div class="col-2">
                     <a role="button" href="#" data-target="#modalIMG"
@@ -62,19 +61,19 @@
                     </div>
                     <div class="col-1">
                         <a href="{% url 'image_update' image.id %}">
-                            <button type="button" class="btn btn-outline-secondary">Edit</button>
+                            <button type="button" class="btn-sm btn-outline-secondary">{% trans "Edit" %}</button>
                         </a>
                     </div>
                     <div class="col-1">
                         <a href="{% url 'image_delete' image.id %}"
                            class="confirm-delete" title="Delete" data-toggle="modal"
                            data-target="#taskModal" onclick="getUrl('{% url 'image_delete' image.id %}')">
-                            <button class="btn trigger-btn btn-outline-danger">Delete</button>
+                            <button class="btn-sm trigger-btn btn-outline-danger">{% trans "Delete" %}</button>
                         </a>
                     </div>
                 </div>
                 {% empty %}
-                <div><h5 class="text-center">You didn't create anything yet.</h5></div>
+                <div><h5 class="text-center">{% trans "You didn't create anything yet." %}</h5></div>
                 {% endfor %}
                 </form>
             </div>

@@ -1,5 +1,5 @@
 {% extends "base_generic.html" %}
-
+{% load i18n %}
 {% block content %}
     <div class="container">
         <div id="carousel01" class="carousel slide z-depth-1-half" data-ride="carousel" data-interval="3000">
@@ -30,7 +30,7 @@
                     <div class="header-text hidden-xs">
                         <div class="col-md-12 text-center">
                             <div class="">
-                                <a class="btn btn-theme btn-sm btn-min-block" href="#">Default</a>
+                                <a class="btn btn-theme btn-sm btn-min-block" href="#">{% trans "Default" %}</a>
                             </div>
                         </div>
                     </div>
@@ -39,11 +39,11 @@
             </div>
             <a class="carousel-control-prev" href="#carousel01" role="button" data-slide="prev">
                 <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="sr-only">Previous</span>
+                <span class="sr-only">{% trans "Previous" %}</span>
             </a>
             <a class="carousel-control-next" href="#carousel01" role="button" data-slide="next">
                 <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="sr-only">Next</span>
+                <span class="sr-only">{% trans "Next" %}</span>
             </a>
         </div>
     </div>
