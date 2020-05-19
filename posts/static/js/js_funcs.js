@@ -23,7 +23,7 @@ function insert_AHREF_AtCaret(areaId) {
     var txtarea = document.getElementById(areaId);
     var scrollPos = txtarea.scrollTop;
     var caretPos = txtarea.selectionStart;
-    var text = '<a href=""></a>';
+    var text = '<a href="" target="_blank"></a>';
     var front = (txtarea.value).substring(0, caretPos);
     var back = (txtarea.value).substring(txtarea.selectionEnd, txtarea.value.length);
     txtarea.value = front + text + back;
