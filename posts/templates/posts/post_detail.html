@@ -1,13 +1,18 @@
 {% extends "base_generic.html" %}
 {% load humanize %}
 {% load i18n %}
+{% load static %}
 {% block content %}
+<section id="bck-lnk">
+<a href="{{ request.META.HTTP_REFERER }}">
+    <img  src="{% static '/css/back-back-button.png' %}" width="47px" height="47px">
+</a>
+</section>
 <div class="container row">
     <div class="col-12">
             <article class="my-post-article">
                 <header>
                     <h1 class="text-center">{{ post.title }}</h1>
-                    <p>{{ post.summary }}</p>
                     <strong>
                         {% trans "by" %} {{ post.author.first_name }} {{ post.author.last_name }}
                     </strong>
@@ -15,6 +20,17 @@
                         <a href="{% url 'post_update' post.id %}">
                             {% trans "Edit post" %}
                         </a>
+                    {% endif %}
+                    <br>
+                    {% if post.tags.count > 0 %}
+                    {% trans 'Tags' %}:
+                    {% for tg in post.tags.all %}
+                        {% if tg.slug %}
+                            <small><span class="tag-link-styles">
+                               <a href="{% url 'tagged-posts' tg.slug %}">{{ tg }}</a>
+                            </span></small>
+                        {% endif %}
+                    {% endfor %}
                     {% endif %}
                 </header>
                 {% autoescape off %}
@@ -34,18 +50,45 @@
                     {% endfor %}
                     <div class="form-group">
                         {{ comment_form.comment_text.errors }}
-                        <h2><label for="{{ comment_form.comment_text.id_for_label }}">
-                            {{ comment_form.comment_text.label_tag }}</label></h2>
+                        <h2>{{ comment_form.comment_text.label_tag }}</h2>
                         {{ comment_form.comment_text|safe }}
                     </div>
                     <button class="btn btn-outline-primary" type="submit">{% trans "Post" %}</button>
                 </form>
                 {% else %}
+                {% comment %}
                 <h3>{% trans "To comment you need to" %}
                     <a href="{% url 'login' %}?next={{ request.path }}">{% trans "Login" %}</a> (
                     <a href="{% url 'social:begin' 'facebook' %}">{% trans "with Facebook" %}</a> {% trans "or" %}
                     <a href="{% url 'signup' %}">{% trans "Sign UP" %}</a> )
                 </h3>
+                {% endcomment %}
+                <form method="post" action="">
+                    {% csrf_token %}
+                    {% for field in comment_form.hidden_fields %}
+                       {{ field }}
+                    {% endfor %}
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col">
+                                {{ comment_form.user_name.errors }}
+                                {{ comment_form.user_name.label_tag }}
+                                {{ comment_form.user_name }}
+                            </div>
+                            <div class="col">
+                                {{ comment_form.user_email.errors }}
+                                {{ comment_form.user_email.label_tag }}
+                                {{ comment_form.user_email }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        {{ comment_form.comment_text.errors }}
+                        <h2>{{ comment_form.comment_text.label_tag }}</h2>
+                        {{ comment_form.comment_text|safe }}
+                    </div>
+                    <button class="btn btn-outline-primary" type="submit">{% trans "Comment" %}</button>
+                </form>
                 {% endif %}
                 <br>
                 <h3>{% trans "Comments" %}:</h3>
@@ -53,12 +96,17 @@
                 <hr>
                 <div class="row">
                     <div class="col-2">
-                        <a href="{% url 'view_profile' comment.comment_user %}">
-                            <img src="{{ comment.comment_user.profile.get_avatar }}" width="80"/>
-                            {{ comment.comment_user.last_name }}<br>
-                            {{ comment.comment_user.first_name }}<br>
-                            ({{ comment.comment_user.username }})
-                        </a>
+                        {% if comment.comment_user %}
+                            <a href="{% url 'view_profile' comment.comment_user %}">
+                                <img src="{{ comment.comment_user.profile.get_avatar }}" width="80"/>
+                                {{ comment.comment_user.last_name }}<br>
+                                {{ comment.comment_user.first_name }}<br>
+                                ({{ comment.comment_user.username }})
+                            </a>
+                        {% else %}
+                            <img src="/static/images/no-avatar.png" width="80"/>
+                            {{ comment.user_name }}
+                        {% endif %}
                     </div>
                     <div class="col-10">
                         <div class="row">

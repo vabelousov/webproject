@@ -5,18 +5,41 @@
 {% regroup post_list|dictsort:'type.code' by type.code as post_by_type_list %}
 <div class="container row">
     <div class="col-12">
+        {% if tag %}
+        <h1 class="text-center">{% trans "Posts" %}</h1>
+        <h3 class="text-center">{% trans "tagged as" %} {{ tag }}</h3>
+        {% endif %}
+        {% if tags %}
+        <div class="tags_block">
+            {% trans 'Tags' %}<hr>
+            {% for tg in tags %}
+            {% if tg.slug %}
+            <span class="tag-link-styles">
+                <small><a href="{% url 'tagged-posts' tg.slug %}">{{ tg }}</a></small>
+            </span>
+            {% endif %}
+            {% endfor %}
+        </div>
+        {% endif %}
+
     {% for type in post_by_type_list %}
     {% regroup type.list|dictsort:'main_category.code' by main_category.code as post_by_cat_list %}
         {% for main_category in post_by_cat_list %}
         <div class="my-page-list-border">
-            <a href="{% url 'pages' type.grouper %}">
-                {{ type.grouper|type_desc }}
-            </a>/<a href="{% url 'pages' type.grouper|add:'/'|add:main_category.grouper %}">
-                {{ main_category.grouper|cat_desc }}
-            </a>
             <div class="row">
+                <div class="col-md-10 my-cat-panel">
+                    <div class="btn-group btn-group-sm" role="group" aria-label="structure path">
+                        <a href="{% url 'pages' type.grouper %}" class="btn btn-info">
+                            {{ type.grouper|type_desc }}
+                        </a>
+                            <button type="button" class="btn btn-info">&gt;</button>
+                        <a href="{% url 'pages' type.grouper|add:'/'|add:main_category.grouper %}" class="btn btn-info">
+                            {{ main_category.grouper|cat_desc }}
+                        </a>
+                    </div>
+                </div>
                 {% for post in main_category.list|dictsortreversed:'date_published' %}
-                <div class="col-md-3 my-cat-itm">
+                <div class="col-md-5 my-cat-itm">
                     <div>
                         <div class="my-cat-itm-img">
                             <a href="{{ post.get_absolute_url }}">
@@ -24,23 +47,33 @@
                             </a>
                         </div>
                         <div class="my-cat-itm-text">
-                            <a href="{{ post.get_absolute_url }}">{{ post.title }} {% trans "by" %} {{ post.author.first_name }} {{post.author.last_name}}</a>
+                            <h4><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></h4>
                         </div>
                         <div class="my-cat-itm-text">
-                            {{ post.summary|truncatechars:100 }}
+                        <small>{% trans "by" %} {{ post.author.first_name }} {{post.author.last_name}}</small>
+                        </div>
+                        <div class="my-cat-itm-text">
+                            <p>{{ post.summary|truncatechars:200 }}</p>
+                            {% for tg in post.tags.all %}
+                              {% if tg.slug %}
+                                <span class="tag-link-styles">
+                                    <small><a href="{% url 'tagged-posts' tg.slug %}">{{ tg }}</a></small>
+                                </span>
+                              {% endif %}
+                            {% endfor %}
                         </div>
                     </div>
                 </div>
              {% empty %}
-            <p>{% trans "No post in this category" %}</p>
+            <p class="text-center my-top-margin-100">{% trans "There are no posts" %}</p>
             {% endfor %}
             </div>
         </div>
         {% empty %}
-        <p>{% trans "No post in this category" %}</p>
+        <p class="text-center my-top-margin-100">{% trans "There are no posts" %}</p>
         {% endfor %}
     {% empty %}
-        <p>{% trans "No post in this category" %}</p>
+        <p class="text-center my-top-margin-100">{% trans "There are no posts" %}</p>
     {% endfor %}
     </div>
 </div>

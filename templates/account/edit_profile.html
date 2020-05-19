@@ -15,13 +15,13 @@
                             <div class="row">
                                 <div class="col">
                                     {{ form.username.errors }}
-                                    <label for="{{ form.username.id_for_label }}">{{ form.username.label_tag }}</label>
+                                    {{ form.username.label_tag }}
                                     {{ form.username }}
                                     <small>{{ form.username.help_text }}</small>
                                 </div>
                                 <div class="col">
                                     {{ form.email.errors }}
-                                    <label for="{{ form.email.id_for_label }}">{{ form.email.label_tag }}</label>
+                                    {{ form.email.label_tag }}
                                     <input type="email" name="email" class="form-control" value="{{ form.email.value }}" maxlength="254" id="id_email">
                                     <small>{{ form.email.help_text }}</small>
                                 </div>
@@ -31,13 +31,13 @@
                             <div class="row">
                                 <div class="col">
                                     {{ form.first_name.errors }}
-                                    <label for="{{ form.first_name.id_for_label }}">{{ form.first_name.label_tag }}</label>
+                                    {{ form.first_name.label_tag }}
                                     {{ form.first_name }}
                                     <small>{{ form.first_name.help_text }}</small>
                                 </div>
                                 <div class="col">
                                     {{ form.last_name.errors }}
-                                    <label for="{{ form.last_name.id_for_label }}">{{ form.last_name.label_tag }}</label>
+                                    {{ form.last_name.label_tag }}
                                     {{ form.last_name }}
                                     <small>{{ form.last_name.help_text }}</small>
                                 </div>
@@ -45,24 +45,21 @@
                         </div>
                         <div class="form-group">
                             {{ profile_form.bio.errors }}
-                            <label for="{{ profile_form.bio.id_for_label }}">
-                                {{ profile_form.bio.label_tag }}</label>
-                                {{ profile_form.bio }}
+                            {{ profile_form.bio.label_tag }}
+                            {{ profile_form.bio }}
                             <small>{{ profile_form.bio.help_text }}</small>
                         </div>
                         <div class="form-group">
                             <div class="row">
                                 <div class="col">
                                     {{ profile_form.location.errors }}
-                                    <label for="{{ profile_form.location.id_for_label }}">
-                                        {{ profile_form.location.label_tag }}</label>
+                                    {{ profile_form.location.label_tag }}
                                     {{ profile_form.location }}
                                      <small>{{ profile_form.location.help_text }}</small>
                                  </div>
                                  <div class="col">
                                      {{ profile_form.birth_date.errors }}
-                                     <label for="{{ profile_form.birth_date.id_for_label }}">
-                                         {{ profile_form.birth_date.label_tag }}</label>
+                                     {{ profile_form.birth_date.label_tag }}
                                      {{ profile_form.birth_date }}
                                      <small>{{ profile_form.birth_date.help_text }}</small>
                                  </div>
@@ -74,13 +71,15 @@
                                 <br>
                             {% endif %}
                             {{ profile_form.avatar.errors }}
-                            <label for="{{ profile_form.avatar.id_for_label }}">
-                                {{ profile_form.avatar.label_tag }}</label>
+                            {{ profile_form.avatar.label_tag }}
                             {{ profile_form.avatar }}
                             <small>{{ profile_form.avatar.help_text }}</small>
                         </div>
                         <div class="form-group">
-                            <button type="submit" class="btn btn-outline-primary btn-block"> {% trans 'Save' %} </button>
+                            <button type="submit" class="btn btn-outline-primary"> {% trans 'Save' %} </button>
+                            <button type="button" class="btn btn-outline-secondary" onclick="history.back(); return false;">
+                                {% trans 'Back' %}
+                            </button>
                         </div>
                     </form>
                 </div>

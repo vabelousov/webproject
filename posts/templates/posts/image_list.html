@@ -3,26 +3,33 @@
 {% block content %}
     <div class="container row">
         <div class="col-12">
-            <h2 class="text-center">{% trans "Images" %}{% if tag %} {% trans "tagged as" %} {{ tag|title }}{% endif %}</h2>
+            <h1 class="text-center">{% trans "Images" %}</h1>
+                {% if tag %}<h3 class="text-center"> {% trans "tagged as" %} {{ tag|title }}</h3>{% endif %}
             {% if tags %}
             <div class="tags_block">
                 {% trans 'Tags' %}<hr>
                 {% for tg in tags %}
                     <span class="tag-link-styles">
-                         <a href="{% url 'tagged-images' tg.slug %}">{{ tg|title }}</a>
+                        <small><a href="{% url 'tagged-images' tg.slug %}">{{ tg|title }}</a></small>
                     </span>
                 {% endfor %}
             </div>
             {% endif %}
             <div class="gallery-row my-page-list-border">
                 {% if img_count > 0 %}
-
                 <div class="gallery-column">
                     {% for img in common_images_1 %}
                     <a role="button" href="#" data-target="#modalIMG"
                        data-toggle="modal" data-whatever="{{ img.get_original }}" data-atext="{{ img.alt_text }}" data-tags="{{ img.tags.all|join:', ' }}">
-                       <img src="{{ img.get_image }}" alt="{{ img.alt_text }}">
+                        <img src="{{ img.get_image }}" alt="{{ img.alt_text }}">
                     </a>
+                    {% for tg in img.tags.all %}
+                        {% if tg.slug %}
+                                <span class="tag-link-styles">
+                                    <small><a href="{% url 'tagged-images' tg.slug %}">{{ tg }}</a></small>
+                                </span>
+                        {% endif %}
+                    {% endfor %}
                     {% endfor %}
                 </div>
                 <div class="gallery-column">
@@ -31,6 +38,13 @@
                        data-toggle="modal" data-whatever="{{ img.get_original }}" data-atext="{{ img.alt_text }}" data-tags="{{ img.tags.all|join:', ' }}">
                        <img src="{{ img.get_image }}" alt="{{ img.alt_text }}">
                     </a>
+                    {% for tg in img.tags.all %}
+                        {% if tg.slug %}
+                                <span class="tag-link-styles">
+                                    <small><a href="{% url 'tagged-images' tg.slug %}">{{ tg }}</a></small>
+                                </span>
+                        {% endif %}
+                    {% endfor %}
                     {% endfor %}
                 </div>
                 <div class="gallery-column">
@@ -39,6 +53,13 @@
                        data-toggle="modal" data-whatever="{{ img.get_original }}" data-atext="{{ img.alt_text }}" data-tags="{{ img.tags.all|join:', ' }}">
                        <img src="{{ img.get_image }}" alt="{{ img.alt_text }}">
                     </a>
+                    {% for tg in img.tags.all %}
+                        {% if tg.slug %}
+                                <span class="tag-link-styles">
+                                    <small><a href="{% url 'tagged-images' tg.slug %}">{{ tg }}</a></small>
+                                </span>
+                        {% endif %}
+                    {% endfor %}
                     {% endfor %}
                 </div>
                 <div class="gallery-column">
@@ -47,10 +68,19 @@
                        data-toggle="modal" data-whatever="{{ img.get_original }}" data-atext="{{ img.alt_text }}" data-tags="{{ img.tags.all|join:', ' }}">
                        <img src="{{ img.get_image }}" alt="{{ img.alt_text }}">
                     </a>
+                    {% for tg in img.tags.all %}
+                        {% if tg.slug %}
+                                <span class="tag-link-styles">
+                                    <small><a href="{% url 'tagged-images' tg.slug %}">{{ tg }}</a></small>
+                                </span>
+                        {% endif %}
+                    {% endfor %}
                     {% endfor %}
                 </div>
                 {% else %}
-                <p>{% trans "There are no images in the list." %}</p>
+                   <p class="my-top-margin-100 text-center">
+                       {% trans "There are no images in the list." %}
+                   </p>
                 {% endif %}
             </div>
         </div>

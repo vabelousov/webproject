@@ -13,17 +13,17 @@
                 {% endfor %}
                 <div class="form-group">
                     <p>{{ form.title.errors }}</p>
-                    <label for="{{ form.title.id_for_label }}">{{ form.title.label_tag }}</label>
+                    {{ form.title.label_tag }}
                     {{ form.title }}
                 </div>
                 <div class="form-group">
                     {{ form.summary.errors }}
-                    <label for="{{ form.summary.id_for_label }}">{{ form.summary.label_tag }}</label>
+                    {{ form.summary.label_tag }}
                     {{ form.summary }}
                 </div>
                 <div class="form-group">
                     {{ form.body.errors }}
-                    <label for="{{ form.body.id_for_label }}">{{ form.body.label_tag }}</label>
+                    {{ form.body.label_tag }}
                     <input type="button" class="btn btn-outline-info" value="<img>"
                            onclick="insert_IMG_AtCaret('id_body')">
                     <input type="button" class="btn btn-outline-info" value="<a href>"
@@ -32,19 +32,19 @@
                 </div>
                 <div class="form-group">
                     {{ form.thumbnail_url.errors }}
-                    <label for="{{ form.thumbnail_url.id_for_label }}">{{ form.thumbnail_url.label_tag }}</label>
+                    {{ form.thumbnail_url.label_tag }}
                     {{ form.thumbnail_url }}
                 </div>
                 <div class="form-group">
                     <div class="row">
                         <div class="col">
                             {{ form.type.errors }}
-                            <label for="{{ form.type.id_for_label }}">{{ form.type.label_tag }}</label>
+                            {{ form.type.label_tag }}
                             {{ form.type }}
                         </div>
                         <div class="col">
                             {{ form.status.errors }}
-                            <label for="{{ form.status.id_for_label }}">{{ form.status.label_tag }}</label>
+                            {{ form.status.label_tag }}
                             {{ form.status }}
                         </div>
                     </div>
@@ -53,17 +53,25 @@
                     <div class="row">
                         <div class="col">
                             {{ form.main_category.errors }}
-                            <label for="{{ form.main_category.id_for_label }}">{{ form.main_category.label_tag }}</label>
+                            {{ form.main_category.label_tag }}
                             {{ form.main_category }}
                         </div>
                         <div class="col">
                             {{ form.sub_category.errors }}
-                            <label for="{{ form.sub_category.id_for_label }}">{{ form.sub_category.label_tag }}</label>
+                            {{ form.sub_category.label_tag }}
                             {{ form.sub_category }}
                         </div>
                     </div>
                 </div>
+                <div class="form-group">
+                    <p>{{ form.tags.errors }}</p>
+                    {{ form.tags.label_tag }}
+                    {{ form.tags }}
+                </div>
                 <button type="submit" class="btn btn-outline-primary">{% trans "Save" %}</button>
+                <button type="button" class="btn btn-outline-secondary" onclick="history.back(); return false;">
+                    {% trans 'Back' %}
+                </button>
             </form>
         </div>
     </div>
@@ -78,8 +86,6 @@
                     </a>
                     <div class="caption">
                         <p>
-                            <input type="button" value="t"
-                                   onclick="insert_URL_AtCaret('id_thumbnail_url', '{{ img.image.get_thumbnail }}')">
                             <input type="button" value="m"
                                    onclick="insert_URL_AtCaret('id_body', '{{ img.image.get_image }}')">
                             <input type="button" value="o"

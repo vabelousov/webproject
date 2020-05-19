@@ -18,6 +18,7 @@ from django.utils.translation import gettext as _
 
 from django.core.files.base import ContentFile
 from PIL import Image as Img
+from .ru_taggit import UnicodeTaggedItem
 
 
 def listToString(s):
@@ -183,11 +184,6 @@ class Image(models.Model):
         verbose_name=_('Middle size'),
         editable=False
     )
-    thumbnail = models.ImageField(
-        upload_to=path_file_resize('media/images/thumbnails'),
-        verbose_name=_('Thumbnail'),
-        editable=False
-    )
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -210,6 +206,7 @@ class Image(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
 
     tags = TaggableManager(
+        through=UnicodeTaggedItem,
         blank=True,
         help_text='Tags list.',
         verbose_name=_('Tags')
@@ -224,56 +221,14 @@ class Image(models.Model):
         """
         # if self.pk is None:
         if self.original:
-            if not self.make_thumbnail():
-                raise Exception(
-                    _('Could not create thumbnail - is the file type valid?')
-                )
             if not self.make_middle():
                 raise Exception(
                     _('Could not create middle size\
                     image - is the file type valid?')
                 )
         else:
-            self.thumbnail.delete()
             self.image.delete()
         super(Image, self).save(*args, **kwargs)
-
-    def make_thumbnail(self):
-        basewidth = 200
-
-        img = Img.open(self.original)
-        width_percent = (basewidth / float(img.size[0]))
-        height_size = int((float(img.size[1]) * float(width_percent)))
-        img = img.resize((basewidth, height_size), Img.ANTIALIAS)
-
-        thumb_name, thumb_extension = os.path.splitext(self.original.name)
-        thumb_extension = thumb_extension.lower()
-
-        thumb_filename = thumb_name + '_thumb' + thumb_extension
-
-        if thumb_extension in ['.jpg', '.jpeg']:
-            FTYPE = 'JPEG'
-        elif thumb_extension == '.gif':
-            FTYPE = 'GIF'
-        elif thumb_extension == '.png':
-            FTYPE = 'PNG'
-        else:
-            return False    # Unrecognized file type
-
-        # Save thumbnail to in-memory file as StringIO
-        temp_thumb = BytesIO()
-        img.save(temp_thumb, FTYPE, quantity=100)
-        temp_thumb.seek(0)
-
-        # set save=False, otherwise it will run in an infinite loop
-        self.thumbnail.save(
-            os.path.basename(thumb_filename),
-            ContentFile(temp_thumb.read()),
-            save=False
-        )
-        temp_thumb.close()
-
-        return True
 
     def make_middle(self):
         basewidth = 800
@@ -343,16 +298,9 @@ class Image(models.Model):
             url = '/static/images/no-image.png'
         return url
 
-    def get_thumbnail(self):
-        try:
-            url = self.thumbnail.url
-        except:
-            url = '/static/images/no-image.png'
-        return url
-
     def image_tag(self):
         return mark_safe(
-            '<img src="%s" width="50" height="50" />' % self.get_thumbnail()
+            '<img src="%s" width="50" height="50" />' % self.get_image()
         )
 
     class Meta:
@@ -437,6 +385,12 @@ class Post(models.Model):
     published = PublishedManager()  # Собственный менеджер
     draft = DraftManager()  # Собственный менеджер
     hidden = HiddenManager()  # Собственный менеджер
+    tags = TaggableManager(
+        through=UnicodeTaggedItem,
+        blank=True,
+        help_text='Tags list.',
+        verbose_name=_('Tags')
+    )  # менеджер тэгов
 
     @staticmethod
     def _create_post_records(count=3, tp='stories', mc='alpinism', sc=''):
@@ -451,7 +405,7 @@ class Post(models.Model):
             pst.type = Type.objects.get(code=tp)
             pst.main_category = Category.objects.get(code=mc)
             pst.sub_category = Category.objects.get(code=sc)
-            pst.thumbnail_url = '/media/media/images/thumbnails/file_63e871582a15.jpg'
+            pst.thumbnail_url = 'file_63e871582a15.jpg'
             pst.save()
 
     def __str__(self):
@@ -490,15 +444,15 @@ class Post(models.Model):
         verbose_name_plural = _('Posts')
 
 
-#Post._create_post_records(5, 'stories', 'alpinism')
-#Post._create_post_records(4, 'stories', 'multipitches')
-#Post._create_post_records(7, 'stories', 'climbing')
-#Post._create_post_records(12, 'topos', 'alpinism')
-#Post._create_post_records(3, 'topos', 'multipitches')
-#Post._create_post_records(2, 'topos', 'climbing')
-#Post._create_post_records(3, 'tips', 'alpinism')
-#Post._create_post_records(4, 'tips', 'adaptation')
-#Post._create_post_records(5, 'tips', 'equipment')
+# Post._create_post_records(5, 'stories', 'alpinism')
+# Post._create_post_records(4, 'stories', 'multipitches')
+# Post._create_post_records(7, 'stories', 'climbing')
+# Post._create_post_records(12, 'topos', 'alpinism')
+# Post._create_post_records(3, 'topos', 'multipitches')
+# Post._create_post_records(2, 'topos', 'climbing')
+# Post._create_post_records(3, 'tips', 'alpinism')
+# Post._create_post_records(4, 'tips', 'adaptation')
+# Post._create_post_records(5, 'tips', 'equipment')
 
 
 class ImageBasket(models.Model):
@@ -510,7 +464,7 @@ class ImageBasket(models.Model):
     )
     image = models.ForeignKey(
         Image,
-        on_delete=models.SET_NULL,
+        on_delete=models.CASCADE,
         null=True,
         verbose_name=_('Image')
     )
@@ -537,8 +491,18 @@ class Comment(models.Model):
         on_delete=models.CASCADE,
         related_name='users',
         help_text=_('Comment user'),
+        blank=True,
         null=True,
         verbose_name=_('Commentator')
+    )
+    user_name = models.CharField(
+        max_length=100,
+        verbose_name=_('username'),
+        null=True
+    )
+    user_email = models.EmailField(
+        null=True,
+        verbose_name=_('E-mail')
     )
     comment_text = models.TextField(
         help_text='Comment text',
@@ -684,6 +648,13 @@ class MyMenu(MPTTModel):
         default='000',
         verbose_name=_('Sort order')
     )
+    active = models.BooleanField(verbose_name=_('Active node'), default=True)
+    footer_node = models.BooleanField(
+        verbose_name=_('Footer node'),
+        default=False
+    )
 
     class MPTTMeta:
         order_insertion_by = ['order']
+        verbose_name = _('MyMenu')
+        verbose_name_plural = _('MyMenus')

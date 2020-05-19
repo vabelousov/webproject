@@ -91,6 +91,7 @@ class MyUserAdmin(admin.ModelAdmin):
 class CommentAdmin(admin.ModelAdmin):
     list_display = (
         'comment_user',
+        'user_email',
         'comment_post',
         'date_created',
         'is_active'
@@ -136,6 +137,8 @@ admin.site.register(
         'title',
         'name',
         'order',
+        'active',
+        'footer_node'
     ),
     list_display_links=(
         'indented_title',

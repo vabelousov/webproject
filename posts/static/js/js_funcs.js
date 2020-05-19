@@ -47,13 +47,3 @@ function insert_IMG_AtCaret(areaId) {
     txtarea.focus();
     txtarea.scrollTop = scrollPos;
 }
-
-function getCookie(name) {
-    var value = '; ' + document.cookie,
-        parts = value.split('; ' + name + '=');
-    if (parts.length == 2) return parts.pop().split(';').shift();
-}
-
-function reload_page() {
-    window.location.reload(true);
-}

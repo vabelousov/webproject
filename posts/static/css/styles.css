@@ -2,7 +2,7 @@
    v2.0 | 20110126
    License: none (public domain)
 */
-
+/*
 html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
 a, abbr, acronym, address, big, cite, code,
@@ -23,7 +23,9 @@ time, mark, audio, video {
   font: inherit;
   vertical-align: baseline;
 }
+*/
 /* HTML5 display-role reset for older browsers */
+/*
 article, aside, details, figcaption, figure,
 footer, header, hgroup, menu, nav, section {
   display: block;
@@ -46,6 +48,7 @@ table {
   border-collapse: collapse;
   border-spacing: 0;
 }
+*/
 /*
   ========================================
   Пользовательские стили
@@ -54,48 +57,59 @@ table {
 body {
   background: #fff;
   color: #000;
-  font: 300 16px/22px "Roboto", "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font: 1.3em regular 'Open Sans', serif;
 }
+
 /*
   ========================================
   Типографика
   ========================================
-  Oswald - заголовки
-  Roboto Condensed - текст
   Roboto
 */
-h1, h2, h3, h4 {
-  color: #000;
-}
+
 h1 {
-  font-size: 36px;
-  line-height: 44px;
+   font: 2.5em 'Roboto', sans-serif;
+   font-weight: 900;
+   text-transform: uppercase;
+   letter-spacing: 0.08em;
 }
 h2 {
-  font-size: 24px;
-  line-height: 44px;
+   font: 1.875em 'Roboto', sans-serif;
+   font-weight: 800;
+   text-transform: uppercase;
+   letter-spacing: 0.07em;
 }
 h3 {
-  font-size: 21px;
+   font: 1.5em 'Roboto', sans-serif;
+   font-weight: 700;
+   letter-spacing: 0.07em;
 }
 h4 {
-  font-size: 18px;
+   font: 1.25em 'Roboto', sans-serif;
+   font-weight: 600;
+   letter-spacing: 0.07em;
 }
 h5 {
-  color: #000;
-  font-size: 14px;
-  font-weight: 400;
+   font: 1.1em 'Roboto', sans-serif;
+   font-weight: 500;
+   letter-spacing: 0.07em;
 }
-strong {
-  font-weight: 400;
+h6 {
+   font: 1em 'Roboto', sans-serif;
+   font-weight: 400;
+   letter-spacing: 0.07em;
 }
-cite, em {
-  font-style: italic;
-}
+
 p {
+   font-weight: 300;
+   letter-spacing: 0.05em;
 }
+
 span {
+   font-weight: 100;
+   letter-spacing: 0em;
 }
+
 /*
   ==================================
   отзывчивая типографика
@@ -124,13 +138,15 @@ html {
   Ссылки
   ========================================
 */
+
 a {
-  color: #648880;
   text-decoration: none;
 }
 a:hover {
   color: #a9b2b9;
+  text-decoration: none;
 }
+
 /*
   ========================================
   Основной заголовок
@@ -188,17 +204,20 @@ a:hover {
   padding: 2px;
   border: 1px solid rgba(0,0,0,.15);
 }
+
 .navbar a {
-  color: #648880;
+  color: #323232;
   text-decoration: none;
 }
 .navbar a:hover {
-  color: #a9b2b9;
+  color: #4C4C4C;
   text-decoration: none;
 }
+
 .bg-custom {
-  background-color: #fff; !important;
+  background: #fff;
 }
+
 /*
   =======================================
   содержание страницы
@@ -206,13 +225,17 @@ a:hover {
 */
 .container {
   max-width: 1280px;
-  min-height: 300px;
+  min-height: 430px;
   padding: 0px;
 }
 .my-page-list-border {
   margin: 0px 0px 30px 30px;
   padding: 20px;
   /* border: 1px solid rgba(0,0,0,.15); */
+}
+
+.container h1 {
+  margin-top: 20px;
 }
 /*
   =======================================
@@ -255,14 +278,13 @@ a:hover {
   height: 100px;
   padding-top: 20px;
   background: #fff;
-  /* border: 1px solid rgba(0,0,0,.15); */
   position: relative;
 }
 .primary-footer-margin {
   margin-top: 20px;
 }
 .primary-footer a {
-  color: #648880;
+  color: #9D9D9D;
   text-decoration: none;
 }
 .primary-footer a:hover {
@@ -270,12 +292,14 @@ a:hover {
 }
 /*
   =================================
-  main cat page
+  main page
   =================================
 */
+.my-cat-panel {
+  margin-left: 30px;
+}
 .my-cat-itm {
   margin: 20px;
-  /* border: 1px solid rgba(0,0,0,.15); */
 }
 .my-cat-itm-img {
   padding: 10px;
@@ -284,6 +308,21 @@ a:hover {
   text-align: justify;
   margin: 0px 10px 10px 10px;
 }
+/*
+.my-cat-panel a{
+   background-color:#e9f6fc;
+   text-decoration:none;
+   padding:0px 7px 0px 7px;
+   border:1px solid #CFCECE;
+   border-radius:1px;
+   margin-right:0px;
+   color:#007205;
+   white-space: nowrap;
+}
+.my-cat-panel a:hover{
+   color:#a43900;
+   }
+*/
 /*
   ===============================
   gallery
@@ -325,7 +364,7 @@ a:hover {
   =================================
 */
 	.modal-confirm .modal-content {
-		padding: 20px;
+		padding: 40px;
 		border-radius: 5px;
 		border: none;
         text-align: center;
@@ -550,13 +589,14 @@ article p {
 }
 /*
   =================================
-  обтекаемый блок слева
+  обтекаемый блок слева с тегами
   =================================
 */
 .tags_block {
     float: right; /* Обтекание по правому краю */
     background: #fff; /* Цвет фона */
     padding: 10px; /* Поля вокруг текста */
+    margin-top: 50px;
     margin-left: 20px; /* Отступ справа */
     width: 15%; /* Ширина блока */
 }
@@ -569,22 +609,49 @@ article p {
    line-height:1.8;
    margin-right:3px;
    color:#007205;
+   white-space: nowrap;
 }
 .tag-link-styles a:hover{
    color:#a43900;
    }
 /*
-  =====================================
-  переключатель языка
-  =====================================
+  =============================
+  кнопка наверх
+  =============================
 */
-#language-switcher .bootstrap-select {
-    width: 120px;
-    margin-top: 10px;
-    margin-left: 8px;
+#back-top {
+    position:fixed;
+    top: 60px;
+    left: 20px;
+}
+#back-top a {
+    display:block;
+    text-align:center;
+    font: 12px Arial, Verdana, Tahoma, sans-serif;
+    text-transform:uppercase;
+    text-decoration:none;
+    color: #333;
+}
+#back-top a:hover {
+    color:#000;
+}
+#back-top span {
+    display: none;
+    width:47px;
+    height:47px;
+    display:block;
+    margin-bottom:7px;
+    background:url(back-top-button.png) no-repeat center center;
 }
 
-#language-switcher .bootstrap-select button {
-    padding-top: 3px;
-    padding-bottom: 3px;
+/*
+  =============================
+  кнопка назад
+  =============================
+*/
+#bck-lnk {
+    position: fixed;
+    top: 130px;
+    left: 20px;
+    z-index: 9999;
 }

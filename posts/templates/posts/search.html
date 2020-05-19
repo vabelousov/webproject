@@ -9,7 +9,7 @@
                 <form class="form-inline" action="." method="get">
                     <div class="form-group">
                         {{ form.query.errors }}
-                        <label for="{{ form.query.id_for_label }}">{{ form.query.label_tag }}</label>
+                        {{ form.query.label_tag }}
                         {{ form.query }}
                     </div>
                     <div class="form-group">
@@ -20,7 +20,7 @@
             {% if query %}
             <h6>{% trans "Posts containing" %} "{{ query }}"</h6>
             <h6>{% with results.count as total_results %}
-                  {% blocktrans count results=total_results %}Found {{ results }} result.{% plural %}Found {{ results }} results.{% endblocktrans %}
+{% blocktrans count x_results=total_results %}Found {{ x_results }} result.{% plural %}Found {{ x_results }} results.{% endblocktrans %}
                 {% endwith %}
             </h6>
             <div class="row my-search-box">
@@ -31,7 +31,7 @@
                             <a href="{{ post.get_absolute_url }}"><img src="{{ post.get_thumbnail}}" width="100%"></a>
                         </div>
                         <div class="my-search-box-text-padding"><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></div>
-                        <div class="my-search-box-text-padding"><a href="{{ post.get_absolute_url }}">{{ post.summary|truncatewords:5 }}</a></div>
+                        <div class="my-search-box-text-padding">{{ post.summary|truncatewords:5 }}</div>
                     </div>
                 </div>
                 {% empty %}

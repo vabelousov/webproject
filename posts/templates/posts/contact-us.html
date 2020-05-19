@@ -1,0 +1,29 @@
+{% extends "base_generic.html" %}
+{% load i18n %}
+{% block content %}
+   <div class="container">
+        <div class="row justify-content-center my-login-margin">
+            <div class="col-md-6">
+                <div class="card">
+                    <header class="card-header">
+                       <h2>{% trans 'Contact Us' %}</h2>
+                    </header>
+                    <div class="card-body">
+                       <form method="post">
+                           {% csrf_token %}
+                           {{ form.as_p }}
+                           <input type="submit" class="btn btn-sm btn-outline-primary" value="{% trans 'Send' %}" />
+                       </form>
+                    </div>
+                    <div class="border-top card-body text-center">
+                        {% if messages %}
+                        {% for message in messages %}
+                        <p>{{ message }}</p>
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

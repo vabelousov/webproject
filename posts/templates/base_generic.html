@@ -6,12 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" >
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Open+Sans">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.2/animate.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>
 
     <!-- Добавление дополнительного статического CSS файла -->
     {% load static %}
-
+    <script src="{% static 'dropdown-menu/js/bootnavbar.js' %}"></script>
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
     <link rel="stylesheet" href="{% static 'dropdown-menu/css/bootnavbar.css' %}"/>
 
@@ -21,34 +25,17 @@
 
 </head>
 <body>
-
+{% comment %}
 <div class="container-fluid top-bg">
     <p>
        <h1 class="logo-first-line">Above the clouds</h1>
        <br>
        <h6 class="logo-second-line">Exploring the world together</h6>
     </p>
-    <div class="float-right">
-        <form action="{% url 'set_language' %}" method="post">
-            {% csrf_token %}
-            <input name="next" type="hidden" value="{{ redirect_to }}" />
-            <select class="bootstrap-select" name="{% trans 'language' %}" style="width: auto;" onchange="this.form.submit()">
-              {% get_current_language as LANGUAGE_CODE %}
-              {% get_available_languages as LANGUAGES %}
-              {% get_language_info_list for LANGUAGES as languages %}
-              {% for language in languages %}
-                  <option
-                    value="{{ language.code }}"
-                    {% if language.code == LANGUAGE_CODE %} selected="selected"{% endif %}>
-                    {{ language.code }}
-                  </option>
-              {% endfor %}
-            </select>
-        </form>
-        </div>
 </div>
+{% endcomment %}
 
-<header class="sticky-top">
+<header >
     <nav class="navbar navbar-expand-lg navbar-light bg-custom" id="bootnavbar">
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
                 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -66,14 +53,30 @@
             </div>
             <div class="order-3 offset-right">
                 <ul class="navbar-nav ml-auto">
+                    {% get_current_language as LANGUAGE_CODE %}
+                    {% get_available_languages as LANGUAGES %}
+                    {% get_language_info_list for LANGUAGES as languages %}
+                    <li class="nav-item dropdown">
+                        <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown"><img
+                                src="/static/images/{{LANGUAGE_CODE}}.png">&nbsp;<span class="caret"></span></a>
+                        <ul class="dropdown-menu" role="menu" id="language-list">
+                            {% for language in languages %}
+                            <li>
+                                <a class="dropdown-item change_language" href="#" lang-code="{{ language.code }}">
+                                    {% if language.code == LANGUAGE_CODE %}&#10003;{% else %}&nbsp;&nbsp;{% endif %}
+                                    <img src="/static/images/{{ language.code }}.png">
+                                    {{ language.name_local }}
+                                </a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </li>
                     {% if user.is_authenticated %}
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown"
                            aria-haspopup="true" aria-expanded="false">
-                            <span>
                                 {% if user.first_name %} {{ user.first_name }} {% else %} no-first-name {% endif %}
                                 {% if user.last_name %} {{ user.last_name }} {% else %} no-sur-name {% endif %}
-                            </span>
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                             <li class="dropdown-item">
@@ -83,7 +86,6 @@
                             </li>
                             {% if user.is_superuser %}
                             <li class="dropdown-item"><a href="/admin/">{% trans "Administration panel" %}</a></li>
-                            <li class="dropdown-item"><a href="{% url 'typo-graphica' %}">{% trans "Typographica" %}</a></li>
                             <li class="dropdown-item"><a href="{% url 'site-statistics' %}">{% trans "Statistics" %}</a></li>
                             <li class="dropdown-item"><a href="{% url 'under-construction' %}">{% trans "Under Construction" %}</a></li>
                             {% endif %}
@@ -98,6 +100,7 @@
                                     {% if perms.posts.change_image %}
                                     <li class="dropdown-item"><a href="{% url 'my-images' %}">{% trans "My images" %}</a></li>
                                     {% endif %}
+                                    <li class="dropdown-item"><a href="{% url 'typo-graphica' %}">{% trans "Typographica" %}</a></li>
                                 </ul>
                             </li>
                             {% endif %}
@@ -109,71 +112,28 @@
                     <li class="nav-item"><a class="nav-link" href="{% url 'login' %}?next={{ request.path }}">{% trans "Login" %}</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'signup' %}">{% trans "Sign Up" %}</a></li>
                     {% endif %}
-
-                    {% get_current_language as LANGUAGE_CODE %}
-                    {% get_available_languages as LANGUAGES %}
-                    {% get_language_info_list for LANGUAGES as languages %}
-                    <li class="nav-item dropdown">
-                        <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown"><img
-                                src="/static/images/{{LANGUAGE_CODE}}.png">&nbsp;<span class="caret"></span></a>
-                        <ul class="dropdown-menu" role="menu" id="language-list">
-                            {% for language in languages %}
-                            <li>
-                                <a class="dropdown-item" href="{% url 'set_language' %}"
-                                   data-language-code="{{ language.code }}">
-                                    {% if language.code == LANGUAGE_CODE %}&#10003;{% else %}&nbsp;&nbsp;{% endif %}
-                                    <img src="/static/images/{{ language.code }}.png">
-                                    {{ language.name_local }}
-                                </a>
-                            </li>
-                            {% endfor %}
-                        </ul>
-                    </li>
-
                 </ul>
             </div>
         </div>
     </nav>
-
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-
-    <script src="{% static 'dropdown-menu/js/bootnavbar.js' %}"></script>
-
-    <script type="text/javascript">
-        $(function () {
-            $('#bootnavbar').bootnavbar({
-              //options
-              //animation: false
-            });
-        })
-
-$('#language-list a').on('click', function(event) {
-    event.preventDefault();
-    var target = $(event.target);
-    var url = target.attr('href');
-    var language_code = target.data('language-code');
-    $.ajax({
-        type: 'POST',
-        url: url,
-        data: {language: language_code},
-        headers: {"X-CSRFToken": getCookie('csrftoken')}
-    }).done(function(data, textStatus, jqXHR) {
-        reload_page();
-    });
-});
-    </script>
+    <form action="{% url 'set_language' %}" method="post" style="display: none" id="change_language_form">
+       {% comment %}!!!Скрытая форма смены языка!!!{% endcomment %}
+       {% csrf_token %}
+       <select type="hidden">
+           <option type="hidden" id="language-option" value=""></option>
+       </select>
+       <input name="next" type="hidden" value="{{ request.path }}"/>
+       <input type="hidden" value="" name="language" id="language" />
+    </form>
 </header>
 
 <section>
     {% block content %} {% endblock %}
     {% block pagination %}
 {% if is_paginated %}
-  <ul class="pagination  justify-content-center my-pagination-padding">
+  <ul class="pagination justify-content-center my-pagination-padding">
     {% if page_obj.has_previous %}
-      <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">&#9668;</a></li>
+      <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.query %}&query={{request.GET.query }}{% endif %}">&#9668;</a></li>
     {% else %}
       <li class="page-item disabled"><span class="page-link">&#9668;</span></li>
     {% endif %}
@@ -181,11 +141,11 @@ $('#language-list a').on('click', function(event) {
       {% if page_obj.number == i %}
         <li class="page-item active"><span class="page-link">{{ i }} <span class="sr-only">(current)</span></span></li>
       {% else %}
-        <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+        <li class="page-item"><a class="page-link" href="?page={{ i }}{% if request.GET.query %}&query={{request.GET.query }}{% endif %}">{{ i }}</a></li>
       {% endif %}
     {% endfor %}
     {% if page_obj.has_next %}
-      <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">&#9658;</a></li>
+      <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.query %}&query={{request.GET.query }}{% endif %}">&#9658;</a></li>
     {% else %}
       <li class="page-item disabled"><span class="page-link">&#9658;</span></li>
     {% endif %}
@@ -205,7 +165,45 @@ $('#language-list a').on('click', function(event) {
     </div>
 </footer>
 
-<script src="{% static 'js/js_funcs.js' %}"></script>
+<section id="back-top">
+    <a href="#top"><span></span></a>
+</section>
 
+<script src="{% static 'js/js_funcs.js' %}"></script>
+    <script type="text/javascript">
+        $(function () {
+            $('#bootnavbar').bootnavbar({
+              //options
+              //animation: false
+            });
+        })
+        $('.change_language').click(function(e){
+            e.preventDefault();
+            $('#language').val($(this).attr('lang-code'));
+            $('#language-option').val($(this).attr('lang-code'));
+            $('#change_language_form').submit();
+        });
+        $(document).ready(function(){
+           // hide #back-top first
+           $("#back-top").hide();
+           $(function () {
+               $(window).scroll(function () {
+                     if ($(this).scrollTop() > 200) {
+                             $('#back-top').fadeIn();
+                     } else {
+                             $('#back-top').fadeOut();
+                     }
+               });
+
+               $('#back-top a').click(function () {
+                     $('body,html').animate({
+                             scrollTop: 0
+                     }, 600);
+                     return false;
+               });
+           });
+        });
+
+    </script>
 </body>
 </html>

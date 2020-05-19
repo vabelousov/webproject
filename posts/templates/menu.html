@@ -1,6 +1,9 @@
 {% load mptt_tags %}
 <ul class="navbar-nav">
  {% recursetree menu %}
+
+   {% if node.active and not node.footer_node %}
+  
    {% if not node.is_leaf_node %}
      <li class="nav-item dropdown">
        {% if node.is_root_node %}
@@ -40,5 +43,8 @@
      </ul>
    {% endif %}
  </li>
+
+   {% endif %}
+
 {% endrecursetree %}
 </ul>

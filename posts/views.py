@@ -27,8 +27,10 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from .models import Post, Image, Comment, Profile, Carousel,\
     ImageBasket, Category, MyMenu, Type
 from .forms import CommentForm, SignUpForm, EditProfileForm,\
-    ProfileForm, PostForm, ImagesForm, SearchForm, UserImagesForm
+    ProfileForm, PostForm, ImagesForm, SearchForm, UserImagesForm,\
+    Comment2Form, ContactForm
 from .tokens import account_activation_token
+from django.core.mail import send_mail
 
 
 def index(request):
@@ -97,6 +99,41 @@ class PostListView(generic.ListView):
                 qs = Post.published.all()
         return qs
 
+    def get_context_data(self, **kwargs):
+        context = super(PostListView, self).get_context_data(**kwargs)
+        context['tags'] = Post.tags.all()
+        return context
+
+
+class PostTagListView(generic.ListView):
+    paginate_by = 9
+    model = Post
+    context_object_name = 'post_list'
+    template_name = 'posts/post_list.html'
+
+    def get_queryset(self):
+        try:
+            qs = Post.published.filter(
+                type__code__exact=self.kwargs['type']
+            ).filter(
+                main_category__code__exact=self.kwargs['category']
+            ).filter(tags__slug=self.kwargs.get("slug")).all()
+        except:
+            try:
+                qs = Post.published.filter(
+                    type__code__exact=self.kwargs['type']
+                ).filter(tags__slug=self.kwargs.get("slug")).all()
+            except:
+                qs = Post.published.filter(
+                    tags__slug=self.kwargs.get("slug")
+                ).all()
+        return qs
+
+    def get_context_data(self, **kwargs):
+        context = super(PostTagListView, self).get_context_data(**kwargs)
+        context["tag"] = Post.tags.get(slug=self.kwargs.get("slug")).name
+        return context
+
 
 class PostDetailView(FormMixin, generic.DetailView):
     model = Post
@@ -111,18 +148,28 @@ class PostDetailView(FormMixin, generic.DetailView):
         context['comments'] = Comment.objects.filter(
             comment_post__exact=context['post'].id
         ).filter(is_active=True).order_by('-date_created')
-        comment_form = CommentForm(
-            initial={
-                'comment_user': self.request.user,
-                'comment_post': context['post'].id
-            }
-        )
+        if self.request.user.is_authenticated:
+            comment_form = CommentForm(
+                initial={
+                    'comment_user': self.request.user,
+                    'comment_post': context['post'].id
+                }
+            )
+        else:
+            comment_form = Comment2Form(
+                initial={
+                    'comment_post': context['post'].id
+                }
+            )
         context['comment_form'] = comment_form
         return context
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
-        form = self.get_form()
+        if self.request.user.is_authenticated:
+            form = self.get_form(form_class=CommentForm)
+        else:
+            form = self.get_form(form_class=Comment2Form)
 
         if form.is_valid():
             return self.form_valid(form)
@@ -224,7 +271,7 @@ class ImageTagListView(generic.ListView):
         context['common_images_4'] = img4
         context['img_count'] = cnt
 
-        context["tag"] = self.kwargs.get("slug")
+        context["tag"] = Image.tags.get(slug=self.kwargs.get("slug")).name
         return context
 
 
@@ -255,10 +302,13 @@ class ImagesByUserListView(PermissionRequiredMixin, generic.ListView):
                 if 'clear-from-basket' in request.POST['img-action']:
                     if form.cleaned_data['image_object']:
                         for item in form.cleaned_data['image_object']:
-                            bsk = ImageBasket.objects.filter(
-                                user__exact=self.request.user
-                            ).filter(image__id__exact=item.id).first()
-                            bsk.delete()
+                            try:
+                                bsk = ImageBasket.objects.filter(
+                                    user__exact=self.request.user
+                                ).filter(image__id__exact=item.id).first()
+                                bsk.delete()
+                            except:
+                                pass
                 if 'add-to-basket' in request.POST['img-action']:
                     if form.cleaned_data['image_object']:
                         for item in form.cleaned_data['image_object']:
@@ -414,7 +464,7 @@ def post_search(request):
                 search=SearchVector('title', 'summary', 'body'),
             ).filter(search=query)
 
-    paginator = Paginator(results, 2)
+    paginator = Paginator(results, 5)
     page_number = request.GET.get('page')
 
     try:
@@ -432,6 +482,7 @@ def post_search(request):
     args['form'] = form
     args['results'] = results
     args['page_obj'] = page_obj
+    args['paginator'] = paginator
     args['query'] = query
     if page_obj:
         args['is_paginated'] = True
@@ -528,3 +579,32 @@ class ImageDelete(PermissionRequiredMixin, DeleteView):
         obj = get_object_or_404(Image, id=self.kwargs.get('pk'))
         obj.delete()
         return redirect('my-images')
+
+
+def contact_us(request):
+    if request.method == 'POST':
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            sender_name = form.cleaned_data['name']
+            sender_email = form.cleaned_data['email']
+
+            message = _('{0} has sent you a new message: \n\n{1}').\
+                format(sender_name, form.cleaned_data['message'])
+            send_mail(
+                _('New Enquiry'),
+                message,
+                sender_email,
+                ['enquiry@exampleco.com']
+            )
+            messages.add_message(
+                request,
+                messages.SUCCESS,
+                _('Your message has been sent!')
+            )
+            return HttpResponseRedirect(
+                ''
+            )
+    else:
+        form = ContactForm()
+
+    return render(request, 'posts/contact-us.html', {'form': form})

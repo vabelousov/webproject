@@ -35,13 +35,12 @@ sitemaps = {
 # Добавьте URL соотношения, чтобы перенаправить запросы
 # с корневового URL, на URL приложения
 urlpatterns = [
-
-    path('i18n/', include('django.conf.urls.i18n')),
     path('admin/', admin.site.urls),
 ]
 
 urlpatterns += i18n_patterns(
-     path('home/', include('posts.urls')),
+    path('i18n/', include('django.conf.urls.i18n')),
+    path('home/', include('posts.urls')),
     prefix_default_language=False,
 )
 

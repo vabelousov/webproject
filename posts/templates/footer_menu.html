@@ -1,6 +1,6 @@
 {% load mptt_tags %}
 {% for node in menu %}
-     {% if node.is_root_node %}
+     {% if node.is_root_node and node.active %}
        <div class="col text-center">
        {% if node.reverse_url %}
          {% if node.url_attr %}

@@ -1,12 +1,11 @@
 # -*- coding:utf-8 -*-
 
-from django.conf.urls import url, include
+from django.conf.urls import url
 
 from . import views
 
 urlpatterns = [
     url(r'^$', views.index, name='index'),
-    url(r'^i18n/', include('django.conf.urls.i18n')),
     url(
         r'^pages/(?P<type>\D+)/(?P<category>\D+)/$',
         views.PostListView.as_view(),
@@ -24,7 +23,12 @@ urlpatterns = [
         name='post-detail'
     ),
     url(
-        r'^common-images/$',
+        r'^tagged-posts/(?P<slug>[-\w]+)/$',
+        views.PostTagListView.as_view(),
+        name="tagged-posts"
+    ),
+    url(
+        r'^gallery/$',
         views.CommonImageListView.as_view(),
         name='common-images'
     ),
@@ -73,4 +77,5 @@ urlpatterns = [
         views.ImageDelete.as_view(),
         name='image_delete'
     ),
+    url(r'^contact-us/$', views.contact_us, name='contact-us'),
 ]
