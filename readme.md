@@ -36,3 +36,9 @@
       появилась новая модель для перевода на уже работающей базе - но нужно выполнить команду
       ниже, которая добавит поля в таблицы переводов модели.
       python manage.py update_translation_fields
+
+### экспорт импорт дампа ###
+      python manage.py dumpdata --exclude auth.permission --exclude contenttypes > db.json
+      scp db.json юзер@хост:~/путь/
+      python manage.py loaddata db.json
+      

@@ -1,0 +1,758 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-05-15 14:55+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
+"%100>=11 && n%100<=14)? 2 : 3);\n"
+
+#: posts/forms.py:83 posts/models.py:575
+msgid "E-mail"
+msgstr "электронный адрес"
+
+#: posts/forms.py:107
+msgid "Query"
+msgstr "Запрос"
+
+#: posts/models.py:78 posts/models.py:98
+msgid "Code"
+msgstr "Код"
+
+#: posts/models.py:83 posts/models.py:103
+msgid "Description"
+msgstr "Описание"
+
+#: posts/models.py:92 posts/templates/posts/user_posts.html:18
+#: templates/site-statistics.html:11
+msgid "Type"
+msgstr "Тип"
+
+#: posts/models.py:93
+#, fuzzy
+#| msgid "Type"
+msgid "Types"
+msgstr "Тип"
+
+#: posts/models.py:112 posts/models.py:415 templates/site-statistics.html:10
+msgid "Category"
+msgstr "Категория"
+
+#: posts/models.py:113
+msgid "Categories"
+msgstr "Категории"
+
+#: posts/models.py:118 posts/models.py:360 posts/models.py:515
+msgid "Image"
+msgstr "Изображение"
+
+#: posts/models.py:123
+msgid "Alt"
+msgstr ""
+
+#: posts/models.py:128 posts/models.py:657
+msgid "Title"
+msgstr "Заголовок"
+
+#: posts/models.py:133
+msgid "reverse URL"
+msgstr "Путь реверса"
+
+#: posts/models.py:139 posts/models.py:672
+msgid "URL attr"
+msgstr ""
+
+#: posts/models.py:143
+msgid "Active"
+msgstr "Активные"
+
+#: posts/models.py:145
+msgid "Text"
+msgstr "Текст"
+
+#: posts/models.py:151
+msgid "Order"
+msgstr "Порядок сортировки"
+
+#: posts/models.py:168 posts/models.py:171 templates/site-statistics.html:9
+msgid "Carousel"
+msgstr "Карусель"
+
+#: posts/models.py:172
+msgid "Carousels"
+msgstr "Карусели"
+
+#: posts/models.py:178
+msgid "Original"
+msgstr "Оригинал"
+
+#: posts/models.py:183
+msgid "Middle size"
+msgstr "Средний размер"
+
+#: posts/models.py:188
+msgid "Thumbnail"
+msgstr "Иконка"
+
+#: posts/models.py:194
+msgid "Uploader"
+msgstr "Загрузил"
+
+#: posts/models.py:196 posts/models.py:509 posts/models.py:571
+msgid "User"
+msgstr "Пользователь"
+
+#: posts/models.py:202 posts/models.py:203
+#: posts/templates/posts/user_images.html:16
+msgid "Alt text"
+msgstr "Текст изображения"
+
+#: posts/models.py:206
+msgid "Common image"
+msgstr "Доступное изображение"
+
+#: posts/models.py:208 posts/templates/posts/user_images.html:17
+msgid "Common"
+msgstr "Общее"
+
+#: posts/models.py:215 posts/templates/posts/image_list.html:9
+#: posts/templates/posts/user_images.html:15
+msgid "Tags"
+msgstr "Метки"
+
+#: posts/models.py:229
+msgid "Could not create thumbnail - is the file type valid?"
+msgstr "Не удается создать иконку - тип файла верный?"
+
+#: posts/models.py:233
+msgid ""
+"Could not create middle size                    image - is the file type "
+"valid?"
+msgstr "Не удается создать среднее изображение - тип файла верный?"
+
+#: posts/models.py:361 posts/templates/posts/image_list.html:6
+#: templates/site-statistics.html:8
+msgid "Images"
+msgstr "Изображения"
+
+#: posts/models.py:366
+msgid "Draft"
+msgstr "Черновик"
+
+#: posts/models.py:367 posts/templates/posts/user_posts.html:19
+msgid "Published"
+msgstr "Опубликован"
+
+#: posts/models.py:368
+msgid "Hidden"
+msgstr "Скрытый"
+
+#: posts/models.py:373
+msgid "Post author"
+msgstr "Автор публикации"
+
+#: posts/models.py:375 posts/models.py:480
+msgid "Author"
+msgstr "Автор"
+
+#: posts/models.py:379 posts/models.py:380
+msgid "Post title"
+msgstr "Заголовок публикации"
+
+#: posts/models.py:384 posts/models.py:387
+msgid "Post summary"
+msgstr "Краткое содержание"
+
+#: posts/models.py:390
+msgid "Post text (html tags allowed)"
+msgstr "Текст публикации (теги html разрешены)"
+
+#: posts/models.py:393
+msgid "Post text"
+msgstr "Текст публикации"
+
+#: posts/models.py:397
+msgid "Thumbnail url"
+msgstr "URL иконки"
+
+#: posts/models.py:399
+msgid "Thumbnail URL"
+msgstr "URL иконки"
+
+#: posts/models.py:404 posts/models.py:407
+msgid "Post type"
+msgstr "Тип публикации"
+
+#: posts/models.py:412
+msgid "Main category"
+msgstr "Категория"
+
+#: posts/models.py:420
+msgid "Sub category"
+msgstr "Под категория"
+
+#: posts/models.py:423 posts/templates/posts/user_posts.html:21
+msgid "Sub Category"
+msgstr "Под категория"
+
+#: posts/models.py:429 posts/models.py:430
+msgid "Post status"
+msgstr "Статус публикации"
+
+#: posts/models.py:489 posts/models.py:533
+#: posts/templates/posts/post_detail.html:41
+#: posts/templates/posts/user_posts.html:15
+msgid "Post"
+msgstr "Публикация"
+
+#: posts/models.py:490 templates/site-statistics.html:6
+msgid "Posts"
+msgstr "Публикации"
+
+#: posts/models.py:522
+msgid "Basket"
+msgstr "Корзина"
+
+#: posts/models.py:523
+msgid "Baskets"
+msgstr "Корзины"
+
+#: posts/models.py:531 posts/models.py:564
+#: posts/templates/posts/post_detail.html:51 templates/site-statistics.html:7
+msgid "Comments"
+msgstr "Комментарии"
+
+#: posts/models.py:539
+msgid "Comment user"
+msgstr "Автор комментария"
+
+#: posts/models.py:541
+msgid "Commentator"
+msgstr "Комментатор"
+
+#: posts/models.py:545 posts/models.py:563
+msgid "Comment"
+msgstr "Комментарий"
+
+#: posts/models.py:551
+msgid "Active comment"
+msgstr "Активный комментарий"
+
+#: posts/models.py:552
+msgid "Is active"
+msgstr "Активный?"
+
+#: posts/models.py:580
+msgid "Few words about you"
+msgstr "Несколько слов о себе"
+
+#: posts/models.py:581
+msgid "BIO"
+msgstr "БИО"
+
+#: posts/models.py:586
+msgid "Add your location e.g. Moscow"
+msgstr "Ваше местоположение н.п. Гандурас"
+
+#: posts/models.py:587
+msgid "Location"
+msgstr "Местоположение"
+
+#: posts/models.py:592
+msgid "Add your birthday here"
+msgstr "Дата вашего рождения"
+
+#: posts/models.py:593
+msgid "Birth date"
+msgstr "Дата рождения"
+
+#: posts/models.py:597
+msgid "Avatar image"
+msgstr "Изображение аватарки"
+
+#: posts/models.py:613
+msgid "Could not create avatar - is the file type valid?"
+msgstr "Не удается создать аватар - тип файла верен?"
+
+#: posts/models.py:642 posts/templates/base_generic.html:104
+msgid "Profile"
+msgstr "Профиль"
+
+#: posts/models.py:643
+msgid "Profiles"
+msgstr "Профили"
+
+#: posts/models.py:661 templates/account/settings.html:23
+msgid "Name"
+msgstr "Имя"
+
+#: posts/models.py:667
+msgid "Reverse url"
+msgstr "Реверс-ссылка"
+
+#: posts/models.py:680
+msgid "Parent node"
+msgstr "Родитель"
+
+#: posts/models.py:685
+#, fuzzy
+#| msgid "Sort orfer"
+msgid "Sort order"
+msgstr "Порядок сортировки"
+
+#: posts/templates/base_generic.html:35
+msgid "language"
+msgstr "язык"
+
+#: posts/templates/base_generic.html:64 posts/templates/posts/search.html:16
+msgid "Search"
+msgstr "Поиск"
+
+#: posts/templates/base_generic.html:85
+msgid "Administration panel"
+msgstr "Админка"
+
+#: posts/templates/base_generic.html:86
+msgid "Typographica"
+msgstr "Типографика"
+
+#: posts/templates/base_generic.html:87 templates/site-statistics.html:4
+msgid "Statistics"
+msgstr "Статистика"
+
+#: posts/templates/base_generic.html:88
+msgid "Under Construction"
+msgstr "В процессе разработки"
+
+#: posts/templates/base_generic.html:93
+msgid "My workspace"
+msgstr "Рабочее место"
+
+#: posts/templates/base_generic.html:96
+msgid "My posts"
+msgstr "Мои публикации"
+
+#: posts/templates/base_generic.html:99
+msgid "My images"
+msgstr "Мои изображения"
+
+#: posts/templates/base_generic.html:105
+msgid "Logout"
+msgstr "Выход"
+
+#: posts/templates/base_generic.html:109
+#: posts/templates/posts/post_detail.html:45 templates/account/signup.html:9
+#: templates/registration/login.html:36
+msgid "Login"
+msgstr "Вход"
+
+#: posts/templates/base_generic.html:110 templates/account/signup.html:10
+msgid "Sign Up"
+msgstr "Регистрация"
+
+#: posts/templates/base_generic.html:203
+msgid "Vladimir Belousov"
+msgstr "Владимир Белоусов"
+
+#: posts/templates/index.html:33
+msgid "Default"
+msgstr "По умолчанию"
+
+#: posts/templates/index.html:42
+msgid "Previous"
+msgstr "Пред."
+
+#: posts/templates/index.html:46
+msgid "Next"
+msgstr "След."
+
+#: posts/templates/posts/image_form.html:7
+msgid "Edit image"
+msgstr "Изменить избражение"
+
+#: posts/templates/posts/image_form.html:45
+#: posts/templates/posts/post_form.html:66
+#: templates/account/edit_profile.html:83
+msgid "Save"
+msgstr "Сохранить"
+
+#: posts/templates/posts/image_list.html:6
+msgid "tagged as"
+msgstr "помечен как"
+
+#: posts/templates/posts/image_list.html:53
+msgid "There are no images in the list."
+msgstr "Нет изображений..."
+
+#: posts/templates/posts/modals.html:7
+msgid "Confirm deletion"
+msgstr "Подверждение удаления"
+
+#: posts/templates/posts/modals.html:9
+msgid "Are your sure you want to delete?"
+msgstr "Вы уверены что хотите удалить?"
+
+#: posts/templates/posts/modals.html:11
+#: posts/templates/posts/user_images.html:71
+#: posts/templates/posts/user_posts.html:44
+msgid "Delete"
+msgstr "Удалить"
+
+#: posts/templates/posts/modals.html:12
+msgid "Cancel"
+msgstr "Отмена"
+
+#: posts/templates/posts/modals.html:27
+msgid "Close"
+msgstr "Закрыть"
+
+#: posts/templates/posts/post_detail.html:12
+#: posts/templates/posts/post_list.html:27
+msgid "by"
+msgstr "автор"
+
+#: posts/templates/posts/post_detail.html:16
+#: posts/templates/posts/post_form.html:7
+msgid "Edit post"
+msgstr "Редактирование публикации"
+
+#: posts/templates/posts/post_detail.html:44
+msgid "To comment you need to"
+msgstr "Для того чтобы оставить комментарий вам нужно"
+
+#: posts/templates/posts/post_detail.html:46
+msgid "with Facebook"
+msgstr "через Facebook"
+
+#: posts/templates/posts/post_detail.html:46
+msgid "or"
+msgstr "или"
+
+#: posts/templates/posts/post_detail.html:47
+msgid "Sign UP"
+msgstr "Зарегистрироваться"
+
+#: posts/templates/posts/post_detail.html:74
+msgid "No comments here yet"
+msgstr "Здесь пока никто ничего не писал"
+
+#: posts/templates/posts/post_form.html:71
+msgid "Photo-basket"
+msgstr "Корзина изображений"
+
+#: posts/templates/posts/post_form.html:92
+msgid "No images in basket"
+msgstr "Нет изображений в корзине"
+
+#: posts/templates/posts/post_list.html:35
+#: posts/templates/posts/post_list.html:40
+#: posts/templates/posts/post_list.html:43
+msgid "No post in this category"
+msgstr "Нет публикаций в категории"
+
+#: posts/templates/posts/search.html:6
+msgid "Search results"
+msgstr "Результаты поиска"
+
+#: posts/templates/posts/search.html:21
+msgid "Posts containing"
+msgstr "Публикации содержащие"
+
+#: posts/templates/posts/search.html:23
+#, python-format
+msgid "Found %(x_results)s result."
+msgid_plural "Found %(x_results)s results."
+msgstr[0] "Найден %(x_results)s результат."
+msgstr[1] "Найдено %(x_results)s результата."
+msgstr[2] "Найдено %(x_results)s результатов."
+msgstr[3] "Найден %(x_results)s результат."
+
+#: posts/templates/posts/search.html:38
+msgid "There are no results for your query."
+msgstr "Ничего не нашли по вашему запросу"
+
+#: posts/templates/posts/user_images.html:12
+msgid "New Image"
+msgstr "Создать"
+
+#: posts/templates/posts/user_images.html:18
+msgid "In<br>Basket"
+msgstr "В<br>корзине"
+
+#: posts/templates/posts/user_images.html:24
+msgid "Delete selected"
+msgstr "Удалить помеченные"
+
+#: posts/templates/posts/user_images.html:25
+msgid "Add to basket"
+msgstr "Добавить в корзину"
+
+#: posts/templates/posts/user_images.html:26
+msgid "Delete in Basket"
+msgstr "Убрать из корзины"
+
+#: posts/templates/posts/user_images.html:28
+msgid "Go"
+msgstr "Да"
+
+#: posts/templates/posts/user_images.html:64
+#: posts/templates/posts/user_posts.html:37
+msgid "Edit"
+msgstr "Изменить"
+
+#: posts/templates/posts/user_images.html:76
+msgid "You didn't create anything yet."
+msgstr "Вы пока что ничего не создали..."
+
+#: posts/templates/posts/user_posts.html:12
+msgid "New post"
+msgstr "Создать"
+
+#: posts/templates/posts/user_posts.html:20
+msgid "Main Category"
+msgstr "Категория"
+
+#: posts/templates/posts/user_posts.html:22
+msgid "Status"
+msgstr "Статус"
+
+#: posts/templates/posts/user_posts.html:49
+msgid "You didn't post anything yet."
+msgstr "Вы ничего не опубликовали пока что..."
+
+#: posts/views.py:360
+msgid "Your password was successfully updated!"
+msgstr "Ваш пароль был успешно изменен!"
+
+#: posts/views.py:364
+msgid "Please correct the error below."
+msgstr "Исправте ошибки ниже."
+
+#: templates/account/account_activation_invalid.html:8
+msgid ""
+"The confirmation link was invalid, possibly because it has already been used."
+msgstr ""
+"Ссылка на подтверждение недействительная, возможно ей уже воспользовались."
+
+#: templates/account/settings.html:9 templates/account/view_profile.html:16
+msgid "Social accounts"
+msgstr "Аккаунты соц-сетей"
+
+#: templates/account/settings.html:22
+msgid "Signed in via"
+msgstr "Вошел с"
+
+#: templates/account/settings.html:24
+msgid "Provider url"
+msgstr "URL-Провайдер"
+
+#: templates/account/settings.html:24
+msgid "link"
+msgstr "ссылка"
+
+#: templates/account/settings.html:29
+msgid "Connected as"
+msgstr "Вошел как"
+
+#: templates/account/settings.html:33
+msgid "Disconnect from Facebook"
+msgstr "Отвязать Facebook"
+
+#: templates/account/settings.html:37
+msgid "You must"
+msgstr "Вы должны"
+
+#: templates/account/settings.html:37
+msgid "define a password"
+msgstr "определить пароль"
+
+#: templates/account/settings.html:37
+msgid "for your account"
+msgstr "для вашей учетной записи"
+
+#: templates/account/settings.html:38
+msgid "before disconnecting from Facebook"
+msgstr "перед тем как отвязать Facebook"
+
+#: templates/account/settings.html:41
+#, fuzzy
+#| msgid "Login with Facebook"
+msgid "Connect to Facebook"
+msgstr "Войдите через Facebook"
+
+#: templates/account/signup.html:40 templates/registration/login.html:9
+#: templates/registration/login.html:41
+msgid "Signup"
+msgstr "Регистрация"
+
+#: templates/account/view_profile.html:9
+msgid "USERNAME"
+msgstr "Пользователь"
+
+#: templates/account/view_profile.html:14
+msgid "Edit your profile"
+msgstr "Изменить ваш профайл"
+
+#: templates/account/view_profile.html:28
+msgid "about me"
+msgstr "обо мне"
+
+#: templates/page_is_under_construction.html:5
+msgid "This page is under construction"
+msgstr "Страница в процессе разработки"
+
+#: templates/registration/logged_out.html:8
+msgid "You have successfully logged out!"
+msgstr "Вы успешно вышли!"
+
+#: templates/registration/logged_out.html:9
+msgid "Click here to login again."
+msgstr "Нажмите сюда чтоб войти снова."
+
+#: templates/registration/login.html:10
+msgid "Log In"
+msgstr "Вход"
+
+#: templates/registration/login.html:12
+msgid "Your username and password didn't match. Please try again."
+msgstr "Ваш логин или пароль не верны. Поробуйте ещё раз."
+
+#: templates/registration/login.html:16
+msgid ""
+"Your account doesn't have access to this page. To proceed, please login with "
+"an account that has access."
+msgstr ""
+"У вас нет доступа к этой странице. Воспользуйтесь учетными данными, с "
+"правами доступа к странице."
+
+#: templates/registration/login.html:18
+msgid "Please login."
+msgstr "Войдите"
+
+#: templates/registration/login.html:41
+#, fuzzy
+#| msgid "Social accounts"
+msgid "No account?"
+msgstr "Нет учетоной записи?"
+
+#: templates/registration/login.html:42
+msgid "Login with Facebook"
+msgstr "Войдите через Facebook"
+
+#: templates/registration/login.html:43
+msgid "Lost password?"
+msgstr "Забыли пароль?"
+
+#: templates/registration/password_reset_complete.html:8
+msgid "The password has been changed!"
+msgstr "Пароль изменен!"
+
+#: templates/registration/password_reset_complete.html:11
+msgid "Log in again?"
+msgstr "Хотите войти снова?"
+
+#: templates/registration/password_reset_confirm.html:10
+msgid "Password reset (step 2)"
+msgstr "Сброс пароля (шаг 2)"
+
+#: templates/registration/password_reset_confirm.html:11
+msgid "Please enter (and confirm) your new password."
+msgstr "Введите (и подтвердите) свой новый пароль."
+
+#: templates/registration/password_reset_confirm.html:20
+msgid "New password:"
+msgstr "Новый пароль:"
+
+#: templates/registration/password_reset_confirm.html:25
+msgid "Confirm password:"
+msgstr "Подвердите пароль:"
+
+#: templates/registration/password_reset_confirm.html:30
+msgid "Change my password"
+msgstr "Изменить свой пароль"
+
+#: templates/registration/password_reset_confirm.html:36
+#: templates/registration/password_reset_confirm.html:38
+msgid "Password reset failed"
+msgstr "Ошибка сброса пароля"
+
+#: templates/registration/password_reset_confirm.html:41
+msgid "Try one more time."
+msgstr "Попробуйте еще раз."
+
+#: templates/registration/password_reset_confirm.html:45
+msgid ""
+"The password reset link was invalid, possibly because it has already been "
+"used. Please request a new password reset."
+msgstr ""
+"Ссылка на сброс пароля не действительна, возможно ей уже воспользовались."
+"Запросите сброс пароля снова."
+
+#: templates/registration/password_reset_done.html:9
+msgid ""
+"We've emailed you instructions for setting your password. If they haven't "
+"arrived in a few minutes, check your spam folder."
+msgstr ""
+"Мы направили вам электронное письмо с инструкциями по сбросу пароля.Если вы "
+"не получите письмо в течении нескольких минут - проверьте спам"
+
+#: templates/registration/password_reset_form.html:9
+msgid "Password reset"
+msgstr "Сброс пароля"
+
+#: templates/registration/password_reset_form.html:17
+msgid "Reset password"
+msgstr "Сбросить пароль"
+
+#: templates/site-statistics.html:6
+msgid "published"
+msgstr "опубликованы"
+
+#: templates/site-statistics.html:6
+msgid "draft"
+msgstr "черновики"
+
+#: templates/site-statistics.html:6
+msgid "hidden"
+msgstr "скрытые"
+
+#: templates/site-statistics.html:7 templates/site-statistics.html:8
+msgid "total"
+msgstr "итого"
+
+#: templates/site-statistics.html:7
+msgid "inactive"
+msgstr "не активные"
+
+#: templates/site-statistics.html:8
+msgid "common"
+msgstr "общие"
+
+#: templates/site-statistics.html:12
+msgid "Menu"
+msgstr "Меню"
+
+#: webproject/settings.py:197
+msgid "Russian"
+msgstr "Русский"
+
+#: webproject/settings.py:198
+msgid "English"
+msgstr "Английский"
+
+#: webproject/settings.py:199
+msgid "French"
+msgstr "Французский"

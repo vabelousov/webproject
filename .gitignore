@@ -5,7 +5,7 @@ styles_old.css
 webproject/.env
 posts/migrations/*.*
 posts/templates/depricated/*.*
-locale/
+# locale/
 
 __*
 !__init__.py
@@ -24,3 +24,10 @@ __*
 *.xls
 *.xlsx
 *.jpeg
+
+!en.png
+!fr.png
+!ru.png
+!no-avatar.png
+!back-back-button.png
+!back-top-button.png

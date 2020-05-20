@@ -1,0 +1,739 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-05-15 14:55+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: posts/forms.py:83 posts/models.py:575
+msgid "E-mail"
+msgstr ""
+
+#: posts/forms.py:107
+msgid "Query"
+msgstr ""
+
+#: posts/models.py:78 posts/models.py:98
+msgid "Code"
+msgstr ""
+
+#: posts/models.py:83 posts/models.py:103
+msgid "Description"
+msgstr ""
+
+#: posts/models.py:92 posts/templates/posts/user_posts.html:18
+#: templates/site-statistics.html:11
+msgid "Type"
+msgstr ""
+
+#: posts/models.py:93
+msgid "Types"
+msgstr ""
+
+#: posts/models.py:112 posts/models.py:415 templates/site-statistics.html:10
+msgid "Category"
+msgstr ""
+
+#: posts/models.py:113
+msgid "Categories"
+msgstr ""
+
+#: posts/models.py:118 posts/models.py:360 posts/models.py:515
+msgid "Image"
+msgstr ""
+
+#: posts/models.py:123
+msgid "Alt"
+msgstr ""
+
+#: posts/models.py:128 posts/models.py:657
+msgid "Title"
+msgstr ""
+
+#: posts/models.py:133
+msgid "reverse URL"
+msgstr ""
+
+#: posts/models.py:139 posts/models.py:672
+msgid "URL attr"
+msgstr ""
+
+#: posts/models.py:143
+msgid "Active"
+msgstr ""
+
+#: posts/models.py:145
+msgid "Text"
+msgstr ""
+
+#: posts/models.py:151
+msgid "Order"
+msgstr ""
+
+#: posts/models.py:168 posts/models.py:171 templates/site-statistics.html:9
+msgid "Carousel"
+msgstr ""
+
+#: posts/models.py:172
+msgid "Carousels"
+msgstr ""
+
+#: posts/models.py:178
+msgid "Original"
+msgstr ""
+
+#: posts/models.py:183
+msgid "Middle size"
+msgstr ""
+
+#: posts/models.py:188
+msgid "Thumbnail"
+msgstr ""
+
+#: posts/models.py:194
+msgid "Uploader"
+msgstr ""
+
+#: posts/models.py:196 posts/models.py:509 posts/models.py:571
+msgid "User"
+msgstr ""
+
+#: posts/models.py:202 posts/models.py:203
+#: posts/templates/posts/user_images.html:16
+msgid "Alt text"
+msgstr ""
+
+#: posts/models.py:206
+msgid "Common image"
+msgstr ""
+
+#: posts/models.py:208 posts/templates/posts/user_images.html:17
+msgid "Common"
+msgstr ""
+
+#: posts/models.py:215 posts/templates/posts/image_list.html:9
+#: posts/templates/posts/user_images.html:15
+msgid "Tags"
+msgstr ""
+
+#: posts/models.py:229
+msgid "Could not create thumbnail - is the file type valid?"
+msgstr ""
+
+#: posts/models.py:233
+msgid ""
+"Could not create middle size                    image - is the file type "
+"valid?"
+msgstr ""
+
+#: posts/models.py:361 posts/templates/posts/image_list.html:6
+#: templates/site-statistics.html:8
+msgid "Images"
+msgstr ""
+
+#: posts/models.py:366
+msgid "Draft"
+msgstr ""
+
+#: posts/models.py:367 posts/templates/posts/user_posts.html:19
+msgid "Published"
+msgstr ""
+
+#: posts/models.py:368
+msgid "Hidden"
+msgstr ""
+
+#: posts/models.py:373
+msgid "Post author"
+msgstr ""
+
+#: posts/models.py:375 posts/models.py:480
+msgid "Author"
+msgstr ""
+
+#: posts/models.py:379 posts/models.py:380
+msgid "Post title"
+msgstr ""
+
+#: posts/models.py:384 posts/models.py:387
+msgid "Post summary"
+msgstr ""
+
+#: posts/models.py:390
+msgid "Post text (html tags allowed)"
+msgstr ""
+
+#: posts/models.py:393
+msgid "Post text"
+msgstr ""
+
+#: posts/models.py:397
+msgid "Thumbnail url"
+msgstr ""
+
+#: posts/models.py:399
+msgid "Thumbnail URL"
+msgstr ""
+
+#: posts/models.py:404 posts/models.py:407
+msgid "Post type"
+msgstr ""
+
+#: posts/models.py:412
+msgid "Main category"
+msgstr ""
+
+#: posts/models.py:420
+msgid "Sub category"
+msgstr ""
+
+#: posts/models.py:423 posts/templates/posts/user_posts.html:21
+msgid "Sub Category"
+msgstr ""
+
+#: posts/models.py:429 posts/models.py:430
+msgid "Post status"
+msgstr ""
+
+#: posts/models.py:489 posts/models.py:533
+#: posts/templates/posts/post_detail.html:41
+#: posts/templates/posts/user_posts.html:15
+msgid "Post"
+msgstr ""
+
+#: posts/models.py:490 templates/site-statistics.html:6
+msgid "Posts"
+msgstr ""
+
+#: posts/models.py:522
+msgid "Basket"
+msgstr ""
+
+#: posts/models.py:523
+msgid "Baskets"
+msgstr ""
+
+#: posts/models.py:531 posts/models.py:564
+#: posts/templates/posts/post_detail.html:51 templates/site-statistics.html:7
+msgid "Comments"
+msgstr ""
+
+#: posts/models.py:539
+msgid "Comment user"
+msgstr ""
+
+#: posts/models.py:541
+msgid "Commentator"
+msgstr ""
+
+#: posts/models.py:545 posts/models.py:563
+msgid "Comment"
+msgstr ""
+
+#: posts/models.py:551
+msgid "Active comment"
+msgstr ""
+
+#: posts/models.py:552
+msgid "Is active"
+msgstr ""
+
+#: posts/models.py:580
+msgid "Few words about you"
+msgstr ""
+
+#: posts/models.py:581
+msgid "BIO"
+msgstr ""
+
+#: posts/models.py:586
+msgid "Add your location e.g. Moscow"
+msgstr ""
+
+#: posts/models.py:587
+msgid "Location"
+msgstr ""
+
+#: posts/models.py:592
+msgid "Add your birthday here"
+msgstr ""
+
+#: posts/models.py:593
+msgid "Birth date"
+msgstr ""
+
+#: posts/models.py:597
+msgid "Avatar image"
+msgstr ""
+
+#: posts/models.py:613
+msgid "Could not create avatar - is the file type valid?"
+msgstr ""
+
+#: posts/models.py:642 posts/templates/base_generic.html:104
+msgid "Profile"
+msgstr ""
+
+#: posts/models.py:643
+msgid "Profiles"
+msgstr ""
+
+#: posts/models.py:661 templates/account/settings.html:23
+msgid "Name"
+msgstr ""
+
+#: posts/models.py:667
+msgid "Reverse url"
+msgstr ""
+
+#: posts/models.py:680
+msgid "Parent node"
+msgstr ""
+
+#: posts/models.py:685
+msgid "Sort order"
+msgstr ""
+
+#: posts/templates/base_generic.html:35
+msgid "language"
+msgstr ""
+
+#: posts/templates/base_generic.html:64 posts/templates/posts/search.html:16
+msgid "Search"
+msgstr ""
+
+#: posts/templates/base_generic.html:85
+msgid "Administration panel"
+msgstr ""
+
+#: posts/templates/base_generic.html:86
+msgid "Typographica"
+msgstr ""
+
+#: posts/templates/base_generic.html:87 templates/site-statistics.html:4
+msgid "Statistics"
+msgstr ""
+
+#: posts/templates/base_generic.html:88
+msgid "Under Construction"
+msgstr ""
+
+#: posts/templates/base_generic.html:93
+msgid "My workspace"
+msgstr ""
+
+#: posts/templates/base_generic.html:96
+msgid "My posts"
+msgstr ""
+
+#: posts/templates/base_generic.html:99
+msgid "My images"
+msgstr ""
+
+#: posts/templates/base_generic.html:105
+msgid "Logout"
+msgstr ""
+
+#: posts/templates/base_generic.html:109
+#: posts/templates/posts/post_detail.html:45 templates/account/signup.html:9
+#: templates/registration/login.html:36
+msgid "Login"
+msgstr ""
+
+#: posts/templates/base_generic.html:110 templates/account/signup.html:10
+msgid "Sign Up"
+msgstr ""
+
+#: posts/templates/base_generic.html:203
+msgid "Vladimir Belousov"
+msgstr ""
+
+#: posts/templates/index.html:33
+msgid "Default"
+msgstr ""
+
+#: posts/templates/index.html:42
+msgid "Previous"
+msgstr ""
+
+#: posts/templates/index.html:46
+msgid "Next"
+msgstr ""
+
+#: posts/templates/posts/image_form.html:7
+msgid "Edit image"
+msgstr ""
+
+#: posts/templates/posts/image_form.html:45
+#: posts/templates/posts/post_form.html:66
+#: templates/account/edit_profile.html:83
+msgid "Save"
+msgstr ""
+
+#: posts/templates/posts/image_list.html:6
+msgid "tagged as"
+msgstr ""
+
+#: posts/templates/posts/image_list.html:53
+msgid "There are no images in the list."
+msgstr ""
+
+#: posts/templates/posts/modals.html:7
+msgid "Confirm deletion"
+msgstr ""
+
+#: posts/templates/posts/modals.html:9
+msgid "Are your sure you want to delete?"
+msgstr ""
+
+#: posts/templates/posts/modals.html:11
+#: posts/templates/posts/user_images.html:71
+#: posts/templates/posts/user_posts.html:44
+msgid "Delete"
+msgstr ""
+
+#: posts/templates/posts/modals.html:12
+msgid "Cancel"
+msgstr ""
+
+#: posts/templates/posts/modals.html:27
+msgid "Close"
+msgstr ""
+
+#: posts/templates/posts/post_detail.html:12
+#: posts/templates/posts/post_list.html:27
+msgid "by"
+msgstr ""
+
+#: posts/templates/posts/post_detail.html:16
+#: posts/templates/posts/post_form.html:7
+msgid "Edit post"
+msgstr ""
+
+#: posts/templates/posts/post_detail.html:44
+msgid "To comment you need to"
+msgstr ""
+
+#: posts/templates/posts/post_detail.html:46
+msgid "with Facebook"
+msgstr ""
+
+#: posts/templates/posts/post_detail.html:46
+msgid "or"
+msgstr ""
+
+#: posts/templates/posts/post_detail.html:47
+msgid "Sign UP"
+msgstr ""
+
+#: posts/templates/posts/post_detail.html:74
+msgid "No comments here yet"
+msgstr ""
+
+#: posts/templates/posts/post_form.html:71
+msgid "Photo-basket"
+msgstr ""
+
+#: posts/templates/posts/post_form.html:92
+msgid "No images in basket"
+msgstr ""
+
+#: posts/templates/posts/post_list.html:35
+#: posts/templates/posts/post_list.html:40
+#: posts/templates/posts/post_list.html:43
+msgid "No post in this category"
+msgstr ""
+
+#: posts/templates/posts/search.html:6
+msgid "Search results"
+msgstr ""
+
+#: posts/templates/posts/search.html:21
+msgid "Posts containing"
+msgstr ""
+
+#: posts/templates/posts/search.html:23
+#, python-format
+msgid "Found %(x_results)s result."
+msgid_plural "Found %(x_results)s results."
+msgstr[0] ""
+msgstr[1] ""
+
+#: posts/templates/posts/search.html:38
+msgid "There are no results for your query."
+msgstr ""
+
+#: posts/templates/posts/user_images.html:12
+msgid "New Image"
+msgstr ""
+
+#: posts/templates/posts/user_images.html:18
+msgid "In<br>Basket"
+msgstr ""
+
+#: posts/templates/posts/user_images.html:24
+msgid "Delete selected"
+msgstr ""
+
+#: posts/templates/posts/user_images.html:25
+msgid "Add to basket"
+msgstr ""
+
+#: posts/templates/posts/user_images.html:26
+msgid "Delete in Basket"
+msgstr ""
+
+#: posts/templates/posts/user_images.html:28
+msgid "Go"
+msgstr ""
+
+#: posts/templates/posts/user_images.html:64
+#: posts/templates/posts/user_posts.html:37
+msgid "Edit"
+msgstr ""
+
+#: posts/templates/posts/user_images.html:76
+msgid "You didn't create anything yet."
+msgstr ""
+
+#: posts/templates/posts/user_posts.html:12
+msgid "New post"
+msgstr ""
+
+#: posts/templates/posts/user_posts.html:20
+msgid "Main Category"
+msgstr ""
+
+#: posts/templates/posts/user_posts.html:22
+msgid "Status"
+msgstr ""
+
+#: posts/templates/posts/user_posts.html:49
+msgid "You didn't post anything yet."
+msgstr ""
+
+#: posts/views.py:360
+msgid "Your password was successfully updated!"
+msgstr ""
+
+#: posts/views.py:364
+msgid "Please correct the error below."
+msgstr ""
+
+#: templates/account/account_activation_invalid.html:8
+msgid ""
+"The confirmation link was invalid, possibly because it has already been used."
+msgstr ""
+
+#: templates/account/settings.html:9 templates/account/view_profile.html:16
+msgid "Social accounts"
+msgstr ""
+
+#: templates/account/settings.html:22
+msgid "Signed in via"
+msgstr ""
+
+#: templates/account/settings.html:24
+msgid "Provider url"
+msgstr ""
+
+#: templates/account/settings.html:24
+msgid "link"
+msgstr ""
+
+#: templates/account/settings.html:29
+msgid "Connected as"
+msgstr ""
+
+#: templates/account/settings.html:33
+msgid "Disconnect from Facebook"
+msgstr ""
+
+#: templates/account/settings.html:37
+msgid "You must"
+msgstr ""
+
+#: templates/account/settings.html:37
+msgid "define a password"
+msgstr ""
+
+#: templates/account/settings.html:37
+msgid "for your account"
+msgstr ""
+
+#: templates/account/settings.html:38
+msgid "before disconnecting from Facebook"
+msgstr ""
+
+#: templates/account/settings.html:41
+msgid "Connect to Facebook"
+msgstr ""
+
+#: templates/account/signup.html:40 templates/registration/login.html:9
+#: templates/registration/login.html:41
+msgid "Signup"
+msgstr ""
+
+#: templates/account/view_profile.html:9
+msgid "USERNAME"
+msgstr ""
+
+#: templates/account/view_profile.html:14
+msgid "Edit your profile"
+msgstr ""
+
+#: templates/account/view_profile.html:28
+msgid "about me"
+msgstr ""
+
+#: templates/page_is_under_construction.html:5
+msgid "This page is under construction"
+msgstr ""
+
+#: templates/registration/logged_out.html:8
+msgid "You have successfully logged out!"
+msgstr ""
+
+#: templates/registration/logged_out.html:9
+msgid "Click here to login again."
+msgstr ""
+
+#: templates/registration/login.html:10
+msgid "Log In"
+msgstr ""
+
+#: templates/registration/login.html:12
+msgid "Your username and password didn't match. Please try again."
+msgstr ""
+
+#: templates/registration/login.html:16
+msgid ""
+"Your account doesn't have access to this page. To proceed, please login with "
+"an account that has access."
+msgstr ""
+
+#: templates/registration/login.html:18
+msgid "Please login."
+msgstr ""
+
+#: templates/registration/login.html:41
+msgid "No account?"
+msgstr ""
+
+#: templates/registration/login.html:42
+msgid "Login with Facebook"
+msgstr ""
+
+#: templates/registration/login.html:43
+msgid "Lost password?"
+msgstr ""
+
+#: templates/registration/password_reset_complete.html:8
+msgid "The password has been changed!"
+msgstr ""
+
+#: templates/registration/password_reset_complete.html:11
+msgid "Log in again?"
+msgstr ""
+
+#: templates/registration/password_reset_confirm.html:10
+msgid "Password reset (step 2)"
+msgstr ""
+
+#: templates/registration/password_reset_confirm.html:11
+msgid "Please enter (and confirm) your new password."
+msgstr ""
+
+#: templates/registration/password_reset_confirm.html:20
+msgid "New password:"
+msgstr ""
+
+#: templates/registration/password_reset_confirm.html:25
+msgid "Confirm password:"
+msgstr ""
+
+#: templates/registration/password_reset_confirm.html:30
+msgid "Change my password"
+msgstr ""
+
+#: templates/registration/password_reset_confirm.html:36
+#: templates/registration/password_reset_confirm.html:38
+msgid "Password reset failed"
+msgstr ""
+
+#: templates/registration/password_reset_confirm.html:41
+msgid "Try one more time."
+msgstr ""
+
+#: templates/registration/password_reset_confirm.html:45
+msgid ""
+"The password reset link was invalid, possibly because it has already been "
+"used. Please request a new password reset."
+msgstr ""
+
+#: templates/registration/password_reset_done.html:9
+msgid ""
+"We've emailed you instructions for setting your password. If they haven't "
+"arrived in a few minutes, check your spam folder."
+msgstr ""
+
+#: templates/registration/password_reset_form.html:9
+msgid "Password reset"
+msgstr ""
+
+#: templates/registration/password_reset_form.html:17
+msgid "Reset password"
+msgstr ""
+
+#: templates/site-statistics.html:6
+msgid "published"
+msgstr ""
+
+#: templates/site-statistics.html:6
+msgid "draft"
+msgstr ""
+
+#: templates/site-statistics.html:6
+msgid "hidden"
+msgstr ""
+
+#: templates/site-statistics.html:7 templates/site-statistics.html:8
+msgid "total"
+msgstr ""
+
+#: templates/site-statistics.html:7
+msgid "inactive"
+msgstr ""
+
+#: templates/site-statistics.html:8
+msgid "common"
+msgstr ""
+
+#: templates/site-statistics.html:12
+msgid "Menu"
+msgstr ""
+
+#: webproject/settings.py:197
+msgid "Russian"
+msgstr ""
+
+#: webproject/settings.py:198
+msgid "English"
+msgstr ""
+
+#: webproject/settings.py:199
+msgid "French"
+msgstr ""

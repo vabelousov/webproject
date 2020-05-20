@@ -40,7 +40,7 @@ urlpatterns = [
 
 urlpatterns += i18n_patterns(
     path('i18n/', include('django.conf.urls.i18n')),
-    path('home/', include('posts.urls')),
+    path('', include('posts.urls')),
     prefix_default_language=False,
 )
 
@@ -50,9 +50,9 @@ urlpatterns += i18n_patterns(
          name='django.contrib.sitemaps.posts.sitemap'),
 )
 
-urlpatterns += i18n_patterns(
-    path('', RedirectView.as_view(url='/home/', permanent=True)),
-)
+# urlpatterns += i18n_patterns(
+#     path('', RedirectView.as_view(url='/home/', permanent=True)),
+# )
 
 urlpatterns += static(
     settings.STATIC_URL, document_root=settings.STATIC_ROOT
