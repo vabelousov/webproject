@@ -17,7 +17,7 @@
                         {% trans "by" %} {{ post.author.first_name }} {{ post.author.last_name }}
                     </strong>
                     {% if perms.posts.change_post %}
-                        <a href="{% url 'post_update' post.id %}">
+                        <a href="{% url 'post_update' post.slug %}">
                             {% trans "Edit post" %}
                         </a>
                     {% endif %}
@@ -97,11 +97,10 @@
                 <div class="row">
                     <div class="col-2">
                         {% if comment.comment_user %}
-                            <a href="{% url 'view_profile' comment.comment_user %}">
-                                <img src="{{ comment.comment_user.profile.get_avatar }}" width="80"/>
+                            <a href="{% url 'view_profile' comment.comment_user.id %}">
+                                <img src="{{ comment.comment_user.get_avatar }}" width="80"/>
                                 {{ comment.comment_user.last_name }}<br>
-                                {{ comment.comment_user.first_name }}<br>
-                                ({{ comment.comment_user.username }})
+                                {{ comment.comment_user.first_name }}
                             </a>
                         {% else %}
                             <img src="/static/images/no-avatar.png" width="80"/>

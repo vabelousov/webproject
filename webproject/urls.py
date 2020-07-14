@@ -36,6 +36,8 @@ sitemaps = {
 # с корневового URL, на URL приложения
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('sitemap.xml', sitemap, {'sitemaps': sitemaps},
+         name='django.contrib.sitemaps.posts.sitemap'),
 ]
 
 urlpatterns += i18n_patterns(
@@ -44,11 +46,6 @@ urlpatterns += i18n_patterns(
     prefix_default_language=False,
 )
 
-
-urlpatterns += i18n_patterns(
-    path('sitemap.xml', sitemap, {'sitemaps': sitemaps},
-         name='django.contrib.sitemaps.posts.sitemap'),
-)
 
 # urlpatterns += i18n_patterns(
 #     path('', RedirectView.as_view(url='/home/', permanent=True)),
@@ -60,6 +57,14 @@ urlpatterns += static(
 
 urlpatterns += static(
     settings.MEDIA_URL, document_root=settings.MEDIA_ROOT
+)
+
+urlpatterns += i18n_patterns(
+    path(
+        'accounts/login/',
+        views.remember_me_login,
+        name='remember_me_login',
+    ),
 )
 
 urlpatterns += i18n_patterns(
@@ -91,7 +96,7 @@ urlpatterns += i18n_patterns(
         name='password'
     ),
     url(
-        r'^profile/(?P<username>\w+)/$',
+        r'^profile/(?P<id>\w+)/$',
         views.view_profile,
         name='view_profile'
     ),

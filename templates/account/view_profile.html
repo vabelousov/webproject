@@ -6,10 +6,10 @@
             <div class="profile-container">
                 <div class="row">
                     <div class="col-md-6 img">
-                        <h5>{% trans "USERNAME" %}: {{ person_user.username}}</h5>
+                        <h5>{% trans "USERNAME" %}:</h5>
                         <br>
-                        <img src="{{ person.get_avatar }}" alt="" class="img-rounded" width="150px">
-                        {% if user.username == person_user.username %}
+                        <img src="{{ person_user.get_avatar }}" alt="" class="img-rounded" width="150px">
+                        {% if user.email == person_user.email %}
                         <br>
                         <a href="{% url 'edit_profile' %}">{% trans "Edit your profile" %}</a>
                         <br>
@@ -19,16 +19,18 @@
                     <div class="col-md-6 details">
                         <blockquote>
                             <h5>{{ person_user.first_name }} {{ person_user.last_name }}</h5>
-                            <small><cite title="Source Title"><i class="icon-map-marker">{{ person.location }}</i></cite></small>
+                            <small><cite title="Source Title"><i class="icon-map-marker">{{ person_user.location }}</i></cite></small>
                             <br>
-                            <small>{{ person.birth_date|date:"SHORT_DATE_FORMAT" }}</small>
+                            <small>{{ person_user.birth_date|date:"SHORT_DATE_FORMAT" }}</small>
+                            <br>
+                            <small><cite title="Source Title"><i class="icon-map-marker">{{ person_user.language }}</i></cite></small>
                         </blockquote>
                         <br>
                         <blockquote>
                             <h5>{% trans "about me" %}</h5>
                             <small>
                                 <cite title="Source Title">
-                                    <i class="icon-map-marker">{{ person.bio }}</i>
+                                    <i class="icon-map-marker">{{ person_user.bio }}</i>
                                 </cite>
                             </small>
                         </blockquote>

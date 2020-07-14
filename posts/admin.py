@@ -2,26 +2,28 @@
 
 from django.contrib import admin
 from mptt.admin import DraggableMPTTAdmin
-from django.contrib.auth.models import User
-from .models import Post, Image, Comment, Profile, \
-    MyMenu, Carousel, Category, ImageBasket, Type
+# from django.contrib.auth.models import User
+from .models import Post, Image, Comment, \
+    MyMenu, Carousel, Category, ImageBasket, Type, CustomUser
+from django.contrib.auth.admin import UserAdmin
+from .forms import CustomUserCreationForm, CustomUserChangeForm
 
 
-class ProfileInline(admin.StackedInline):
-    model = Profile
-    can_delete = False
-    verbose_name_plural = 'Profile'
-    fk_name = 'user'
-    fields = (
-        'avatar_tag',
-        'avatar',
-        'bio',
-        'location',
-        'birth_date',
-        'email_confirmed'
-    )
-    readonly_fields = ['avatar_tag']  # Specify that this read only field
-
+#class ProfileInline(admin.StackedInline):
+#    model = Profile
+#    can_delete = False
+#    verbose_name_plural = 'Profile'
+#    fk_name = 'user'
+#    fields = (
+#        'avatar_tag',
+#        'avatar',
+#        'bio',
+#        'location',
+#        'birth_date',
+#        'email_confirmed'
+#    )
+#    readonly_fields = ['avatar_tag']  # Specify that this read only field
+#
 
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
@@ -30,12 +32,13 @@ class PostAdmin(admin.ModelAdmin):
         'main_category', 'sub_category',
         'status'
     )
+    prepopulated_fields = {'slug': ('title',)}
     list_filter = ('type',
                    'main_category', 'sub_category', 'status', 'date_published'
                    )
     fieldsets = (
         (None, {
-            'fields': ('title', 'summary', 'author', 'thumbnail_url',)
+            'fields': ('title', 'slug', 'summary', 'author', 'thumbnail_url',)
         }),
         ('Text', {
             'fields': ('body',)
@@ -59,33 +62,33 @@ class ImageAdmin(admin.ModelAdmin):
         return instance.image_tag()
 
 
-class MyUserAdmin(admin.ModelAdmin):
-    inlines = [ProfileInline]
-    list_display = (
-        'avatar_tag',
-        'username',
-        'first_name',
-        'last_name',
-        'email',
-        'is_staff',
-        'is_superuser',
-        'is_active',
-        'get_location'
-    )
-
-    def get_location(self, instance):
-        return instance.profile.location
-
-    get_location.short_description = 'Location'
-
-    def get_inline_instances(self, request, obj=None):
-        if not obj:
-            return list()
-        return super(MyUserAdmin, self).get_inline_instances(request, obj)
-
-    def avatar_tag(self, obj):
-        return obj.profile.avatar_tag()
-
+#class MyUserAdmin(admin.ModelAdmin):
+#    inlines = [ProfileInline]
+#    list_display = (
+#        'avatar_tag',
+#        'username',
+#        'first_name',
+#        'last_name',
+#        'email',
+#        'is_staff',
+#        'is_superuser',
+#        'is_active',
+#        'get_location'
+#    )
+#
+#    def get_location(self, instance):
+#        return instance.profile.location
+#
+#    get_location.short_description = 'Location'
+#
+#    def get_inline_instances(self, request, obj=None):
+#        if not obj:
+#            return list()
+#        return super(MyUserAdmin, self).get_inline_instances(request, obj)
+#
+#    def avatar_tag(self, obj):
+#        return obj.profile.avatar_tag()
+#
 
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):
@@ -128,6 +131,36 @@ class ImageBasketAdmin(admin.ModelAdmin):
     list_filter = ('user', 'image')
 
 
+class CustomUserAdmin(UserAdmin):
+    add_form = CustomUserCreationForm
+    form = CustomUserChangeForm
+    model = CustomUser
+    list_display = ('avatar_tag', 'email', 'first_name', 'last_name', 'is_staff', 'is_active', 'date_joined')
+    list_filter = ('email', 'is_staff', 'is_active',)
+    fieldsets = (
+        (None, {'fields': ('email', 'password')}),
+        ('User data', {'fields': ('first_name', 'last_name')}),
+        ('Permissions', {'fields': ('is_staff', 'is_active', 'groups', 'user_permissions')}),
+        ('Profile', {'fields': ('email_confirmed', 'bio', 'location', 'birth_date', 'language')}),
+        ('Avatar', {'fields': ('avatar',)}),
+    )
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('email', 'password1', 'password2', 'is_staff', 'is_active')}
+        ),
+        ('User data', {'fields': ('first_name', 'last_name')}),
+        ('Profile', {'fields': ('email_confirmed', 'bio', 'location', 'birth_date', 'language')}),
+        ('Avatar', {'fields': ('avatar',)}),
+    )
+
+    def avatar_tag(self, obj):
+        return obj.avatar_tag()
+
+    search_fields = ('email',)
+    ordering = ('email',)
+
+
 admin.site.register(
     MyMenu,
     DraggableMPTTAdmin,
@@ -158,5 +191,5 @@ class TypeAdmin(admin.ModelAdmin):
     list_filter = ('code',)
 
 
-admin.site.unregister(User)
-admin.site.register(User, MyUserAdmin)
+# admin.site.unregister(User)
+admin.site.register(CustomUser, CustomUserAdmin)

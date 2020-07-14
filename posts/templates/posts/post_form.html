@@ -68,6 +68,13 @@
                     {{ form.tags.label_tag }}
                     {{ form.tags }}
                 </div>
+                {% comment %}
+                <div class="form-group">
+                    <p>{{ form.slug.errors }}</p>
+                    {{ form.slug.label_tag }}
+                    {{ form.slug }}
+                </div>
+                {% endcomment %}
                 <button type="submit" class="btn btn-outline-primary">{% trans "Save" %}</button>
                 <button type="button" class="btn btn-outline-secondary" onclick="history.back(); return false;">
                     {% trans 'Back' %}
@@ -77,18 +84,25 @@
     </div>
     <div class="col-4">
         <h5 class="text-center my-right-panel">{% trans "Photo-basket" %}:</h5>
-        <div class="row my-post-right-panel-border">
+        <div class="row my-post-right-panel">
+            <input type="button" value="{% trans 'Clear basket' %}" class="btn-sm btn-outline-primary" id="clear-basket">
+            <div class="col-md-6" id="no-images-data">{% trans "No images in basket" %}.</div>
+        </div>
+        <div class="row my-post-right-panel-border my-right-panel-height" id="for-hide">
+
             {% for img in basket %}
             <div class="col-md-6">
-                <div class="thumbnail my-post-right-panel-thumbnail">
+                <div class="thumbnail my-post-right-panel-thumbnail" id="images-list">
                     <a href="#">
                         <img src="{{ img.image.get_image }}" alt="Lights" width="100%">
                     </a>
                     <div class="caption">
                         <p>
-                            <input type="button" value="m"
+                            <input type="button" value="t" class="btn-sm btn-outline-info"
+                                   onclick="insert_URL_AtCaret('id_thumbnail_url', '{{ img.image.get_image }}')">
+                            <input type="button" value="m" class="btn-sm btn-outline-info"
                                    onclick="insert_URL_AtCaret('id_body', '{{ img.image.get_image }}')">
-                            <input type="button" value="o"
+                            <input type="button" value="o" class="btn-sm btn-outline-info"
                                    onclick="insert_URL_AtCaret('id_body', '{{ img.image.get_original }}')">
                         </p>
                     </div>
@@ -100,4 +114,29 @@
         </div>
     </div>
 </div>
+<script>
+$(document).ready(function() {
+    $('#no-images-data').hide();
+    $('#clear-basket').on('click', function(e) {
+        e.preventDefault();
+        var data = 'clear';
+
+        $.ajax({
+            url: {% url 'clear-basket' %},
+            method: 'GET',
+            data: data,
+            success: function(d) {
+                console.log(d);
+                //$('#images-list').hide();
+                $('#for-hide').hide();
+                $('#clear-basket').hide();
+                $('#no-images-data').show();
+            },
+            error: function(d) {
+                console.log(d);
+            }
+        });
+    });
+});
+</script>
 {% endblock content %}

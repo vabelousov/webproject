@@ -32,10 +32,12 @@
                         <a href="{% url 'pages' type.grouper %}" class="btn btn-info">
                             {{ type.grouper|type_desc }}
                         </a>
+                        {% if main_category.grouper %}
                             <button type="button" class="btn btn-info">&gt;</button>
                         <a href="{% url 'pages' type.grouper|add:'/'|add:main_category.grouper %}" class="btn btn-info">
                             {{ main_category.grouper|cat_desc }}
                         </a>
+                        {% endif %}
                     </div>
                 </div>
                 {% for post in main_category.list|dictsortreversed:'date_published' %}

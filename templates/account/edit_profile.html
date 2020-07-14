@@ -14,15 +14,9 @@
                         <div class="form-group">
                             <div class="row">
                                 <div class="col">
-                                    {{ form.username.errors }}
-                                    {{ form.username.label_tag }}
-                                    {{ form.username }}
-                                    <small>{{ form.username.help_text }}</small>
-                                </div>
-                                <div class="col">
                                     {{ form.email.errors }}
                                     {{ form.email.label_tag }}
-                                    <input type="email" name="email" class="form-control" value="{{ form.email.value }}" maxlength="254" id="id_email">
+                                    <input type="email" name="email" class="form-control" value="{{ form.email.value }}" maxlength="254" id="id_email" readonly>
                                     <small>{{ form.email.help_text }}</small>
                                 </div>
                             </div>
@@ -44,36 +38,42 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            {{ profile_form.bio.errors }}
-                            {{ profile_form.bio.label_tag }}
-                            {{ profile_form.bio }}
-                            <small>{{ profile_form.bio.help_text }}</small>
+                            {{ form.bio.errors }}
+                            {{ form.bio.label_tag }}
+                            {{ form.bio }}
+                            <small>{{ form.bio.help_text }}</small>
                         </div>
                         <div class="form-group">
                             <div class="row">
                                 <div class="col">
-                                    {{ profile_form.location.errors }}
-                                    {{ profile_form.location.label_tag }}
-                                    {{ profile_form.location }}
-                                     <small>{{ profile_form.location.help_text }}</small>
+                                    {{ form.location.errors }}
+                                    {{ form.location.label_tag }}
+                                    {{ form.location }}
+                                     <small>{{ form.location.help_text }}</small>
                                  </div>
                                  <div class="col">
-                                     {{ profile_form.birth_date.errors }}
-                                     {{ profile_form.birth_date.label_tag }}
-                                     {{ profile_form.birth_date }}
-                                     <small>{{ profile_form.birth_date.help_text }}</small>
+                                     {{ form.birth_date.errors }}
+                                     {{ form.birth_date.label_tag }}
+                                     {{ form.birth_date }}
+                                     <small>{{ form.birth_date.help_text }}</small>
+                                 </div>
+                                <div class="col">
+                                     {{ form.language.errors }}
+                                     {{ form.language.label_tag }}
+                                     {{ form.language }}
+                                     <small>{{ form.language.help_text }}</small>
                                  </div>
                             </div>
                         </div>
                         <div class="form-group">
-                            {% if user.profile.avatar %}
-                                <img src="{{ user.profile.get_avatar }}" alt="" class="img-rounded" width="150px">
+                            {% if user.avatar %}
+                                <img src="{{ user.get_avatar }}" alt="" class="img-rounded" width="150px">
                                 <br>
                             {% endif %}
-                            {{ profile_form.avatar.errors }}
-                            {{ profile_form.avatar.label_tag }}
-                            {{ profile_form.avatar }}
-                            <small>{{ profile_form.avatar.help_text }}</small>
+                            {{ form.avatar.errors }}
+                            {{ form.avatar.label_tag }}
+                            {{ form.avatar }}
+                            <small>{{ form.avatar.help_text }}</small>
                         </div>
                         <div class="form-group">
                             <button type="submit" class="btn btn-outline-primary"> {% trans 'Save' %} </button>

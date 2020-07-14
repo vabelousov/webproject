@@ -1,11 +1,24 @@
 # -*- coding:utf-8 -*-
 from django import forms
 from django.utils.translation import gettext_lazy as _
-from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.models import User
 from taggit.forms import TagWidget
+from .models import Comment, Post, Image
+from django.contrib.auth.forms import UserCreationForm, UserChangeForm, AuthenticationForm
+from .models import CustomUser
 
-from .models import Comment, Profile, Post, Image
+
+class CustomUserCreationForm(UserCreationForm):
+
+    class Meta(UserCreationForm):
+        model = CustomUser
+        fields = ('email',)
+
+
+class CustomUserChangeForm(UserChangeForm):
+
+    class Meta:
+        model = CustomUser
+        fields = ('email',)
 
 
 class PostForm(forms.ModelForm):
@@ -14,6 +27,7 @@ class PostForm(forms.ModelForm):
         exclude = ('date_published', 'date_created', 'date_updated')
         widgets = {
             'author': forms.HiddenInput(),
+            # 'slug': forms.TextInput(attrs={'class': 'form-control'}),
             'title': forms.TextInput(attrs={'class': 'form-control'}),
             'summary': forms.Textarea(
                 attrs={'class': 'form-control', 'rows': 4}
@@ -36,6 +50,7 @@ class ImagesForm(forms.ModelForm):
         exclude = ()
         widgets = {
             'user': forms.HiddenInput(),
+            'original': forms.ClearableFileInput(attrs={'multiple': True}),
             'alt_text': forms.TextInput(attrs={'class': 'form-control'}),
             'common': forms.CheckboxInput(
                 attrs={'class': 'form-check-input'}
@@ -71,31 +86,27 @@ class Comment2Form(forms.ModelForm):
         }
 
 
-class ProfileForm(forms.ModelForm):
-    class Meta:
-        model = Profile
-        fields = ('bio', 'location', 'birth_date', 'avatar')
-        widgets = {
-            'bio': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
-            'location': forms.TextInput(attrs={'class': 'form-control'}),
-            'birth_date': forms.DateInput(attrs={'class': 'form-control'}),
-        }
-
-
 class EditProfileForm(forms.ModelForm):
     class Meta:
-        model = User
+        model = CustomUser
         fields = (
-            'username',
             'email',
             'first_name',
-            'last_name'
+            'last_name',
+            'bio',
+            'location',
+            'birth_date',
+            'language',
+            'avatar'
         )
         widgets = {
-            'username': forms.TextInput(attrs={'class': 'form-control'}),
             'first_name': forms.TextInput(attrs={'class': 'form-control'}),
             'last_name': forms.TextInput(attrs={'class': 'form-control'}),
             'email': forms.EmailInput(attrs={'class': 'form-control'}),
+            'bio': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
+            'location': forms.TextInput(attrs={'class': 'form-control'}),
+            'birth_date': forms.DateInput(attrs={'class': 'form-control'}),
+            'language': forms.Select(attrs={'class': 'form-control'}),
         }
 
 
@@ -108,15 +119,14 @@ class SignUpForm(UserCreationForm):
     )
 
     class Meta:
-        model = User
+        model = CustomUser
         fields = (
-            'username',
             'email',
             'password1',
             'password2',
         )
         widgets = {
-            'username': forms.TextInput(attrs={'class': 'form-control'}),
+            'email': forms.TextInput(attrs={'class': 'form-control'}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -158,3 +168,12 @@ class ContactForm(forms.Form):
         widget=forms.Textarea(attrs={'class': 'form-control'}),
         label=_('Your message:')
     )
+
+
+class AuthenticationRememberMeForm(AuthenticationForm):
+    """
+    Subclass of Django ``AuthenticationForm`` which adds a remember me
+    checkbox.
+    """
+    remember_me = forms.BooleanField(label=_('Remember Me'), initial=False,
+                                     required=False)

@@ -1,4 +1,7 @@
 # -*- coding:utf-8 -*-
+import re
+import taggit
+
 from django.utils.translation import gettext as _
 from django.contrib.postgres.search import SearchVector
 from django.template.context_processors import csrf
@@ -8,10 +11,10 @@ from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.views.generic.edit import FormMixin
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.contrib.auth import login
+
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
 from django.contrib.sites.shortcuts import get_current_site
 from django.utils.encoding import force_bytes, force_text
 from django.utils.http import urlsafe_base64_encode
@@ -24,13 +27,20 @@ from django.contrib import messages
 from social_django.models import UserSocialAuth
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 
-from .models import Post, Image, Comment, Profile, Carousel,\
+from .models import Post, Image, Comment, Carousel, CustomUser, \
     ImageBasket, Category, MyMenu, Type
-from .forms import CommentForm, SignUpForm, EditProfileForm,\
-    ProfileForm, PostForm, ImagesForm, SearchForm, UserImagesForm,\
-    Comment2Form, ContactForm
+from .forms import CommentForm, SignUpForm, \
+    PostForm, ImagesForm, SearchForm, UserImagesForm,\
+    Comment2Form, ContactForm, EditProfileForm, AuthenticationRememberMeForm
 from .tokens import account_activation_token
 from django.core.mail import send_mail
+
+from django.conf import settings as webproject_settings
+from django.contrib.auth import REDIRECT_FIELD_NAME
+from django.contrib.auth import login as auth_login
+from django.views.decorators.cache import never_cache
+from django.views.decorators.csrf import csrf_protect
+from django.contrib.sites.models import Site
 
 
 def index(request):
@@ -74,6 +84,7 @@ def site_statistics(request):
     args['category_count'] = Category.objects.count()
     args['type_count'] = Type.objects.count()
     args['menu_count'] = MyMenu.objects.count()
+
     return render(request, 'site-statistics.html', args)
 
 
@@ -140,7 +151,7 @@ class PostDetailView(FormMixin, generic.DetailView):
     form_class = CommentForm
 
     def get_success_url(self):
-        return reverse('post-detail', kwargs={'pk': self.object.pk})
+        return reverse('post-detail', kwargs={'slug': self.kwargs.get("slug")})
 
     def get_context_data(self, **kwargs):
         context = super(PostDetailView, self).get_context_data(**kwargs)
@@ -195,6 +206,29 @@ class PostsByAuthorListView(PermissionRequiredMixin, generic.ListView):
         return Post.objects.filter(
             author=self.request.user
         ).order_by('type__code').order_by('-date_published')
+
+
+class UserPostTagListView(PermissionRequiredMixin, generic.ListView):
+    permission_required = [
+        'posts.add_post',
+        'posts.change_post',
+        'posts.delete_post'
+    ]
+    model = Post
+    template_name = 'posts/user_posts.html'
+    paginate_by = 30
+
+    def get_queryset(self):
+        return Post.objects.filter(
+            author=self.request.user
+        ).filter(
+            tags__slug=self.kwargs.get("slug")
+        ).order_by('-date_published')
+
+    def get_context_data(self, **kwargs):
+        context = super(UserPostTagListView, self).get_context_data(**kwargs)
+        context["tag"] = Post.tags.get(slug=self.kwargs.get("slug")).name
+        return context
 
 
 class CommonImageListView(generic.ListView):
@@ -319,6 +353,121 @@ class ImagesByUserListView(PermissionRequiredMixin, generic.ListView):
         return HttpResponseRedirect('')
 
 
+class UserImageTagListView(PermissionRequiredMixin, generic.ListView):
+    permission_required = [
+        'posts.add_image',
+        'posts.change_image',
+        'posts.delete_image'
+    ]
+    model = Image
+    form_class = UserImagesForm
+    template_name = 'posts/user_images.html'
+    paginate_by = 10
+
+    def get_queryset(self):
+        return Image.objects.filter(
+            user=self.request.user
+        ).filter(tags__slug=self.kwargs.get("slug")).all()
+
+    def get_context_data(self, **kwargs):
+        context = super(UserImageTagListView, self).get_context_data(**kwargs)
+        context["tag"] = Image.tags.get(slug=self.kwargs.get("slug")).name
+        return context
+
+    def post(self, request, *args, **kwargs):
+        form = UserImagesForm(request.POST)
+        if form.is_valid():
+            if 'img-action' in request.POST:
+                if 'delete-selected' in request.POST['img-action']:
+                    if form.cleaned_data['image_object']:
+                        for item in form.cleaned_data['image_object']:
+                            item.delete()
+                if 'clear-from-basket' in request.POST['img-action']:
+                    if form.cleaned_data['image_object']:
+                        for item in form.cleaned_data['image_object']:
+                            try:
+                                bsk = ImageBasket.objects.filter(
+                                    user__exact=self.request.user
+                                ).filter(image__id__exact=item.id).first()
+                                bsk.delete()
+                            except:
+                                pass
+                if 'add-to-basket' in request.POST['img-action']:
+                    if form.cleaned_data['image_object']:
+                        for item in form.cleaned_data['image_object']:
+                            bsk = ImageBasket()
+                            bsk.user = request.user
+                            bsk.image = item
+                            bsk.save()
+        return HttpResponseRedirect('')
+
+
+@csrf_protect
+@never_cache
+def remember_me_login(request, template_name='registration/login.html',
+                      redirect_field_name=REDIRECT_FIELD_NAME,
+                      authentication_form=AuthenticationRememberMeForm):
+    """
+    Based on login view cribbed from
+    https://github.com/django/django/blob/1.2.7/django/contrib/auth/views.py#L25
+
+    Displays the login form with a remember me checkbox and handles the
+    login action.
+
+    The authentication_form parameter has been changed from
+    ``django.contrib.auth.forms.AuthenticationForm`` to
+    ``remember_me.forms.AuthenticationRememberMeForm``.  To change this, pass a
+    different form class as the ``authentication_form`` parameter.
+    """
+
+    redirect_to = request.GET.get(redirect_field_name, '')
+
+    if request.method == "POST":
+
+        form = authentication_form(data=request.POST)
+        if form.is_valid():
+            redirect_to = request.POST.get(redirect_field_name)
+            # Light security check -- make sure redirect_to isn't garbage.
+            if not redirect_to or ' ' in redirect_to:
+                redirect_to = webproject_settings.LOGIN_REDIRECT_URL
+
+            # Heavier security check -- redirects to http://example.com should
+            # not be allowed, but things like /view/?param=http://example.com
+            # should be allowed. This regex checks if there is a '//' *before* a
+            # question mark.
+            elif '//' in redirect_to and re.match(r'[^\?]*//', redirect_to):
+                redirect_to = webproject_settings.LOGIN_REDIRECT_URL
+
+            if form.cleaned_data.get('remember_me'):
+                request.session.set_expiry(1209600)
+
+            # Okay, security checks complete. Log the user in.
+            auth_login(request, form.get_user())
+
+            if request.session.test_cookie_worked():
+                request.session.delete_test_cookie()
+
+            return HttpResponseRedirect(redirect_to)
+
+    else:
+        form = authentication_form(request)
+
+    request.session.set_test_cookie()
+
+    current_site = get_current_site(request)
+
+    return render(
+        request,
+        template_name, {
+            'form': form,
+            'redirect_field_name': redirect_field_name,
+            'redirect_field_value': redirect_to,
+            'site': current_site,
+            'site_name': current_site.name,
+        }
+    )
+
+
 def signup(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST)
@@ -361,9 +510,9 @@ def activate(
 
     if user is not None and account_activation_token.check_token(user, token):
         user.is_active = True
-        user.profile.email_confirmed = True
+        user.email_confirmed = True
         user.save()
-        login(
+        remember_me_login(
             request,
             user,
             backend='django.contrib.auth.backends.ModelBackend'
@@ -421,32 +570,19 @@ def password(request):
 def edit_profile(request):
     if request.method == 'POST':
         form = EditProfileForm(request.POST, instance=request.user)
-        profile_form = ProfileForm(
-            request.POST,
-            request.FILES,
-            instance=request.user.profile
-        )
-
-        if form.is_valid() and profile_form.is_valid():
-            user_form = form.save()
-            custom_form = profile_form.save(False)
-            custom_form.user = user_form
-            custom_form.save()
-            return redirect('view_profile', username=request.user.username)
+        if form.is_valid():
+            form.save()
+            return redirect('view_profile', id=request.user.id)
     else:
         form = EditProfileForm(instance=request.user)
-        profile_form = ProfileForm(instance=request.user.profile)
         args = {}
         args['form'] = form
-        args['profile_form'] = profile_form
         return render(request, 'account/edit_profile.html', args)
 
 
-def view_profile(request, username):
-    person_user = User.objects.get(username=username)
-    person = Profile.objects.get(user=person_user)
+def view_profile(request, id):
+    person_user = CustomUser.objects.get(id=id)
     args = {}
-    args['person'] = person
     args['person_user'] = person_user
     return render(request, 'account/view_profile.html', args)
 
@@ -515,9 +651,14 @@ class PostUpdate(PermissionRequiredMixin, UpdateView):
     model = Post
     form_class = PostForm
     success_url = None
+    page = 1
+
+    def dispatch(self, request, *args, **kwargs):
+        self.page = self.request.GET.get('page', 1)
+        return super(PostUpdate, self).dispatch(request, *args, **kwargs)
 
     def get_success_url(self):
-        return reverse_lazy('my-posts')
+        return reverse_lazy('my-posts') + '?page=' + str(self.page)
 
     def get_context_data(self, **kwargs):
         context = super(PostUpdate, self).get_context_data(**kwargs)
@@ -533,15 +674,43 @@ class PostUpdate(PermissionRequiredMixin, UpdateView):
 class PostDelete(PermissionRequiredMixin, DeleteView):
     permission_required = 'posts.delete_post'
     model = Post
-    success_url = reverse_lazy('my-posts')
+    success_url = None
 
     def get(self, request, *args, **kwargs):
-        obj = get_object_or_404(Post, id=self.kwargs.get('pk'))
+        obj = get_object_or_404(Post, slug=self.kwargs.get('slug'))
         obj.delete()
         return redirect('my-posts')
 
 
+def multiple_images_upload(request):
+    '''
+    мультизагрузка изображений
+    '''
+    if request.method == 'POST':
+        form = ImagesForm(request.POST)
+        files = request.FILES.getlist('original')
+        if form.is_valid():
+            for f in files:
+                img = Image()
+                img.original = f
+                img.user = request.user
+                img.alt_text = form.cleaned_data['alt_text']
+                img.common = form.cleaned_data['common']
+                img.save()
+                tag_list = taggit.utils._parse_tags(request.POST['tags'])
+                img.tags.add(*tag_list)
+            return redirect(reverse_lazy('my-images'))
+    else:
+        form = ImagesForm()
+        args = {}
+        args['form'] = form
+        return render(request, 'posts/image_form.html', args)
+
+
 class ImageCreate(PermissionRequiredMixin, CreateView):
+    '''
+    Загрузка одного изображения
+    '''
     permission_required = 'posts.add_image'
     model = Image
     form_class = ImagesForm
@@ -565,9 +734,14 @@ class ImageUpdate(PermissionRequiredMixin, UpdateView):
     model = Image
     form_class = ImagesForm
     success_url = None
+    page = 1
+
+    def dispatch(self, request, *args, **kwargs):
+        self.page = self.request.GET.get('page', 1)
+        return super(ImageUpdate, self).dispatch(request, *args, **kwargs)
 
     def get_success_url(self):
-        return reverse_lazy('my-images')
+        return reverse_lazy('my-images') + '?page=' + str(self.page)
 
 
 class ImageDelete(PermissionRequiredMixin, DeleteView):
@@ -608,3 +782,16 @@ def contact_us(request):
         form = ContactForm()
 
     return render(request, 'posts/contact-us.html', {'form': form})
+
+
+def clear_basket(request):
+    if request.user.is_authenticated and request.is_ajax and request.GET:
+        import json
+        bs = ImageBasket.objects.filter(user=request.user).all()
+        cnt = ImageBasket.objects.filter(user=request.user).count()
+        for b in bs:
+            b.delete()
+        data = {'message': 'delete basket'.format(cnt)}
+        return HttpResponse(json.dumps(data), content_type='application/json')
+    else:
+        return JsonResponse({'error': 'Only authenticated users'}, status=404)

@@ -68,7 +68,7 @@ INSTALLED_APPS = [
     'social_django',
     'mptt',
     'taggit',
-    'posts.apps.PostsConfig',
+    'posts',
 ]
 
 MIDDLEWARE = [
@@ -115,6 +115,7 @@ DATABASES = {
     'extra': env.db('SQLITE_URL', default='sqlite:////tmp/my-tmp-sqlite.db')
 }
 
+AUTH_USER_MODEL = 'posts.CustomUser'
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/..
@@ -154,10 +155,10 @@ USE_TZ = True
 STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 
-LOGIN_URL = 'login'
+LOGIN_URL = 'remember_me_login'
 LOGIN_REDIRECT_URL = 'index'
 LOGOUT_URL = 'logout'
-LOGOUT_REDIRECT_URL = 'login'
+LOGOUT_REDIRECT_URL = 'remember_me_login'
 
 # LOGIN_REDIRECT_URL = 'index'
 # LOGIN_URL = 'index'
@@ -209,4 +210,9 @@ MODELTRANSLATION_TRANSLATION_REGISTRY = 'posts.translation'
 
 SECURE_SSL_REDIRECT = False
 SESSION_COOKIE_SECURE = True
+
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+SESSION_COOKIE_AGE = 600  # 10 minutes
+SESSION_SAVE_EVERY_REQUEST = True
+
 CSRF_COOKIE_SECURE = True

@@ -18,7 +18,7 @@ urlpatterns = [
     ),
     url(r'^pages/$', views.PostListView.as_view(), name='pages'),
     url(
-        r'^page/(?P<pk>\d+)$',
+        r'^page/(?P<slug>[-\w]+)/$',
         views.PostDetailView.as_view(),
         name='post-detail'
     ),
@@ -44,17 +44,22 @@ urlpatterns = [
         name='my-posts'
     ),
     url(
+        r'^user-tagged-posts/(?P<slug>[-\w]+)/$',
+        views.UserPostTagListView.as_view(),
+        name="user-tagged-posts"
+    ),
+    url(
         r'^mypage/create/$',
         views.PostCreate.as_view(),
         name='post_create'
     ),
     url(
-        r'^mypage/(?P<pk>\d+)/update/$',
+        r'^mypage/(?P<slug>[-\w]+)/update/$',
         views.PostUpdate.as_view(),
         name='post_update'
     ),
     url(
-        r'^mypage/(?P<pk>\d+)/delete/$',
+        r'^mypage/(?P<slug>[-\w]+)/delete/$',
         views.PostDelete.as_view(),
         name='post_delete'
     ),
@@ -64,8 +69,14 @@ urlpatterns = [
         name='my-images'
     ),
     url(
+        r'^user-tagged-images/(?P<slug>[-\w]+)/$',
+        views.UserImageTagListView.as_view(),
+        name="user-tagged-images"
+    ),
+    url(
         r'^myimage/create/$',
-        views.ImageCreate.as_view(),
+        # views.ImageCreate.as_view(),
+        views.multiple_images_upload,
         name='image_create'),
     url(
         r'^myimage/(?P<pk>\d+)/update/$',
@@ -78,4 +89,5 @@ urlpatterns = [
         name='image_delete'
     ),
     url(r'^contact-us/$', views.contact_us, name='contact-us'),
+    url(r'^clear-basket/$', views.clear_basket, name='clear-basket'),
 ]

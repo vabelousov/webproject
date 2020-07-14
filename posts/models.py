@@ -5,30 +5,34 @@ import os
 from django.db import models
 from mptt.models import MPTTModel, TreeForeignKey
 from taggit.managers import TaggableManager
-from django.contrib.auth.models import User
+
+from django.conf import settings
+
 from django.utils import timezone
 from django.urls import reverse
-from django.db.models.signals import post_save
-from django.dispatch import receiver
+
 from django.utils.safestring import mark_safe
 from uuid import uuid4
 from functools import partial
-
-from django.utils.translation import gettext as _
+from django.template.defaultfilters import slugify
+from unidecode import unidecode
 
 from django.core.files.base import ContentFile
 from PIL import Image as Img
 from .ru_taggit import UnicodeTaggedItem
 
+from django.contrib.auth.models import AbstractBaseUser
+from django.contrib.auth.models import PermissionsMixin
+from .managers import CustomUserManager
+from django.utils.translation import ugettext_lazy as _, activate
+
 
 def listToString(s):
     # initialize an empty string
     str1 = ""
-
     # traverse in the string
     for ele in s:
         str1 += ele
-
         # return string
     return str1
 
@@ -72,6 +76,109 @@ class HiddenManager(models.Manager):
         return super(
             HiddenManager, self
         ).get_queryset().filter(status='hidden')
+
+
+class CustomUser(AbstractBaseUser, PermissionsMixin):
+    email = models.EmailField(_('email address'), unique=True)
+    is_staff = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
+    date_joined = models.DateTimeField(default=timezone.now)
+
+    first_name = models.CharField(max_length=100, verbose_name=_('First Name'), blank=True)
+    last_name = models.CharField(max_length=100, verbose_name=_('Last Name'), blank=True)
+
+    email_confirmed = models.BooleanField(
+        default=False,
+        verbose_name=_('E-mail confirmed')
+    )
+    bio = models.TextField(
+        max_length=500,
+        blank=True,
+        help_text=_('Few words about you'),
+        verbose_name=_('BIO')
+    )
+    location = models.CharField(
+        max_length=30,
+        blank=True,
+        help_text=_('Add your location e.g. Moscow'),
+        verbose_name=_('Location')
+    )
+    birth_date = models.DateField(
+        null=True,
+        blank=True,
+        help_text=_('Add your birthday here'),
+        verbose_name=_('Birth date')
+    )
+    avatar = models.ImageField(
+        upload_to='media/images/users',
+        verbose_name=_('Avatar image'),
+        blank=True
+    )
+    language = models.CharField(
+        max_length=3,
+        blank=True,
+        help_text=_('User language'),
+        verbose_name=_('Language'),
+        choices=settings.LANGUAGES,
+        default=settings.LANGUAGE_CODE
+    )
+
+    def save(self, *args, **kwargs):
+        """
+        Make and save the thumbnail for the photo here.
+        """
+        super(CustomUser, self).save(*args, **kwargs)
+
+        activate(self.language)  # активирует язык пользователя.
+
+        if self.avatar:
+            if not self.make_avatar():
+                raise Exception(
+                    _('Could not create avatar - is the file type valid?')
+                )
+
+    def make_avatar(self):
+        basewidth = 300
+        height_size = 300
+        try:
+            img = Img.open(self.avatar)
+            img.thumbnail((basewidth, height_size), Img.ANTIALIAS)
+            img.save(self.avatar.name, format='JPEG', quality=100)
+        except:
+            return False
+        return True
+
+    def get_avatar(self):
+        try:
+            url = self.avatar.url
+        except:
+            url = '/static/images/no-avatar.png'
+        return url
+
+    def avatar_tag(self):
+        return mark_safe(
+            '<img src="%s" width="50" height="50" />' % self.get_avatar()
+        )
+
+    avatar_tag.short_description = _('Avatar')
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
+
+    objects = CustomUserManager()
+
+    def __str__(self):
+        return self.email
+
+    class Meta:
+        verbose_name = _('User')
+        verbose_name_plural = _('Users')
+
+
+#@receiver(user_logged_in)
+#def lang(sender, **kwargs):
+#    lang_code = kwargs['user'].lang
+#    kwargs['request'].session['django_language'] = lang_code
 
 
 class Type(models.Model):
@@ -185,7 +292,7 @@ class Image(models.Model):
         editable=False
     )
     user = models.ForeignKey(
-        User,
+        CustomUser,
         on_delete=models.CASCADE,
         help_text=_('Uploader'),
         default=1,
@@ -221,11 +328,12 @@ class Image(models.Model):
         """
         # if self.pk is None:
         if self.original:
-            if not self.make_middle():
-                raise Exception(
-                    _('Could not create middle size\
-                    image - is the file type valid?')
-                )
+            if not self.image:
+                if not self.make_middle():
+                    raise Exception(
+                        _('Could not create middle size\
+                        image - is the file type valid?')
+                    )
         else:
             self.image.delete()
         super(Image, self).save(*args, **kwargs)
@@ -303,6 +411,56 @@ class Image(models.Model):
             '<img src="%s" width="50" height="50" />' % self.get_image()
         )
 
+    def delete(self, using=None, keep_parents=False):
+        '''
+        удаляем физически фото при удалении объекта.
+        '''
+        self.original.storage.delete(self.original.name)
+        self.image.storage.delete(self.image.name)
+        super().delete()
+
+    @staticmethod
+    def unused_originals(delete=False):
+        '''
+        используется для того чтобы удалить
+        несвязанные фото в папке с оригиналами
+        '''
+        path = 'media/images/originals'
+        file_list = os.listdir(path)
+        for f in file_list:
+            try:
+                img = Image.objects.get(original__contains=f)
+                print('skipping: ' + img)
+            except:
+                img = None
+            if not img:
+                if not img and f != '.DS_Store':
+                    print('found: ' + f)
+                    if delete is True:
+                        print('removing')
+                        os.remove(path + '/' + f)
+
+    @staticmethod
+    def unused_images(delete=False):
+        '''
+        используется для того чтобы удалить
+        несвязанные фото в папке с ресайзами
+        '''
+        path = 'media/images/middles'
+        file_list = os.listdir(path)
+        for f in file_list:
+            print('check: '+path+'/'+f)
+            try:
+                img = Image.objects.get(image__contains=f)
+                print('skipping: ' + img.name)
+            except:
+                img = None
+            if not img and f != '.DS_Store':
+                print('found: '+f)
+                if delete is True:
+                    print('removing')
+                    os.remove(path+'/'+f)
+
     class Meta:
         ordering = ('-id',)
         verbose_name = _('Image')
@@ -316,7 +474,7 @@ class Post(models.Model):
         ('hidden', _('Hidden'))
     )
     author = models.ForeignKey(
-        User,
+        CustomUser,
         on_delete=models.SET_NULL,
         help_text=_('Post author'),
         null=True,
@@ -391,31 +549,25 @@ class Post(models.Model):
         help_text='Tags list.',
         verbose_name=_('Tags')
     )  # менеджер тэгов
-
-    @staticmethod
-    def _create_post_records(count=3, tp='stories', mc='alpinism', sc=''):
-        from loremipsum import get_sentences
-        for i in range(count):
-            pst = Post()
-            pst.title = tp.capitalize() + ' ' + mc.capitalize() + ' ' + str(i)
-            pst.summary = listToString(get_sentences(3, True))
-            pst.body = '<p>' + listToString(get_sentences(10, True)) + '</p>'
-            pst.author = User.objects.get(username='vladimir')
-            pst.status = 'published'
-            pst.type = Type.objects.get(code=tp)
-            pst.main_category = Category.objects.get(code=mc)
-            pst.sub_category = Category.objects.get(code=sc)
-            pst.thumbnail_url = 'file_63e871582a15.jpg'
-            pst.save()
+    slug = models.SlugField(
+        null=True,
+        unique=True,
+        blank=True,
+        max_length=200
+    )
 
     def __str__(self):
         return self.title
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(unidecode(self.title))
+        return super(Post, self).save(*args, **kwargs)
 
     def get_post_code(self):
         return 'pst_' + str(self.id).zfill(8)
 
     def get_absolute_url(self):
-        return reverse('post-detail', args=[str(self.id)])
+        return reverse('post-detail', kwargs={'slug': self.slug})
 
     def get_thumbnail(self):
         if len(self.thumbnail_url) > 0:
@@ -424,10 +576,11 @@ class Post(models.Model):
             url = '/static/images/no-image.png'
         return url
 
+    # странный код - может надо напрямую?
     def display_author(self):
-        return User.objects.get(
+        return CustomUser.objects.get(
             username=self.author
-        ).first_name + ' ' + User.objects.get(
+        ).first_name + ' ' + CustomUser.objects.get(
             username=self.author
         ).last_name
 
@@ -444,20 +597,9 @@ class Post(models.Model):
         verbose_name_plural = _('Posts')
 
 
-# Post._create_post_records(5, 'stories', 'alpinism')
-# Post._create_post_records(4, 'stories', 'multipitches')
-# Post._create_post_records(7, 'stories', 'climbing')
-# Post._create_post_records(12, 'topos', 'alpinism')
-# Post._create_post_records(3, 'topos', 'multipitches')
-# Post._create_post_records(2, 'topos', 'climbing')
-# Post._create_post_records(3, 'tips', 'alpinism')
-# Post._create_post_records(4, 'tips', 'adaptation')
-# Post._create_post_records(5, 'tips', 'equipment')
-
-
 class ImageBasket(models.Model):
     user = models.ForeignKey(
-        User,
+        CustomUser,
         on_delete=models.CASCADE,
         null=True,
         verbose_name=_('User')
@@ -470,7 +612,7 @@ class ImageBasket(models.Model):
     )
 
     def __str__(self):
-        return self.user.username + '_' + str(self.image.id)
+        return self.user.email + '_' + str(self.image.id)
 
     class Meta:
         verbose_name = _('Basket')
@@ -487,7 +629,7 @@ class Comment(models.Model):
         verbose_name=_('Post')
     )
     comment_user = models.ForeignKey(
-        User,
+        CustomUser,
         on_delete=models.CASCADE,
         related_name='users',
         help_text=_('Comment user'),
@@ -528,91 +670,97 @@ class Comment(models.Model):
         verbose_name_plural = _('Comments')
 
 
-class Profile(models.Model):
-    user = models.OneToOneField(
-        User,
-        on_delete=models.CASCADE,
-        verbose_name=_('User')
-    )
-    email_confirmed = models.BooleanField(
-        default=False,
-        verbose_name=_('E-mail')
-    )
-    bio = models.TextField(
-        max_length=500,
-        blank=True,
-        help_text=_('Few words about you'),
-        verbose_name=_('BIO')
-    )
-    location = models.CharField(
-        max_length=30,
-        blank=True,
-        help_text=_('Add your location e.g. Moscow'),
-        verbose_name=_('Location')
-    )
-    birth_date = models.DateField(
-        null=True,
-        blank=True,
-        help_text=_('Add your birthday here'),
-        verbose_name=_('Birth date')
-    )
-    avatar = models.ImageField(
-        upload_to='media/images/users',
-        verbose_name=_('Avatar image'),
-        blank=True
-    )
-
-    def __str__(self):
-        return self.user.username
-
-    def save(self, *args, **kwargs):
-        """
-        Make and save the thumbnail for the photo here.
-        """
-        super(Profile, self).save(*args, **kwargs)
-
-        if self.avatar:
-            if not self.make_avatar():
-                raise Exception(
-                    _('Could not create avatar - is the file type valid?')
-                )
-
-    def make_avatar(self):
-        basewidth = 150
-        height_size = 150
-        try:
-            img = Img.open(self.avatar)
-            img.thumbnail((basewidth, height_size), Img.ANTIALIAS)
-            img.save(self.avatar.name, format='JPEG', quality=100)
-        except:
-            return False
-        return True
-
-    def get_avatar(self):
-        try:
-            url = self.avatar.url
-        except:
-            url = '/static/images/no-avatar.png'
-        return url
-
-    def avatar_tag(self):
-        return mark_safe(
-            '<img src="%s" width="50" height="50" />' % self.get_avatar()
-        )
-
-    avatar_tag.short_description = 'Avatar'
-
-    class Meta:
-        verbose_name = _('Profile')
-        verbose_name_plural = _('Profiles')
-
-
-@receiver(post_save, sender=User)
-def update_user_profile(sender, instance, created, **kwargs):
-    if created:
-        Profile.objects.create(user=instance)
-    instance.profile.save()
-
+#class Profile(models.Model):
+#    user = models.OneToOneField(
+#        CustomUser,
+#        on_delete=models.CASCADE,
+#        verbose_name=_('User')
+#    )
+#    email_confirmed = models.BooleanField(
+#        default=False,
+#        verbose_name=_('E-mail confirmed')
+#    )
+#    bio = models.TextField(
+#        max_length=500,
+#        blank=True,
+#        help_text=_('Few words about you'),
+#        verbose_name=_('BIO')
+#    )
+#    location = models.CharField(
+#        max_length=30,
+#        blank=True,
+#        help_text=_('Add your location e.g. Moscow'),
+#        verbose_name=_('Location')
+#    )
+#    birth_date = models.DateField(
+#        null=True,
+#        blank=True,
+#        help_text=_('Add your birthday here'),
+#        verbose_name=_('Birth date')
+#    )
+#    avatar = models.ImageField(
+#        upload_to='media/images/users',
+#        verbose_name=_('Avatar image'),
+#        blank=True
+#    )
+#    lang = models.CharField(
+#        max_length=3,
+#        blank=True,
+#        help_text=_('User language'),
+#        verbose_name=_('Language')
+#    )
+#
+#    def __str__(self):
+#        return self.user.username
+#
+#    def save(self, *args, **kwargs):
+#        """
+#        Make and save the thumbnail for the photo here.
+#        """
+#        super(Profile, self).save(*args, **kwargs)
+#
+#        if self.avatar:
+#            if not self.make_avatar():
+#                raise Exception(
+#                    _('Could not create avatar - is the file type valid?')
+#                )
+#
+#    def make_avatar(self):
+#        basewidth = 300
+#        height_size = 300
+#        try:
+#            img = Img.open(self.avatar)
+#            img.thumbnail((basewidth, height_size), Img.ANTIALIAS)
+#            img.save(self.avatar.name, format='JPEG', quality=100)
+#        except:
+#            return False
+#        return True
+#
+#    def get_avatar(self):
+#        try:
+#            url = self.avatar.url
+#        except:
+#            url = '/static/images/no-avatar.png'
+#        return url
+#
+#    def avatar_tag(self):
+#        return mark_safe(
+#            '<img src="%s" width="50" height="50" />' % self.get_avatar()
+#        )
+#
+#    avatar_tag.short_description = _('Avatar')
+#
+#    class Meta:
+#        verbose_name = _('Profile')
+#        verbose_name_plural = _('Profiles')
+#
+#
+#@receiver(post_save, sender=CustomUser)
+#def update_user_profile(sender, instance, created, **kwargs):
+#    if created:
+#        Profile.objects.create(user=instance)
+#    instance.profile.save()
+#
 
 class MyMenu(MPTTModel):
     title = models.CharField(

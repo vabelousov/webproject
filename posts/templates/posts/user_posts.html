@@ -2,19 +2,25 @@
 {% load i18n %}
 {% block content %}
     <div class="container row">
+        {% if tag %}
+        <div class="">
+            <h3>{% trans 'Filtered by tag' %}: {{ tag }}</h3>
+        </div>
+        {% endif %}
         <div class="col-12">
             <div class="my-work-list-border">
                 <div class="row">
                     <div class="col">
                         <div class="row">
                             <div class="col-2">
-                                <a href="{% url 'post_create' %}">
+                                <a href="{% url 'post_create' %}?page={{page_obj.number}}">
                                     <button class="btn-sm btn-outline-primary">{% trans "New post" %}</button>
                                 </a>
                             </div>
                             <div class="col text-center">{% trans "Post" %}</div>
                         </div>
                     </div>
+                    <div class="col-2">{% trans "Tags" %}</div>
                     <div class="col-1">{% trans "Type" %}</div>
                     <div class="col-1">{% trans "Published" %}</div>
                     <div class="col-1">{% trans "Main Category" %}</div>
@@ -26,21 +32,27 @@
                 <hr>
                 {% for post in post_list %}
                 <div class="row my-work-list-padding">
-                    <div class="col"><a href="{% url 'post-detail' post.id %}">{{ post.title }}</a></div>
+                    <div class="col"><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></div>
+                    <div class="col-2">
+                       {% for tag in post.tags.all %}
+                           <a href="{% url 'user-tagged-posts' tag.slug %}"> {{ tag.name }}</a>
+                           {% if not forloop.last %}, {% endif %}
+                       {% endfor %}
+                    </div>
                     <div class="col-1">{{ post.type.description }}</div>
                     <div class="col-1">{{ post.date_published|date:"SHORT_DATE_FORMAT" }}</div>
                     <div class="col-1">{{ post.main_category.description }}</div>
                     <div class="col-1">{{ post.sub_category.description }}</div>
                     <div class="col-1">{{ post.status }}</div>
                     <div class="col-1">
-                        <a href="{% url 'post_update' post.id %}">
+                        <a href="{% url 'post_update' post.slug %}?page={{page_obj.number}}">
                             <button class="btn-sm btn-outline-secondary">{% trans "Edit" %}</button>
                         </a>
                     </div>
                     <div class="col-1">
-                        <a href="{% url 'post_delete' post.id %}"
+                        <a href="{% url 'post_delete' post.slug %}?page={{page_obj.number}}"
                            class="confirm-delete" title="Delete" data-toggle="modal"
-                           data-target="#taskModal" onclick="getUrl('{% url 'post_delete' post.id %}')">
+                           data-target="#taskModal" onclick="getUrl('{% url 'post_delete' post.slug %}')">
                             <button class="btn-sm trigger-btn btn-outline-danger">{% trans "Delete" %}</button>
                         </a>
                     </div>

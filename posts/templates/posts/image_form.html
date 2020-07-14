@@ -4,7 +4,7 @@
 {% block content %}
 <div class="container row">
     <div class="col-12">
-        <h2 class="text-center">{% trans "Edit image" %}</h2>
+        <h2 class="text-center">{% trans "Edit image" %} {{image}}</h2>
         <div class="my-page-list-border">
             <form method="post" enctype="multipart/form-data" action="">
                 {% csrf_token %}
