@@ -1,41 +1,108 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    {% block title %}<title>Above the CLOUDS</title>{% endblock %}
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" >
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
-    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Open+Sans">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.2/animate.min.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>
-
+    {% block title %}<title>Snow Summits</title>{% endblock %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta name="description" content="В горы с Белоусовым">
+    <meta name="keywords" content="Горы Альпнизм Восхождение Монблан Альпы Гид Инструктор, Горная школа, Школа альпинизма">
+    <meta name="robots" content="none">
+    <meta name="Author" content="Belousov Vladimir">
+    <meta name="Copyright" content="Belousov Vladimir">
+    <meta name="Address" content="74310, 366 Avenue de la Gare, Les Houches Le Lac, France">
     <!-- Добавление дополнительного статического CSS файла -->
     {% load static %}
-    <script src="{% static 'dropdown-menu/js/bootnavbar.js' %}"></script>
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-    <link rel="stylesheet" href="{% static 'dropdown-menu/css/bootnavbar.css' %}"/>
-
+    <link rel="stylesheet" type="text/css" href="{% static 'css/my-styles.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'font-awesome/css/font-awesome.min.css' %}">
     {% load sitemenu %}
     {% load i18n %}
     {% include 'posts/modals.html' %}
-
 </head>
 <body>
+<div class="wrapper">
+<header class="header">
+    <div class="container">
+        <div class="header__body">
+                    <a href="{% url 'index' %}" class="header__logo">
+                        <img src="/static/images/mountain.png" alt="mountain">
+                    </a>
+                    <div class="header__burger">
+                        <span></span>
+                    </div>
+                    <nav class="header__menu">
+                        <ul class="header__list">
+                            {% show_menu menu %}
+                            <li>
+                                <a href="" class="header__link js-open-modal" data-modal="modalSearch" data-id="search-modal">
+                                    &nbsp;<i class="fa fa-search" aria-hidden="true"></i>&nbsp;
+                                </a>
+                            </li>
+                            {% get_current_language as LANGUAGE_CODE %}
+                            {% get_available_languages as LANGUAGES %}
+                            {% get_language_info_list for LANGUAGES as languages %}
+                            <li>
+                                <a href="#" class="header__link">
+                                    <img src="/static/images/{{LANGUAGE_CODE}}.png">&nbsp;<span class="caret"></span></a>
+                                <span class="header__arrow arrow"></span>
+                                <ul class="submenu__list submenu__small">
+                                    {% for language in languages %}
+                                    <li>
+                                        <a class="submenu__link" href="#" lang-code="{{ language.code }}">
+                                            {% if language.code == LANGUAGE_CODE %}&#10003;{% else %}&nbsp;&nbsp;{% endif %}
+                                            <img src="/static/images/{{ language.code }}.png">
+                                            {{ language.name_local }}
+                                        </a>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </li>
+                             {% if user.is_authenticated %}
+                            <li>
+                                <a href="#" class="header__link js-open-modal" data-modal="modalProfile" data-id="profile-modal">
+                                    &nbsp;<i class="fa fa-user-o" aria-hidden="true"></i>&nbsp;
+                                </a>
+                                <span class="header__arrow arrow"></span>
+                                <ul class="submenu-left__list">
+                                    <li>
+                                        <a href="{% url 'view_profile' request.user.id %}" class="submenu-left__link js-open-modal" data-modal="modalProfile" data-id="profile-modal">
+                                            <div class="avatar__container">
+                                                <img src="{{ user.get_avatar }}" alt="avatar">
+                                            </div>
+                                        </a>
+                                    </li>
+                                    {% if user.is_superuser %}
+                                    <li><a href="/admin/" class="submenu-left__link">{% trans "Administration panel" %}</a></li>
+                                    <li><a href="{% url 'site-statistics' %}" class="submenu-left__link">{% trans "Statistics" %}</a></li>
+                                    <li><a href="{% url 'under-construction' %}" class="submenu-left__link">{% trans "Under Construction" %}</a></li>
+                                    {% endif %}
+                                    {% if perms.posts.change_post or perms.posts.change_image %}
+                                    <li>
+                                        <a class="submenu-left__link" href="">{% trans "My workspace" %}</a>
+                                        <span class="sumbenu-left__arrow arrow"></span>
+                                        <ul class="subsubmenu-left__list">
+                                            {% if perms.posts.change_post %}
+                                            <li><a href="{% url 'my-posts' %}" class="subsubmenu-left__link">{% trans "My posts" %}</a></li>
+                                            {% endif %}
+                                            {% if perms.posts.change_image %}
+                                            <li><a href="{% url 'my-images' %}" class="subsubmenu-left__link">{% trans "My images" %}</a></li>
+                                            {% endif %}
+                                            <li><a href="{% url 'typo-graphica' %}" class="subsubmenu-left__link">{% trans "Typographica" %}</a></li>
+                                        </ul>
+                                    </li>
+                                    {% endif %}
+                                    <li><a href="{% url 'view_profile' request.user.id %}" class="submenu-left__link">{% trans "Profile" %}</a></li>
+                                    <li><a href="{% url 'logout' %}?next={{ request.path }}" class="submenu-left__link">{% trans "Logout" %}</a></li>
+                                </ul>
+                            </li>
+                            {% else %}
+                            <li><a href="{% url 'remember_me_login' %}?next={{ request.path }}" class="header__link">{% trans "Login" %}</a></li>
+                            <li><a href="{% url 'signup' %}" class="header__link">{% trans "Sign Up" %}</a></li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+        </div>
+    </div>
 {% comment %}
-<div class="container-fluid top-bg">
-    <p>
-       <h1 class="logo-first-line">Above the clouds</h1>
-       <br>
-       <h6 class="logo-second-line">Exploring the world together</h6>
-    </p>
-</div>
-{% endcomment %}
-
-<header >
     <nav class="navbar navbar-expand-lg navbar-light bg-custom" id="bootnavbar">
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
                 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -116,6 +183,8 @@
             </div>
         </div>
     </nav>
+{% endcomment %}
+
     <form action="{% url 'set_language' %}" method="post" style="display: none" id="change_language_form">
        {% comment %}!!!Скрытая форма смены языка!!!{% endcomment %}
        {% csrf_token %}
@@ -128,11 +197,37 @@
 </header>
 
 <section>
-
-    {% block content %}
-    {% endblock %}
-    {% block pagination %}
+{% block content %}
+{% endblock %}
+{% block pagination %}
 {% if is_paginated %}
+<div class="pagination">
+    <div class="pagination__body">
+        {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.query %}&query={{request.GET.query }}{% endif %}">&#9668;</a>
+        {% endif %}
+    {% for i in paginator.page_range %}
+      {% if page_obj.number == i %}
+        <a class="active">{{ i }}</a>
+      {% else %}
+        {% if i == 1 or i == page_obj.previous_page_number or i == page_obj.next_page_number or i == paginator.num_pages %}
+           <a class="pagination__mobile-hide" href="?page={{ i }}{% if request.GET.query %}&query={{request.GET.query }}{% endif %}">{{ i }}</a>
+        {% else %}
+           {% if i == 2 and i < page_obj.previous_page_number %}
+           <span class="page-link">...</span>
+           {% endif %}
+           {% if i > page_obj.next_page_number and i < paginator.num_pages and i == page_obj.next_page_number|add:'1' %}
+           <span class="page-link">...</span>
+           {% endif %}
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+    {% if page_obj.has_next %}
+      <a href="?page={{ page_obj.next_page_number }}{% if request.GET.query %}&query={{request.GET.query }}{% endif %}">&#9658;</a>
+    {% endif %}
+    </div>
+</div>
+{% comment %}
   <ul class="pagination justify-content-center my-pagination-padding">
     {% if page_obj.has_previous %}
       <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.query %}&query={{request.GET.query }}{% endif %}">&#9668;</a></li>
@@ -161,8 +256,9 @@
       <li class="page-item disabled"><span class="page-link">&#9658;</span></li>
     {% endif %}
   </ul>
+{% endcomment %}
 {% endif %}
-    {% endblock %}
+{% endblock %}
 </section>
 
 <footer class="primary-footer">
@@ -176,45 +272,9 @@
     </div>
 </footer>
 
-<section id="back-top">
-    <a href="#top"><span></span></a>
-</section>
+</div>
 
-<script src="{% static 'js/js_funcs.js' %}"></script>
-    <script type="text/javascript">
-        $(function () {
-            $('#bootnavbar').bootnavbar({
-              //options
-              //animation: false
-            });
-        })
-        $('.change_language').click(function(e){
-            e.preventDefault();
-            $('#language').val($(this).attr('lang-code'));
-            $('#language-option').val($(this).attr('lang-code'));
-            $('#change_language_form').submit();
-        });
-        $(document).ready(function(){
-           // hide #back-top first
-           $("#back-top").hide();
-           $(function () {
-               $(window).scroll(function () {
-                     if ($(this).scrollTop() > 200) {
-                             $('#back-top').fadeIn();
-                     } else {
-                             $('#back-top').fadeOut();
-                     }
-               });
-
-               $('#back-top a').click(function () {
-                     $('body,html').animate({
-                             scrollTop: 0
-                     }, 600);
-                     return false;
-               });
-           });
-        });
-
-    </script>
 </body>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script src="{% static 'js/main.js' %}"></script>
 </html>

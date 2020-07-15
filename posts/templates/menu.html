@@ -1,50 +1,80 @@
 {% load mptt_tags %}
-<ul class="navbar-nav">
  {% recursetree menu %}
-
    {% if node.active and not node.footer_node %}
-  
    {% if not node.is_leaf_node %}
-     <li class="nav-item dropdown">
+     <li>
        {% if node.is_root_node %}
-         <a class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+           {% if node.reverse_url %}
+             {% if node.url_attr %}
+               <a class="header__link" href="{% url node.reverse_url node.url_attr %}">{{ node.name }}</a>
+             {% else %}
+               <a class="header__link" href="{% url node.reverse_url %}">{{ node.name }}</a>
+             {% endif %}
+           {% else %}
+             {{ node.name }}
+           {% endif %}
+         <span class="header__arrow arrow"></span>
        {% else %}
-         <a class="dropdown-item dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+           {% if node.reverse_url %}
+             {% if node.url_attr %}
+               <a class="submenu__link" href="{% url node.reverse_url node.url_attr %}">{{ node.name }}</a>
+             {% else %}
+               <a class="submenu__link" href="{% url node.reverse_url %}">{{ node.name }}</a>
+             {% endif %}
+           {% else %}
+             {{ node.name }}
+           {% endif %}
+         <span class="submenu__arrow arrow"></span>
        {% endif %}
-       {{ node.name }}</a>
    {% else %}
      {% if node.is_root_node %}
-       <li class="nav-item">
+       <li>
        {% if node.reverse_url %}
          {% if node.url_attr %}
-           <a class="nav-link" href="{% url node.reverse_url node.url_attr %}">{{ node.name }}</a>
+           <a class="header__link" href="{% url node.reverse_url node.url_attr %}">{{ node.name }}</a>
          {% else %}
-           <a class="nav-link" href="{% url node.reverse_url %}">{{ node.name }}</a>
+           <a class="header__link" href="{% url node.reverse_url %}">{{ node.name }}</a>
          {% endif %}
        {% else %}
          {{ node.name }}
        {% endif %}
      {% else %}
-       <li class="dropdown-item">
-       {% if node.reverse_url %}
-         {% if node.url_attr %}
-           <a href="{% url node.reverse_url node.url_attr %}">{{ node.name }}</a>
-         {% else %}
-           <a href="{% url node.reverse_url %}">{{ node.name }}</a>
-         {% endif %}
+       {% if node.parent.is_root_node %}
+           <li>
+           {% if node.reverse_url %}
+             {% if node.url_attr %}
+               <a class="submenu__link" href="{% url node.reverse_url node.url_attr %}">{{ node.name }}</a>
+             {% else %}
+               <a class="submenu__link" href="{% url node.reverse_url %}">{{ node.name }}</a>
+             {% endif %}
+           {% else %}
+             {{ node.name }}
+           {% endif %}
        {% else %}
-         {{ node.name }}
+           <li>
+           {% if node.reverse_url %}
+             {% if node.url_attr %}
+               <a class="subsubmenu__link" href="{% url node.reverse_url node.url_attr %}">{{ node.name }}</a>
+             {% else %}
+               <a class="subsubmenu__link" href="{% url node.reverse_url %}">{{ node.name }}</a>
+             {% endif %}
+           {% else %}
+             {{ node.name }}
+           {% endif %}
        {% endif %}
      {% endif %}
    {% endif %}
    {% if not node.is_leaf_node %}
-     <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+    {% if node.is_root_node %}
+     <ul class="submenu__list">
        {{ children }}
      </ul>
+    {% else %}
+     <ul class="subsubmenu__list">
+       {{ children }}
+     </ul>
+    {% endif %}
    {% endif %}
  </li>
-
    {% endif %}
-
 {% endrecursetree %}
-</ul>
