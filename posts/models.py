@@ -175,12 +175,6 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         verbose_name_plural = _('Users')
 
 
-#@receiver(user_logged_in)
-#def lang(sender, **kwargs):
-#    lang_code = kwargs['user'].lang
-#    kwargs['request'].session['django_language'] = lang_code
-
-
 class Type(models.Model):
     code = models.CharField(
         verbose_name=_('Code'),

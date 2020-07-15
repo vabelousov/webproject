@@ -100,14 +100,23 @@ class PostListView(generic.ListView):
                 type__code__exact=self.kwargs['type']
             ).filter(
                 main_category__code__exact=self.kwargs['category']
+            ).filter(
+                sub_category__code__exact=self.kwargs['subcategory']
             ).all()
         except:
             try:
                 qs = Post.published.filter(
                     type__code__exact=self.kwargs['type']
+                ).filter(
+                    main_category__code__exact=self.kwargs['category']
                 ).all()
             except:
-                qs = Post.published.all()
+                try:
+                    qs = Post.published.filter(
+                        type__code__exact=self.kwargs['type']
+                    ).all()
+                except:
+                    qs = Post.published.all()
         return qs
 
     def get_context_data(self, **kwargs):

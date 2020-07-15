@@ -2,9 +2,41 @@
 {% load i18n %}
 {% load posts_tags %}
 {% block content %}
+
+{% comment %}
+{% regroup post_list|dictsort:'type.code' by type.code as post_by_type_list %}
+
+    {% for type in post_by_type_list %}
+
+    {% regroup type.list|dictsort:'main_category.code' by main_category.code as post_by_cat_list %}
+
+        {% for main_category in post_by_cat_list %}
+
+        {% regroup main_category.list|dictsort:'sub_category.code' by sub_category.code as post_by_scat_list %}
+
+            {% for sub_category in post_by_scat_list %}
+
+                {{ type.grouper|type_desc }}<br>
+                {{ main_category.grouper|cat_desc }}<br>
+                {{ sub_category.grouper|cat_desc }}<br>
+
+                {% for post in sub_category.list|dictsortreversed:'date_published' %}
+                    {{ post.title }}<br>
+                {% endfor %}
+
+            {% endfor %}
+
+        {% endfor %}
+
+    {% endfor %}
+{% endcomment %}
+
+
+
 {% regroup post_list|dictsort:'type.code' by type.code as post_by_type_list %}
 <div class="container row">
     <div class="col-12">
+
         {% if tag %}
         <h1 class="text-center">{% trans "Posts" %}</h1>
         <h3 class="text-center">{% trans "tagged as" %} {{ tag }}</h3>
@@ -25,54 +57,65 @@
     {% for type in post_by_type_list %}
     {% regroup type.list|dictsort:'main_category.code' by main_category.code as post_by_cat_list %}
         {% for main_category in post_by_cat_list %}
-        <div class="my-page-list-border">
-            <div class="row">
-                <div class="col-md-10 my-cat-panel">
-                    <div class="btn-group btn-group-sm" role="group" aria-label="structure path">
-                        <a href="{% url 'pages' type.grouper %}" class="btn btn-info">
-                            {{ type.grouper|type_desc }}
-                        </a>
-                        {% if main_category.grouper %}
-                            <button type="button" class="btn btn-info">&gt;</button>
-                        <a href="{% url 'pages' type.grouper|add:'/'|add:main_category.grouper %}" class="btn btn-info">
-                            {{ main_category.grouper|cat_desc }}
-                        </a>
-                        {% endif %}
-                    </div>
-                </div>
-                {% for post in main_category.list|dictsortreversed:'date_published' %}
-                <div class="col-md-5 my-cat-itm">
-                    <div>
-                        <div class="my-cat-itm-img">
-                            <a href="{{ post.get_absolute_url }}">
-                                <img src="{{ post.get_thumbnail }}" width="100%">
+        {% regroup main_category.list|dictsort:'sub_category.code' by sub_category.code as post_by_scat_list %}
+        {% for sub_category in post_by_scat_list %}
+            <div class="my-page-list-border">
+                <div class="row">
+                    <div class="col-md-10 my-cat-panel">
+                        <div class="btn-group btn-group-sm" role="group" aria-label="structure path">
+                            <a href="{% url 'pages' type.grouper %}" class="btn btn-info">
+                                {{ type.grouper|type_desc }}
                             </a>
-                        </div>
-                        <div class="my-cat-itm-text">
-                            <h4><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></h4>
-                        </div>
-                        <div class="my-cat-itm-text">
-                        <small>{% trans "by" %} {{ post.author.first_name }} {{post.author.last_name}}</small>
-                        </div>
-                        <div class="my-cat-itm-text">
-                            <p>{{ post.summary|truncatechars:200 }}</p>
-                            {% for tg in post.tags.all %}
-                              {% if tg.slug %}
-                                <span class="tag-link-styles">
-                                    <small><a href="{% url 'tagged-posts' tg.slug %}">{{ tg }}</a></small>
-                                </span>
-                              {% endif %}
-                            {% endfor %}
+                            {% if main_category.grouper %}
+                                <button type="button" class="btn btn-info">&gt;</button>
+                            <a href="{% url 'pages' type.grouper|add:'/'|add:main_category.grouper %}" class="btn btn-info">
+                                {{ main_category.grouper|cat_desc }}
+                            </a>
+                            {% endif %}
+                            {% if sub_category.grouper %}
+                                <button type="button" class="btn btn-info">&gt;</button>
+                            <a href="{% url 'pages' type.grouper|add:'/'|add:main_category.grouper|add:'/'|add:sub_category.grouper %}" class="btn btn-info">
+                                {{ sub_category.grouper|cat_desc }}
+                            </a>
+                            {% endif %}
                         </div>
                     </div>
+                    {% for post in sub_category.list|dictsortreversed:'date_published' %}
+                        <div class="col-md-5 my-cat-itm">
+                            <div>
+                                <div class="my-cat-itm-img">
+                                    <a href="{{ post.get_absolute_url }}">
+                                        <img src="{{ post.get_thumbnail }}" width="100%">
+                                    </a>
+                                </div>
+                                <div class="my-cat-itm-text">
+                                    <h4><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></h4>
+                                </div>
+                                <div class="my-cat-itm-text">
+                                <small>{% trans "by" %} {{ post.author.first_name }} {{post.author.last_name}}</small>
+                                </div>
+                                <div class="my-cat-itm-text">
+                                    <p>{{ post.summary|truncatechars:200 }}</p>
+                                    {% for tg in post.tags.all %}
+                                      {% if tg.slug %}
+                                        <span class="tag-link-styles">
+                                            <small><a href="{% url 'tagged-posts' tg.slug %}">{{ tg }}</a></small>
+                                        </span>
+                                      {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <p class="text-center my-top-margin-100">{% trans "There are no posts" %}</p>
+                    {% endfor %}
                 </div>
-             {% empty %}
-            <p class="text-center my-top-margin-100">{% trans "There are no posts" %}</p>
-            {% endfor %}
             </div>
-        </div>
         {% empty %}
-        <p class="text-center my-top-margin-100">{% trans "There are no posts" %}</p>
+            <p class="text-center my-top-margin-100">{% trans "There are no posts" %}</p>
+        {% endfor %}
+        {% empty %}
+            <p class="text-center my-top-margin-100">{% trans "There are no posts" %}</p>
         {% endfor %}
     {% empty %}
         <p class="text-center my-top-margin-100">{% trans "There are no posts" %}</p>

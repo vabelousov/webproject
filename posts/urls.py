@@ -7,6 +7,11 @@ from . import views
 urlpatterns = [
     url(r'^$', views.index, name='index'),
     url(
+        r'^pages/(?P<type>\D+)/(?P<category>\D+)/(?P<subcategory>\D+)/$',
+        views.PostListView.as_view(),
+        name='pages'
+    ),
+    url(
         r'^pages/(?P<type>\D+)/(?P<category>\D+)/$',
         views.PostListView.as_view(),
         name='pages'
